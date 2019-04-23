@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FLServer", "FLServer\FLServer.csproj", "{777DCDE1-318D-4223-A5BD-1F6B903896E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1E101762-84C5-4957-B043-CA49B9D6CFDF}
+	EndGlobalSection
+EndGlobal
