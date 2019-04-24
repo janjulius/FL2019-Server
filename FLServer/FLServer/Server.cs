@@ -72,6 +72,21 @@ namespace FLServer
             }
         }
 
+        public ProgramResult GetUserLvl(int level)
+        {
+            using (var ctx = new PlayerContext())
+            {
+                var result = ctx.Usertest.Where(user => user.Level == level && user.Username.StartsWith('J'));
+
+                foreach(var r in result)
+                {
+                    Console.WriteLine($"{r.Username}");
+                    
+                }
+                return new ProgramResult(true);
+            }
+        }
+
         internal sealed class ProgramResult
         {
             bool Result { get; set; }
