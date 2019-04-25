@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace FLServer.Models
 {
-    public partial class Team
+    public partial class TeamPlayer
     {
         [Key]
+        public int TeamPlayerId { get; set; }
         public int TeamId { get; set; }
-        public Match Match { get; set; }
-        [ForeignKey("Match")]
-        public int MatchFK { get; set; }
-        
+        public int PlayerId { get; set; }
+
     }
 }
