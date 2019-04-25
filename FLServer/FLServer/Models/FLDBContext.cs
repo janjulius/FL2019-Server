@@ -15,6 +15,7 @@ namespace FLServer.Models
         {
         }
 
+        public virtual DbSet<Purchase> Purchase { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserFriend> UserFriend { get; set; }
 
@@ -28,6 +29,13 @@ namespace FLServer.Models
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {}
+        {
+            modelBuilder.Entity<Purchase>(entity =>
+            {
+                entity.HasIndex(e => e.UserId);
+
+                entity.HasIndex(e => e.UserId1);
+            });
+        }
     }
 }
