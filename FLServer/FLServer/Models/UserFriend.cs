@@ -1,21 +1,14 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace FLServer.Models
 {
     public partial class UserFriend
     {
+        [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
-         public string Username {get;set;}
-         public int Exp {get;set;}
-        public int Level {get;set;}
-        public DateTime CreationDate { get; set; }
-
-        public List<Usertest> Friends { get; set; }
-
         public int FriendId { get; set; }
-
     }
 }

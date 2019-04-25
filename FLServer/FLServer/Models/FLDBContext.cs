@@ -15,8 +15,17 @@ namespace FLServer.Models
         {
         }
 
+        public virtual DbSet<Purchase> Purchase { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserFriend> UserFriend { get; set; }
+        public virtual DbSet<Ability> Ability { get; set; }
+        public virtual DbSet<Character> Character { get; set; }
+        public virtual DbSet<Gamemode> Gamemode { get; set; }
+        public virtual DbSet<Map> Map { get; set; }
+        public virtual DbSet<Match> Match { get; set; }
+        public virtual DbSet<Passive> Passive { get; set; }
+        public virtual DbSet<Player> Player { get; set; }
+        public virtual DbSet<Team> Team { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -28,6 +37,11 @@ namespace FLServer.Models
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {}
+        {
+            modelBuilder.Entity<Purchase>(entity =>
+            {
+
+            });
+        }
     }
 }

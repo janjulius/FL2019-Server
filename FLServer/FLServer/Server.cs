@@ -74,9 +74,9 @@ namespace FLServer
 
         public ProgramResult GetUserLvl(int level)
         {
-            using (var ctx = new PlayerContext())
+            using (var ctx = new FLDBContext())
             {
-                var result = ctx.Usertest.Where(user => user.Level == level && user.Username.StartsWith('J'));
+                var result = ctx.User.Where(user => user.Level == level && user.Username.StartsWith('J'));
 
                 foreach(var r in result)
                 {
