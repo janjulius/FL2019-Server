@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -14,5 +15,7 @@ namespace FLServer
          public int Exp {get;set;}
         public int Level {get;set;}
         public DateTime CreationDate { get; set; }
+
+        public List<Usertest> Friends { get; set; }
     }
 }
