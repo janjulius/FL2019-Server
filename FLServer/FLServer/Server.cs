@@ -166,6 +166,15 @@ namespace FLServer
             }
         }
 
+
+        private void UpdateLastLogin(string username)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                ctx.User.Where(u => u.Username == username).First().LastOnline = DateTime.UtcNow;
+            }
+        }
+
         public static byte[] GetHash(string inputString)
         {
             HashAlgorithm algorithm = SHA256.Create();
@@ -214,7 +223,10 @@ namespace FLServer
                 var response = new NetDataWriter();
 
                 if (VerifyPassword(username, GetHashString(password)))
+                {
                     response.Put("Welcome! your login was succesful");
+                    UpdateLastLogin(username);
+                }
                 else
                     response.Put("Your credentials were incorrect or do not exist");
 
@@ -228,6 +240,7 @@ namespace FLServer
 
             dataReader.Recycle();
         }
+
 
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
