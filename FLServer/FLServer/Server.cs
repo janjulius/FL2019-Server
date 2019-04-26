@@ -19,6 +19,9 @@ namespace FLServer
         private const int Port = 9050;
         private NetManager server;
 
+        delegate string HashDelegate(string a);
+        HashDelegate myHashDelegate;
+
         private bool running = true;
 
         public void Run()
@@ -57,6 +60,7 @@ namespace FLServer
             listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
             listener.PeerDisconnectedEvent += OnListenerOnPeerDisconnectedEvent;
+            myHashDelegate += GetHashString;
             // listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Port}");
@@ -80,7 +84,7 @@ namespace FLServer
                     {
                         Username = name,
                         Level = 99,
-                        Password = GetHashString(password),
+                        Password = password,
                         CreationDate = DateTime.UtcNow,
                         Email = email
                     });
@@ -175,13 +179,13 @@ namespace FLServer
             }
         }
 
-        public static byte[] GetHash(string inputString)
+        public byte[] GetHash(string inputString)
         {
             HashAlgorithm algorithm = SHA256.Create();
             return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
 
-        public static string GetHashString(string inputString)
+        public string GetHashString(string inputString)
         {
             StringBuilder sb = new StringBuilder();
             foreach (byte b in GetHash(inputString))
@@ -213,19 +217,20 @@ namespace FLServer
                 var username = dataReader.GetString();
                 var password = dataReader.GetString();
                 var email = dataReader.GetString();
-                AddNewUser(username, password, email);
+                var hpw = GetHashString(password);
+                AddNewUser(username, hpw, email);
             }
             else if (msgid == 3) //login
             {
-                var username = dataReader.GetString();
-                var password = dataReader.GetString();
+                var u = dataReader.GetString();
+                var p = dataReader.GetString();
 
                 var response = new NetDataWriter();
-
-                if (VerifyPassword(username, GetHashString(password)))
+                var a = GetHashString(p.Trim());
+                if (VerifyPassword(u, a))
                 {
                     response.Put("Welcome! your login was succesful");
-                    UpdateLastLogin(username);
+                    UpdateLastLogin(u);
                 }
                 else
                     response.Put("Your credentials were incorrect or do not exist");
