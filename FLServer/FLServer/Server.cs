@@ -50,8 +50,8 @@ namespace FLServer
             {
                 Console.WriteLine("We got connection: {0}", peer.EndPoint); // Show peer ip
                 NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                writer.Put("Hello client!");                                // Put some string
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+                writer.Put("da050fd3-d662-4dd8-929e-0228f76b16a6");         // Put some string
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);          // Send with reliability
             };
 
             listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
