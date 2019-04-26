@@ -1,41 +1,117 @@
 ﻿
 using FLServer.Models;
+using LiteNetLib;
+using LiteNetLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace FLServer
 {
     class Server
     {
-        public Server()
-        {
+        private EventBasedNetListener listener;
+        private const int Port = 9050;
+        private NetManager server;
 
+        private bool running = true;
+
+        public void Run()
+        {
+            Console.WriteLine("Starting server..");
+            Console.WriteLine("Assigning serverlistener..");
+            listener = new EventBasedNetListener();
+            Console.WriteLine($"Serverlistener assigned: {listener.ToString()}");
+
+            Console.WriteLine("Assigning NetManager with serverlistener");
+            server = new NetManager(listener);
+            Console.WriteLine("Attempting to run server");
+            try { server.Start(Port); } catch (Exception e) { Console.WriteLine(e); }
+            //if (!server.Start(Port))
+            //{
+            //    Console.WriteLine("Server start failed");
+            //    Console.ReadKey();
+            //    return;
+            //}
+            listener.ConnectionRequestEvent += request =>
+            {
+                if (server.PeersCount < Constants.MaxConnections)
+                    request.AcceptIfKey(Constants.ConnectionKey);
+                else
+                    request.Reject();
+            };
+
+            listener.PeerConnectedEvent += peer =>
+            {
+                Console.WriteLine("We got connection: {0}", peer.EndPoint); // Show peer ip
+                NetDataWriter writer = new NetDataWriter();                 // Create writer class
+                writer.Put("Hello client!");                                // Put some string
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+            };
+
+            listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
+
+            listener.PeerDisconnectedEvent += OnListenerOnPeerDisconnectedEvent;
+            // listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
+
+            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Port}");
+            while (running)
+            {
+                server.PollEvents();
+                Thread.Sleep(15);
+            }
+
+            server.Stop();
         }
 
-        public void Run() { }
+        internal ProgramResult AddNewUser(string name, string password, string email)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                if (!UserExists(name))
+                {
 
-        internal ProgramResult AddNewUser(string name, string password)
+                    ctx.User.Add(new User()
+                    {
+                        Username = name,
+                        Level = 99,
+                        Password = GetHashString(password),
+                        CreationDate = DateTime.UtcNow,
+                        Email = email
+                    });
+                }
+                ctx.SaveChanges();
+            }
+            return new ProgramResult(true, "User added");
+        }
+
+        private bool UserExists(string name)
         {
             using (var ctx = new FLDBContext())
             {
                 var usr = ctx.User.Where(user => user.Username == name);
-            
+
                 if (usr.Any())
-                    return new ProgramResult(false, "User exists");
-            
-                ctx.User.Add(new User()
-                {
-                    Username = name,
-                    Level = 99,
-                    Password = GetHashString(password),
-                    CreationDate = DateTime.UtcNow
-                });
-                ctx.SaveChanges();
+                    return true;
             }
-            return new ProgramResult(true, "User added");
+            return false;
+        }
+
+        private bool VerifyPassword(string name, string password)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                if (UserExists(name))
+                {
+                    return ctx.User.Where(u => u.Username == name).First().Password == password;
+                }
+            }
+            return false;
         }
 
         internal ProgramResult AddFriend(string name, string toAdd)
@@ -56,7 +132,7 @@ namespace FLServer
             }
             return new ProgramResult(true, $"User {name} added {toAdd}");
         }
-        
+
         internal ProgramResult GetFriends(string name)
         {
             using (var ctx = new FLDBContext())
@@ -65,8 +141,8 @@ namespace FLServer
 
                 var res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
                 StringBuilder sb = new StringBuilder();
-                
-                foreach(var r in res)
+
+                foreach (var r in res)
                 {
                     sb.Append(
                     ctx.User.Where(a => a.UserId == r.FriendId).First().Username + ",");
@@ -81,10 +157,10 @@ namespace FLServer
             {
                 var result = ctx.User.Where(user => user.Level == level && user.Username.StartsWith('J'));
 
-                foreach(var r in result)
+                foreach (var r in result)
                 {
                     Console.WriteLine($"{r.Username}");
-                    
+
                 }
                 return new ProgramResult(true);
             }
@@ -105,10 +181,130 @@ namespace FLServer
             return sb.ToString();
         }
 
+        private void OnListenerOnConnectionRequestEvent(ConnectionRequest request)
+        {
+            Console.WriteLine("Onlistenernconnectionrequestevent");
+            if (server.PeersCount < Constants.MaxConnections)
+            {
+                request.AcceptIfKey(Constants.ConnectionKey);
+            }
+            else
+            {
+                request.Reject();
+            }
+        }
+
+        private void OnListenerOnNetworkReceiveEvent(NetPeer fromPeer, NetPacketReader dataReader,
+            DeliveryMethod deliveryMethod)
+        {
+            ushort msgid = dataReader.GetUShort();
+            
+
+            if (msgid == 2) { //register
+                var username = dataReader.GetString();
+                var password = dataReader.GetString();
+                var email = dataReader.GetString();
+                AddNewUser(username, password, email);
+            }
+            else if (msgid == 3) //login
+            {
+                var username = dataReader.GetString();
+                var password = dataReader.GetString();
+
+                var response = new NetDataWriter();
+
+                if (VerifyPassword(username, GetHashString(password)))
+                    response.Put("Welcome! your login was succesful");
+                else
+                    response.Put("Your credentials were incorrect or do not exist");
+
+                fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
+                response.Reset();
+            }
+            else
+            {
+
+            }
+
+            dataReader.Recycle();
+        }
+
+        private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
+        {
+            Console.WriteLine($"peer disconnected: {peer.EndPoint}");
+        }
+
+        private class ServerListener : INetEventListener
+        {
+            public NetManager Server;
+
+            public void OnPeerConnected(NetPeer peer)
+            {
+                Console.WriteLine("[Server] Peer connected: " + peer.EndPoint);
+                var peers = Server.GetPeers(ConnectionState.Connected);
+                foreach (var netPeer in peers)
+                {
+                    Console.WriteLine("ConnectedPeersList: id={0}, ep={1}", netPeer.Id, netPeer.EndPoint);
+                }
+            }
+
+            public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+            {
+                Console.WriteLine("[Server] Peer disconnected: " + peer.EndPoint + ", reason: " + disconnectInfo.Reason);
+            }
+
+            public void OnNetworkError(IPEndPoint endPoint, SocketError socketErrorCode)
+            {
+                Console.WriteLine("[Server] error: " + socketErrorCode);
+            }
+
+            public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+            {
+                //echo
+                peer.Send(reader.GetRemainingBytes(), deliveryMethod);
+
+                //fragment log
+                if (reader.AvailableBytes == 13218)
+                {
+                    Console.WriteLine("[Server] TestFrag: {0}, {1}",
+                        reader.RawData[reader.UserDataOffset],
+                        reader.RawData[reader.UserDataOffset + 13217]);
+                }
+            }
+
+            public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
+            {
+                Console.WriteLine("[Server] ReceiveUnconnected: {0}", reader.GetString(100));
+            }
+
+            public void OnNetworkLatencyUpdate(NetPeer peer, int latency)
+            {
+
+            }
+
+            public void OnConnectionRequest(ConnectionRequest request)
+            {
+                var acceptedPeer = request.AcceptIfKey("gamekey");
+                Console.WriteLine("[Server] ConnectionRequest. Ep: {0}, Accepted: {1}",
+                    request.RemoteEndPoint,
+                    acceptedPeer != null);
+            }
+
+            //public void OnNetworkError(IPEndPoint endPoint, SocketError socketError)
+            //{
+            //    throw new NotImplementedException();
+            //}
+            //
+            //public void OnNetworkReceiveUnconnected(IPEndPoint remoteEndPoint, NetPacketReader reader, UnconnectedMessageType messageType)
+            //{
+            //    throw new NotImplementedException();
+            //}
+        }
+
         internal sealed class ProgramResult
         {
-            bool Result { get; set; }
-            string Info { get; set; }
+            public bool Result { get; set; }
+            public string Info { get; set; }
             public ProgramResult(bool r)
             {
                 Result = r;
