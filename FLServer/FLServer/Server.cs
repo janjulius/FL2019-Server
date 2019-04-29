@@ -211,7 +211,7 @@ namespace FLServer
             DeliveryMethod deliveryMethod)
         {
             ushort msgid = dataReader.GetUShort();
-            
+
 
             if (msgid == 2) { //register
                 var username = dataReader.GetString();
@@ -219,14 +219,34 @@ namespace FLServer
                 var email = dataReader.GetString();
                 var hpw = GetHashString(password);
                 AddNewUser(username, hpw, email);
+                dataReader.Recycle();
             }
             else if (msgid == 3) //login
             {
                 var u = dataReader.GetString();
                 var p = dataReader.GetString();
 
+                var u1 = u.ToCharArray();
+                char[] u2 = new char[u1.Length - 1];
+                for(int i = 0; i < u1.Length-1; i++)
+                {
+                    u2[i] = u1[i];
+                }
+                u = new string(u2);
+
+                var p1 = p.ToCharArray();
+                char[] p2 = new char[p1.Length - 1];
+                for (int i = 0; i < p1.Length - 1; i++)
+                {
+                    p2[i] = p1[i];
+                }
+                p = new string(u2);
+
+
                 var response = new NetDataWriter();
-                var a = GetHashString(p.Trim());
+
+                var a = GetHashString(p);
+                Console.WriteLine($"{u}:{p} hash = {a}");
                 if (VerifyPassword(u, a))
                 {
                     response.Put("Welcome! your login was succesful");
