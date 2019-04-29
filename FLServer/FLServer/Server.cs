@@ -240,7 +240,7 @@ namespace FLServer
                 {
                     p2[i] = p1[i];
                 }
-                p = new string(u2);
+                p = new string(p2);
 
 
                 var response = new NetDataWriter();
