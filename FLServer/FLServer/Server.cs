@@ -249,11 +249,11 @@ namespace FLServer
                 Console.WriteLine($"{u}:{p} hash = {a}");
                 if (VerifyPassword(u, a))
                 {
-                    response.Put("Welcome! your login was succesful");
+                    response.Put("caf26bd3-a741-426d-9128-6a3f1a030452"); //succesful login
                     UpdateLastLogin(u);
                 }
                 else
-                    response.Put("Your credentials were incorrect or do not exist");
+                    response.Put("5213bb7a-6070-4b6c-b1b7-816bbfd060ac"); //bad credentials
 
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
@@ -322,7 +322,7 @@ namespace FLServer
 
             public void OnConnectionRequest(ConnectionRequest request)
             {
-                var acceptedPeer = request.AcceptIfKey("gamekey");
+                var acceptedPeer = request.AcceptIfKey("9292e1a2-9684-4fb3-98db-bef29fcec999");
                 Console.WriteLine("[Server] ConnectionRequest. Ep: {0}, Accepted: {1}",
                     request.RemoteEndPoint,
                     acceptedPeer != null);
