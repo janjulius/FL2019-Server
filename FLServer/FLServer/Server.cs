@@ -30,6 +30,13 @@ namespace FLServer
             listener = new EventBasedNetListener();
             Console.WriteLine($"Serverlistener assigned: {listener.ToString()}");
 
+            //update server version
+            if (Constants.UpdateVersion)
+            {
+                Console.WriteLine("Updating server version.");
+                Console.WriteLine(SetNewVersion(Constants.ServerVersion));
+            }
+
             Console.WriteLine("Assigning NetManager with serverlistener");
             server = new NetManager(listener);
             Console.WriteLine("Attempting to run server");
@@ -76,14 +83,25 @@ namespace FLServer
         {
             using (var ctx = new FLDBContext())
             {
-                ctx.ServerVersion.Add(new ServerVersion() {
-                    VersionNr = versionNumber
-                });
+                var n = ctx.ServerVersion.First().VersionNr;
+                if (n == versionNumber)
+                {
+                    return new ProgramResult(true, $"Version already up to date ({versionNumber}).");
+                }
+                ctx.ServerVersion.First().VersionNr = versionNumber;
                 ctx.SaveChanges();
-            }
-            return new ProgramResult(true, "Server version updated");         
+                return new ProgramResult(true, $"Server version updated from {n} to {versionNumber}");
+            }      
         }
 
+        internal string GetVersion()
+        {
+            using (var ctx = new FLDBContext())
+            {
+                return ctx.ServerVersion.First().VersionNr;
+            }
+        }
+        
         internal ProgramResult AddNewUser(string name, string password, string email)
         {
             using (var ctx = new FLDBContext())
