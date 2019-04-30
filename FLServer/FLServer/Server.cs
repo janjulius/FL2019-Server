@@ -25,7 +25,7 @@ namespace FLServer
 
         public void Run()
         {
-            Console.WriteLine("Starting server..");
+            Console.WriteLine("Starting Login server..");
             Console.WriteLine("Assigning serverlistener..");
             listener = new EventBasedNetListener();
             Console.WriteLine($"Serverlistener assigned: {listener.ToString()}");
