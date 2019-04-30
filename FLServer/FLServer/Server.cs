@@ -16,7 +16,6 @@ namespace FLServer
     class Server
     {
         private EventBasedNetListener listener;
-        private const int Port = 9050;
         private NetManager server;
 
         delegate string HashDelegate(string a);
@@ -34,7 +33,7 @@ namespace FLServer
             Console.WriteLine("Assigning NetManager with serverlistener");
             server = new NetManager(listener);
             Console.WriteLine("Attempting to run server");
-            try { server.Start(Port); } catch (Exception e) { Console.WriteLine(e); }
+            try { server.Start(Constants.Port); } catch (Exception e) { Console.WriteLine(e); }
             //if (!server.Start(Port))
             //{
             //    Console.WriteLine("Server start failed");
@@ -63,7 +62,7 @@ namespace FLServer
             myHashDelegate += GetHashString;
             // listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
-            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Port}");
+            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
             while (running)
             {
                 server.PollEvents();
@@ -257,7 +256,6 @@ namespace FLServer
                 var response = new NetDataWriter();
 
                 var a = GetHashString(p);
-                Console.WriteLine($"{u}:{p} hash = {a}");
                 if (VerifyPassword(u, a))
                 {
                     response.Put("caf26bd3-a741-426d-9128-6a3f1a030452"); //succesful login
