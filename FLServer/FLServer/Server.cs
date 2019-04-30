@@ -73,6 +73,18 @@ namespace FLServer
             server.Stop();
         }
 
+        internal ProgramResult SetNewVersion(string versionNumber)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                ctx.ServerVersion.Add(new ServerVersion() {
+                    VersionNr = versionNumber
+                });
+                ctx.SaveChanges();
+            }
+            return new ProgramResult(true, "Server version updated");         
+        }
+
         internal ProgramResult AddNewUser(string name, string password, string email)
         {
             using (var ctx = new FLDBContext())
@@ -242,7 +254,6 @@ namespace FLServer
                 }
                 p = new string(p2);
 
-
                 var response = new NetDataWriter();
 
                 var a = GetHashString(p);
@@ -257,6 +268,10 @@ namespace FLServer
 
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
+            }
+            else if (msgid == 3) //Send server version
+            {
+
             }
             else
             {
