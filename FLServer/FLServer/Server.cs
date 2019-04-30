@@ -16,7 +16,6 @@ namespace FLServer
     class Server
     {
         private EventBasedNetListener listener;
-        private const int Port = 9050;
         private NetManager server;
 
         delegate string HashDelegate(string a);
@@ -34,7 +33,7 @@ namespace FLServer
             Console.WriteLine("Assigning NetManager with serverlistener");
             server = new NetManager(listener);
             Console.WriteLine("Attempting to run server");
-            try { server.Start(Port); } catch (Exception e) { Console.WriteLine(e); }
+            try { server.Start(Constants.Port); } catch (Exception e) { Console.WriteLine(e); }
             //if (!server.Start(Port))
             //{
             //    Console.WriteLine("Server start failed");
@@ -63,7 +62,7 @@ namespace FLServer
             myHashDelegate += GetHashString;
             // listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
-            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Port}");
+            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
             while (running)
             {
                 server.PollEvents();
