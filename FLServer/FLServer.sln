@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FL-Login_Server", "FLServer\FL-Login_Server.csproj", "{777DCDE1-318D-4223-A5BD-1F6B903896E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FL-Master_Server", "FL-Master_Server\FL-Master_Server.csproj", "{7AB7D500-86D6-4831-A8F9-AF5F131342C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FL-Game_Server", "FL-Game_Server\FL-Game_Server.csproj", "{2879CD70-5200-4F75-866B-3DAB3C332C75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{777DCDE1-318D-4223-A5BD-1F6B903896E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AB7D500-86D6-4831-A8F9-AF5F131342C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AB7D500-86D6-4831-A8F9-AF5F131342C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AB7D500-86D6-4831-A8F9-AF5F131342C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AB7D500-86D6-4831-A8F9-AF5F131342C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2879CD70-5200-4F75-866B-3DAB3C332C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2879CD70-5200-4F75-866B-3DAB3C332C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2879CD70-5200-4F75-866B-3DAB3C332C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2879CD70-5200-4F75-866B-3DAB3C332C75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
