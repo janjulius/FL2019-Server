@@ -16,7 +16,6 @@ namespace FLServer
     class Server
     {
         private EventBasedNetListener listener;
-        private const int Port = 9050;
         private NetManager server;
 
         delegate string HashDelegate(string a);
@@ -34,7 +33,7 @@ namespace FLServer
             Console.WriteLine("Assigning NetManager with serverlistener");
             server = new NetManager(listener);
             Console.WriteLine("Attempting to run server");
-            try { server.Start(Port); } catch (Exception e) { Console.WriteLine(e); }
+            try { server.Start(Constants.Port); } catch (Exception e) { Console.WriteLine(e); }
             //if (!server.Start(Port))
             //{
             //    Console.WriteLine("Server start failed");
@@ -63,7 +62,7 @@ namespace FLServer
             myHashDelegate += GetHashString;
             // listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
-            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Port}");
+            Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
             while (running)
             {
                 server.PollEvents();
@@ -211,7 +210,7 @@ namespace FLServer
             DeliveryMethod deliveryMethod)
         {
             ushort msgid = dataReader.GetUShort();
-            
+
 
             if (msgid == 2) { //register
                 var username = dataReader.GetString();
@@ -219,21 +218,23 @@ namespace FLServer
                 var email = dataReader.GetString();
                 var hpw = GetHashString(password);
                 AddNewUser(username, hpw, email);
+                dataReader.Recycle();
             }
             else if (msgid == 3) //login
             {
                 var u = dataReader.GetString();
                 var p = dataReader.GetString();
-
+                
                 var response = new NetDataWriter();
-                var a = GetHashString(p.Trim());
+
+                var a = GetHashString(p);
                 if (VerifyPassword(u, a))
                 {
-                    response.Put("Welcome! your login was succesful");
+                    response.Put("caf26bd3-a741-426d-9128-6a3f1a030452"); //succesful login
                     UpdateLastLogin(u);
                 }
                 else
-                    response.Put("Your credentials were incorrect or do not exist");
+                    response.Put("5213bb7a-6070-4b6c-b1b7-816bbfd060ac"); //bad credentials
 
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
@@ -302,7 +303,7 @@ namespace FLServer
 
             public void OnConnectionRequest(ConnectionRequest request)
             {
-                var acceptedPeer = request.AcceptIfKey("gamekey");
+                var acceptedPeer = request.AcceptIfKey("9292e1a2-9684-4fb3-98db-bef29fcec999");
                 Console.WriteLine("[Server] ConnectionRequest. Ep: {0}, Accepted: {1}",
                     request.RemoteEndPoint,
                     acceptedPeer != null);
