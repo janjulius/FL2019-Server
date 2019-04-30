@@ -26,6 +26,7 @@ namespace FLServer.Models
         public virtual DbSet<Passive> Passive { get; set; }
         public virtual DbSet<Player> Player { get; set; }
         public virtual DbSet<Team> Team { get; set; }
+        public virtual DbSet<ServerVersion> ServerVersion {get; set;}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
