@@ -6,4 +6,14 @@
     <RootNamespace>FL_Patch_Server</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FLServer\FL-Login_Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LiteNetLib">
+      <HintPath>..\FLServer\bin\Debug\netcoreapp2.1\LiteNetLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

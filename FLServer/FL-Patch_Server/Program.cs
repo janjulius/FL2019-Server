@@ -6,7 +6,9 @@ namespace FL_Patch_Server
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            PatchServer server = new PatchServer();
+            server.Run();
+            Console.ReadKey();
         }
     }
 }
