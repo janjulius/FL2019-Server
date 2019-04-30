@@ -254,23 +254,7 @@ namespace FLServer
             {
                 var u = dataReader.GetString();
                 var p = dataReader.GetString();
-
-                var u1 = u.ToCharArray();
-                char[] u2 = new char[u1.Length - 1];
-                for(int i = 0; i < u1.Length-1; i++)
-                {
-                    u2[i] = u1[i];
-                }
-                u = new string(u2);
-
-                var p1 = p.ToCharArray();
-                char[] p2 = new char[p1.Length - 1];
-                for (int i = 0; i < p1.Length - 1; i++)
-                {
-                    p2[i] = p1[i];
-                }
-                p = new string(p2);
-
+                
                 var response = new NetDataWriter();
 
                 var a = GetHashString(p);
@@ -285,7 +269,7 @@ namespace FLServer
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
             }
-            else if (msgid == 3) //Send server version
+            else if (msgid == 4) //Send server version
             {
 
             }
