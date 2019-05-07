@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LiteNetLib" Version="0.8.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="LiteNetLib">
       <HintPath>..\FLServer\bin\Debug\netcoreapp2.1\LiteNetLib.dll</HintPath>
     </Reference>
