@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using FLServer.Models;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace FL_Patch_Server
                 string serverVersion;
                 var response = new NetDataWriter();
 
-                using (var ctx = new FLServer.Models.FLDBContext())
+                using (var ctx = new FLDBContext())
                 {
                     serverVersion = ctx.ServerVersion.First().VersionNr;
                 }
@@ -79,7 +80,7 @@ namespace FL_Patch_Server
             if(msgid == 2)
             {
                 var response = new NetDataWriter();
-                using (var ctx = new FLServer.Models.FLDBContext())
+                using (var ctx = new FLDBContext())
                 {
                     response.Put(ctx.ServerVersion.First().VersionNr);
                 }

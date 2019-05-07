@@ -1,5 +1,4 @@
-﻿
-using FLServer.Models;
+﻿using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using System;
@@ -13,7 +12,7 @@ using System.Threading;
 
 namespace FLServer
 {
-    class Server
+    class LoginServer
     {
         private EventBasedNetListener listener;
         private NetManager server;
@@ -112,7 +111,8 @@ namespace FLServer
                     ctx.User.Add(new User()
                     {
                         Username = name,
-                        Level = 99,
+                        UniqueIdentifier = new Guid().ToString(),
+                        Level = 0,
                         Password = password,
                         CreationDate = DateTime.UtcNow,
                         Email = email

@@ -14,6 +14,7 @@ namespace FLServer.Models
         public string Password { get; set; }
         [Required]
         public string Email { get; set; }
+        public string UniqueIdentifier { get; set; }
         public int NormalElo { get; set; }
         public int RankedElo { get; set; }
         public int Exp { get; set; }

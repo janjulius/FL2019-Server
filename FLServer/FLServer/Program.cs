@@ -6,7 +6,7 @@ namespace FLServer
     {
         static void Main(string[] args)
         {
-            Server server = new Server();
+            LoginServer server = new LoginServer();
             server.Run();
             Console.ReadKey();
         }

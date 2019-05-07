@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LiteNetLib;
+using System;
 
 namespace FL_Master_Server
 {
@@ -6,7 +7,12 @@ namespace FL_Master_Server
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            MasterServer server = new MasterServer();
+            server.Run();
+            Console.ReadKey();
         }
+
+        
+
     }
 }
