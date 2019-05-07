@@ -184,6 +184,15 @@ namespace FLServer
             }
         }
 
+
+        private string GetUniqueIdentifier(string u)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                return ctx.User.Where(a => a.Username == u).First().UniqueIdentifier;
+            }
+        }
+
         public ProgramResult GetUserLvl(int level)
         {
             using (var ctx = new FLDBContext())
@@ -261,11 +270,16 @@ namespace FLServer
                 if (VerifyPassword(u, a))
                 {
                     response.Put("caf26bd3-a741-426d-9128-6a3f1a030452"); //succesful login
+                    string t = GetUniqueIdentifier(u);
+                    response.Put(t);
                     UpdateLastLogin(u);
                 }
                 else
+                {
                     response.Put("5213bb7a-6070-4b6c-b1b7-816bbfd060ac"); //bad credentials
+                }
 
+                
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
             }

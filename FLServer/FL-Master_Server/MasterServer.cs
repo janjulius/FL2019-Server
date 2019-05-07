@@ -58,9 +58,10 @@ namespace FL_Master_Server
             ushort msgid = dataReader.GetUShort();
 
 
-            if (msgid == 2)
-            { 
-
+            if (msgid == 423)
+            {
+                string id = dataReader.GetString();
+                Console.WriteLine($"Got a conection from UniquePlayer: {id}");
             }
             else
             {
