@@ -1,6 +1,8 @@
 ﻿using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Shared.Security;
+using Shared.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +67,7 @@ namespace FLServer
             listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
             listener.PeerDisconnectedEvent += OnListenerOnPeerDisconnectedEvent;
-            myHashDelegate += GetHashString;
+            myHashDelegate += Security.GetHashString;
             // listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
@@ -105,7 +107,7 @@ namespace FLServer
         {
             using (var ctx = new FLDBContext())
             {
-                if (!UserExists(name))
+                if (!UserMethods.UserExists(name))
                 {
 
                     ctx.User.Add(new User()
@@ -121,30 +123,6 @@ namespace FLServer
                 ctx.SaveChanges();
             }
             return new ProgramResult(true, "User added");
-        }
-
-        private bool UserExists(string name)
-        {
-            using (var ctx = new FLDBContext())
-            {
-                var usr = ctx.User.Where(user => user.Username == name);
-
-                if (usr.Any())
-                    return true;
-            }
-            return false;
-        }
-
-        private bool VerifyPassword(string name, string password)
-        {
-            using (var ctx = new FLDBContext())
-            {
-                if (UserExists(name))
-                {
-                    return ctx.User.Where(u => u.Username == name).First().Password == password;
-                }
-            }
-            return false;
         }
 
         internal ProgramResult AddFriend(string name, string toAdd)
@@ -209,28 +187,9 @@ namespace FLServer
         }
 
 
-        private void UpdateLastLogin(string username)
-        {
-            using (var ctx = new FLDBContext())
-            {
-                ctx.User.Where(u => u.Username == username).First().LastOnline = DateTime.UtcNow;
-            }
-        }
+        
 
-        public byte[] GetHash(string inputString)
-        {
-            HashAlgorithm algorithm = SHA256.Create();
-            return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-        }
-
-        public string GetHashString(string inputString)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in GetHash(inputString))
-                sb.Append(b.ToString("X2"));
-
-            return sb.ToString();
-        }
+        
 
         private void OnListenerOnConnectionRequestEvent(ConnectionRequest request)
         {
@@ -255,7 +214,7 @@ namespace FLServer
                 var username = dataReader.GetString();
                 var password = dataReader.GetString();
                 var email = dataReader.GetString();
-                var hpw = GetHashString(password);
+                var hpw = Security.GetHashString(password);
                 AddNewUser(username, hpw, email);
                 dataReader.Recycle();
             }
@@ -266,13 +225,13 @@ namespace FLServer
                 
                 var response = new NetDataWriter();
 
-                var a = GetHashString(p);
-                if (VerifyPassword(u, a))
+                var a = Security.GetHashString(p);
+                if (UserMethods.VerifyPassword(u, a))
                 {
                     response.Put("caf26bd3-a741-426d-9128-6a3f1a030452"); //succesful login
                     string t = GetUniqueIdentifier(u);
                     response.Put(t);
-                    UpdateLastLogin(u);
+                    UserMethods.UpdateLastLogin(u);
                 }
                 else
                 {

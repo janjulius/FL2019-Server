@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using FL_Master_Server.User;
+using LiteNetLib;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +13,8 @@ namespace FL_Master_Server
         private NetManager server;
 
         private bool running = true;
+
+        List<NetworkUser> NetworkUsers = new List<NetworkUser>();
 
         public void Run()
         {
