@@ -41,5 +41,19 @@ namespace Shared.Users
             }
         }
 
+        public static IEnumerable<User> GetFriends(string name)
+        {
+            IEnumerable<User> users;
+
+            using (var ctx = new FLDBContext())
+            {
+                var user = ctx.User.Where(u => u.Username == name).First();
+
+                var res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
+
+                
+            }
+        }
+
     }
 }

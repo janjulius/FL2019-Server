@@ -144,23 +144,7 @@ namespace FLServer
             return new ProgramResult(true, $"User {name} added {toAdd}");
         }
 
-        internal ProgramResult GetFriends(string name)
-        {
-            using (var ctx = new FLDBContext())
-            {
-                var user = ctx.User.Where(u => u.Username == name).First();
 
-                var res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
-                StringBuilder sb = new StringBuilder();
-
-                foreach (var r in res)
-                {
-                    sb.Append(
-                    ctx.User.Where(a => a.UserId == r.FriendId).First().Username + ",");
-                }
-                return new ProgramResult(true, sb.ToString());
-            }
-        }
 
 
         private string GetUniqueIdentifier(string u)

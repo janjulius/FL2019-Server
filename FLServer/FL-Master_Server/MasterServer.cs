@@ -68,6 +68,10 @@ namespace FL_Master_Server
                 Console.WriteLine($"Got a conection from UniquePlayer: {id}");
                 fromPeer.Disconnect();
             }
+            else if (msgid == 88)
+            {
+
+            }
             else
             {
 
