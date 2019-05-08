@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FL_Master_Server.Levels
+namespace Shared.Levels
 {
-    class ProgressCalculator
+    public class ProgressCalculator
     {
         int minlevel = 1;
         int maxlevel = 100;

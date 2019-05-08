@@ -61,7 +61,9 @@ namespace FL_Master_Server
             if (msgid == 423)
             {
                 string id = dataReader.GetString();
+                string pwd = dataReader.GetString();
                 Console.WriteLine($"Got a conection from UniquePlayer: {id}");
+                fromPeer.Disconnect();
             }
             else
             {
