@@ -16,6 +16,11 @@ namespace Shared.Security
             return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
 
+        /// <summary>
+        /// Returns the hashed version of the given inputstring
+        /// </summary>
+        /// <param name="inputString">String</param>
+        /// <returns></returns>
         public static string GetHashString(string inputString)
         {
             StringBuilder sb = new StringBuilder();

@@ -13,6 +13,10 @@ namespace Shared.Levels
         double divider = 4;
         double div = 8.0f;
 
+        /// <summary>
+        /// Returns a dictionary of the curve
+        /// </summary>
+        /// <returns>Dictionary int level, experience double</returns>
         public Dictionary<int, double> Curve()
         {
             Dictionary<int, double> lvlExpValues = new Dictionary<int, double>(); //lvl:exp
@@ -32,6 +36,11 @@ namespace Shared.Levels
             return lvlExpValues;
         }
 
+        /// <summary>
+        /// Returns the minumum experience for the given level
+        /// </summary>
+        /// <param name="level">Level</param>
+        /// <returns></returns>
         public double getExperienceByLevel(int level)
         {
             double points = 0;
@@ -50,6 +59,11 @@ namespace Shared.Levels
             return 0;
         }
 
+        /// <summary>
+        /// Returns the level of the given experience
+        /// </summary>
+        /// <param name="experience">Experience</param>
+        /// <returns>int Level</returns>
         public int GetLevelByExperience(double experience)
         {
             int rlvl = -1;

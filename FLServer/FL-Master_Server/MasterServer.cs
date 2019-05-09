@@ -78,11 +78,12 @@ namespace FL_Master_Server
                 }
                 else
                 {
-                    NetDataWriter writer = new NetDataWriter();         
+                    NetDataWriter writer = new NetDataWriter();
+                    FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                     writer.Put((ushort)2004);
-                    writer.Put((uint)UserMethods.GetUserBalance(id));
-                    writer.Put((uint)UserMethods.GetUserPremiumBalance(id));
-                    writer.Put(id);
+                    writer.Put(u.Balance);
+                    writer.Put(u.PremiumBalance);
+                    writer.Put(u.Username);
                     fromPeer.Send(writer, DeliveryMethod.Unreliable);  
                 }
 

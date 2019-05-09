@@ -11,9 +11,9 @@ namespace Shared.Users
     {
         public static bool UserExists(string name)
         {
-            using (var ctx = new FLDBContext())
+            using (FLDBContext ctx = new FLDBContext())
             {
-                var usr = ctx.User.Where(user => user.Username == name);
+                IQueryable<User> usr = ctx.User.Where(user => user.Username == name);
         
                 if (usr.Any())
                     return true;
@@ -23,29 +23,70 @@ namespace Shared.Users
         
         public static void UpdateLastLogin(string username)
         {
-            using (var ctx = new FLDBContext())
+            using (FLDBContext ctx = new FLDBContext())
             {
                 ctx.User.Where(u => u.Username == username).First().LastOnline = DateTime.UtcNow;
             }
         }
-
-        public static int GetUserBalance(string username)
+        
+        public static bool AddFriend(User source, User target)
         {
-            return GetUserByUsername(username).Balance;
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                int uId = ctx.User.Where(u => u == source).First().UserId;
+                int fId = ctx.User.Where(f => f == target).First().UserId;
+
+                if (ctx.UserFriend.Where(a => a.UserId == uId && a.FriendId == fId).Any())
+                    return false;
+
+                ctx.UserFriend.Add(
+                    new UserFriend()
+                    {
+                        UserId = uId,
+                        FriendId = fId
+                    });
+                ctx.SaveChanges();
+            }
+            return true;
         }
 
-        public static int GetUserPremiumBalance(string username)
+        public static void GetFriends(string name)
         {
-            return GetUserByUsername(username).PremiumBalance;
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User user = ctx.User.Where(u => u.Username == name).First();
+
+                IEnumerable<UserFriend> res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
+                StringBuilder sb = new StringBuilder();
+
+                foreach (UserFriend r in res)
+                {
+                    sb.Append(
+                    ctx.User.Where(a => a.UserId == r.FriendId).First().Username + ",");
+                }
+                return;
+            }
         }
 
-        private static User GetUserByUsername(string username)
+        /// <summary>
+        /// gets the user by name
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public static User GetUserByUsername(string username)
         {
-            using (var ctx = new FLDBContext())
+            using (FLDBContext ctx = new FLDBContext())
             {
                 return ctx.User.Where(u => u.Username == username).First();
             }
         }
 
+        public static User GetUserByUniqueIdentifier(string uid)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return ctx.User.Where(u => u.UniqueIdentifier == uid).First();
+            }
+        }
     }
 }
