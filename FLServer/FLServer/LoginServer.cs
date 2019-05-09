@@ -1,6 +1,7 @@
 ﻿using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Shared.Authentication;
 using Shared.Security;
 using Shared.Users;
 using System;
@@ -60,7 +61,7 @@ namespace FLServer
             {
                 Console.WriteLine("We got connection: {0}", peer.EndPoint); // Show peer ip
                 NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                writer.Put("da050fd3-d662-4dd8-929e-0228f76b16a6");         // Put some string
+                writer.Put((ushort)2003);         // Put some string
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);          // Send with reliability
             };
 
@@ -226,16 +227,16 @@ namespace FLServer
                 var response = new NetDataWriter();
 
                 var a = Security.GetHashString(p);
-                if (UserMethods.VerifyPassword(u, a))
+                if (UserAuth.VerifyPassword(u, a))
                 {
-                    response.Put("caf26bd3-a741-426d-9128-6a3f1a030452"); //succesful login
+                    response.Put((ushort)2002); //succesful login
                     string t = GetUniqueIdentifier(u);
                     response.Put(t);
                     UserMethods.UpdateLastLogin(u);
                 }
                 else
                 {
-                    response.Put("5213bb7a-6070-4b6c-b1b7-816bbfd060ac"); //bad credentials
+                    response.Put((ushort)2001); //bad credentials
                 }
 
                 

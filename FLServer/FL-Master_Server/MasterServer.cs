@@ -1,5 +1,9 @@
 ﻿using FL_Master_Server.User;
 using LiteNetLib;
+using LiteNetLib.Utils;
+using Shared.Authentication;
+using Shared.Security;
+using Shared.Users;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -64,9 +68,24 @@ namespace FL_Master_Server
             if (msgid == 423)
             {
                 string id = dataReader.GetString();
-                string pwd = dataReader.GetString();
+                string pwd = Security.GetHashString(dataReader.GetString());
                 Console.WriteLine($"Got a conection from UniquePlayer: {id}");
-                fromPeer.Disconnect();
+                Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
+                if (!UserAuth.VerifyPassword(id, pwd))
+                {
+                    Console.WriteLine("Authetication failed disconnectin the user");
+                    fromPeer.Disconnect();
+                }
+                else
+                {
+                    NetDataWriter writer = new NetDataWriter();         
+                    writer.Put((ushort)2004);
+                    writer.Put((uint)UserMethods.GetUserBalance(id));
+                    writer.Put((uint)UserMethods.GetUserPremiumBalance(id));
+                    writer.Put(id);
+                    fromPeer.Send(writer, DeliveryMethod.Unreliable);  
+                }
+
             }
             else
             {
