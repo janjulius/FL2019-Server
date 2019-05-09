@@ -10,7 +10,7 @@ namespace Shared.Security
     public static class Security
     {
 
-        public static byte[] GetHash(string inputString)
+        internal static byte[] GetHash(string inputString)
         {
             HashAlgorithm algorithm = SHA256.Create();
             return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));

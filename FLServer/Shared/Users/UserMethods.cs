@@ -20,24 +20,30 @@ namespace Shared.Users
             }
             return false;
         }
-
-        public static bool VerifyPassword(string name, string password)
-        {
-            using (var ctx = new FLDBContext())
-            {
-                if (UserMethods.UserExists(name))
-                {
-                    return ctx.User.Where(u => u.Username == name).First().Password == password;
-                }
-            }
-            return false;
-        }
-
+        
         public static void UpdateLastLogin(string username)
         {
             using (var ctx = new FLDBContext())
             {
                 ctx.User.Where(u => u.Username == username).First().LastOnline = DateTime.UtcNow;
+            }
+        }
+
+        public static int GetUserBalance(string username)
+        {
+            return GetUserByUsername(username).Balance;
+        }
+
+        public static int GetUserPremiumBalance(string username)
+        {
+            return GetUserByUsername(username).PremiumBalance;
+        }
+
+        private static User GetUserByUsername(string username)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                return ctx.User.Where(u => u.Username == username).First();
             }
         }
 

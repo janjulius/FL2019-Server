@@ -1,16 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FLServer.Models;
+using Shared.Users;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shared.Authentication
 {
-    public class UserAuth
+    public static class UserAuth
     {
-
-        public bool AuthenticateUser(string name, string pass)
+        public static bool AuthenticateUser(string name, string pass)
         {
+            return VerifyPassword(name, pass);
+        }
+
+        public static bool VerifyPassword(string name, string hashedPassword)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                if (UserMethods.UserExists(name))
+                {
+                    return ctx.User.Where(u => u.Username == name).First().Password == hashedPassword;
+                }
+            }
             return false;
         }
     }
