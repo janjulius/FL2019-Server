@@ -4,16 +4,14 @@ using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace FLServer.Migrations
+namespace FL_Login_Server.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    [Migration("20190430091023_2019_4_30_0")]
-    partial class _2019_4_30_0
+    partial class FLDBContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -195,6 +193,18 @@ namespace FLServer.Migrations
                     b.ToTable("Purchase");
                 });
 
+            modelBuilder.Entity("FLServer.Models.ServerVersion", b =>
+                {
+                    b.Property<string>("VersionId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("VersionNr");
+
+                    b.HasKey("VersionId");
+
+                    b.ToTable("ServerVersion");
+                });
+
             modelBuilder.Entity("FLServer.Models.Team", b =>
                 {
                     b.Property<int>("TeamId")
@@ -241,6 +251,8 @@ namespace FLServer.Migrations
                     b.Property<int>("RankedElo");
 
                     b.Property<string>("Status");
+
+                    b.Property<string>("UniqueIdentifier");
 
                     b.Property<string>("Username")
                         .IsRequired();

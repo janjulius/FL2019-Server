@@ -4,10 +4,16 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>FL_Patch_Server</RootNamespace>
+    <Configurations>Debug;Release;All servers</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FLServer\FL-Login_Server.csproj" />
+    <PackageReference Include="LiteNetLib" Version="0.8.3.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
