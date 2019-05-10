@@ -84,6 +84,9 @@ namespace FL_Master_Server
                     writer.Put(u.Balance);
                     writer.Put(u.PremiumBalance);
                     writer.Put(u.Username);
+                    writer.Put(u.Avatar);
+                    writer.Put(u.Level);
+                    writer.Put(u.Exp);
                     fromPeer.Send(writer, DeliveryMethod.Unreliable);  
                 }
 
