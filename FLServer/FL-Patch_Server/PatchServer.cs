@@ -1,6 +1,7 @@
 ﻿using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Shared.General;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,16 +64,13 @@ namespace FL_Patch_Server
                 string serverVersion;
                 var response = new NetDataWriter();
 
-                using (var ctx = new FLDBContext())
+                serverVersion = General.GetVersion();
+                if (peerVersion == serverVersion)
                 {
-                    serverVersion = ctx.ServerVersion.First().VersionNr;
+                    response.Put("patcher-1"); //succesful 
                 }
-                    if (peerVersion == serverVersion)
-                    {
-                        response.Put("patcher-1"); //succesful 
-                    }
-                    else
-                        response.Put("patcher-2"); //bad 
+                else
+                    response.Put("patcher-2"); //bad 
 
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
@@ -80,10 +78,7 @@ namespace FL_Patch_Server
             if(msgid == 2)
             {
                 var response = new NetDataWriter();
-                using (var ctx = new FLDBContext())
-                {
-                    response.Put(ctx.ServerVersion.First().VersionNr);
-                }
+                response.Put(General.GetVersion());
                 fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
                 response.Reset();
             }
