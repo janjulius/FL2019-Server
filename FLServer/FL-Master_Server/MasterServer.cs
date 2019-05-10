@@ -65,7 +65,7 @@ namespace FL_Master_Server
             ushort msgid = dataReader.GetUShort();
 
 
-            if (msgid == 423)
+            if (msgid == 423) //load into master server PACKETS:PROFILEPARTINFO
             {
                 string id = dataReader.GetString();
                 string pwd = Security.GetHashString(dataReader.GetString());
@@ -90,6 +90,24 @@ namespace FL_Master_Server
                     fromPeer.Send(writer, DeliveryMethod.Unreliable);  
                 }
 
+            }
+            else if(msgid == 424) //get player profile PACKETS:PROFILEACCOUNTINFO
+            {
+                string id = dataReader.GetString();
+                NetDataWriter writer = new NetDataWriter();
+                FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+                if(u != null) //player exists
+                {
+                    writer.Put((ushort)2005);
+                    writer.Put(u.Username);
+                    writer.Put(u.Avatar);
+                    writer.Put(u.Level);
+                    writer.Put(u.Exp);
+                    writer.Put(u.LastOnline.ToString());
+                } else
+                {
+                    //some error message ushort thing
+                }
             }
             else if (msgid == 88)
             {
