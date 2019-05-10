@@ -11,6 +11,6 @@ namespace FLServer
         public const int Port = 9050;
 
         public const bool UpdateVersion = true;
-        public const string ServerVersion = "0.1";
+        public const string ServerVersion = "0.2";
     }
 }
