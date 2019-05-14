@@ -89,5 +89,25 @@ namespace Shared.Users
             }
         }
 
+        public static void CreateNewUser(string username, string password)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                ctx.User.Add(new User()
+                {
+                    Username = username,
+                    Password = Security.Security.GetHashString(password),
+                    Email = "admin@thwamp.nl",
+                    UniqueIdentifier = Guid.NewGuid().ToString(),
+                    CreationDate = DateTime.UtcNow,
+                    Level = 0,
+                    NormalElo = 1250,
+                    RankedElo = 1250,
+                    Verified = true
+                });
+                ctx.SaveChanges();
+            }
+        }
+
     }
 }
