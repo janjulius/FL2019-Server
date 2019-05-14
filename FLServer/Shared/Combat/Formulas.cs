@@ -13,7 +13,7 @@ namespace Shared.Combat
         internal const float BasePercentageMultiplier = 0.5f;
 
         internal const float BaseVelocity = 10;
-        internal const float VelocityNewDamageDivider = 10;
+        internal const float VelocityNewDamageDivider = 20;
         internal const float VelocityWeightDivider = 100;
         internal const float VelocityMultiplier = 1;
         internal const float KnockBackPercentageDivider = 2.5f;
