@@ -41,7 +41,7 @@ namespace Shared.Levels
         /// </summary>
         /// <param name="level">Level</param>
         /// <returns></returns>
-        public double getExperienceByLevel(int level)
+        public int getExperienceByLevel(int level)
         {
             double points = 0;
             double output = 0;
@@ -52,7 +52,7 @@ namespace Shared.Levels
                         * Math.Pow(difference, lvl / div));
                 if (lvl >= level)
                 {
-                    return output;
+                    return (int)Math.Floor(output);
                 }
                 output = (int)Math.Floor(points / divider);
             }
@@ -66,7 +66,6 @@ namespace Shared.Levels
         /// <returns>int Level</returns>
         public int GetLevelByExperience(double experience)
         {
-            int rlvl = -1;
             double points = 0;
             double output = 0;
 
@@ -74,13 +73,15 @@ namespace Shared.Levels
             {
                 points += Math.Floor(lvl + increase * Math.Pow(difference, lvl / div));
                 output = (int)Math.Floor(points / divider);
-                if (lvl >= minlevel)
+                if (lvl >= minlevel) { 
                     output = Math.Floor(points / divider);
-                if (experience >= output)
-                    return lvl;
+                }
+                if (experience <= output)
+                {
+                    return lvl-1;
+                }
             }
-
-            return rlvl;
+            return 0;
         }
     }
 }
