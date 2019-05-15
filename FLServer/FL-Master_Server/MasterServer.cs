@@ -71,6 +71,7 @@ namespace FL_Master_Server
                 string pwd = Security.GetHashString(dataReader.GetString());
                 Console.WriteLine($"Got a conection from UniquePlayer: {id}");
                 Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
+                string[] friends = UserMethods.GetFriends(id);
                 if (!UserAuth.VerifyPassword(id, pwd))
                 {
                     Console.WriteLine("Authetication failed disconnectin the user");
@@ -87,6 +88,7 @@ namespace FL_Master_Server
                     writer.Put(u.Avatar);
                     writer.Put(u.Level);
                     writer.Put(u.Exp);
+                    writer.PutArray(friends);
                     fromPeer.Send(writer, DeliveryMethod.Unreliable);  
                 }
 
@@ -104,9 +106,12 @@ namespace FL_Master_Server
                     writer.Put(u.Level);
                     writer.Put(u.Exp);
                     writer.Put(u.LastOnline.ToString());
+                    fromPeer.Send(writer, DeliveryMethod.Unreliable);
                 } else
                 {
-                    //some error message ushort thing
+                    writer.Put((ushort)2006);
+                    writer.Put(Constants.CantFindProfile);
+                    fromPeer.Send(writer, DeliveryMethod.Unreliable);
                 }
             }
             else if (msgid == 88)
