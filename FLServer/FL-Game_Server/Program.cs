@@ -4,9 +4,12 @@ namespace FL_Game_Server
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            GameServer server = new GameServer();
+
+            server.Run(args);
         }
     }
 }
