@@ -142,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authentication\UserAuth.cs" />
+    <Compile Include="Combat\Formulas.cs" />
     <Compile Include="General\General.cs" />
     <Compile Include="Levels\ProgressCalculator.cs" />
     <Compile Include="Migrations\20190507121349_201957_0.cs" />

@@ -1,4 +1,5 @@
 ﻿using FLServer.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,21 +51,19 @@ namespace Shared.Users
             return true;
         }
 
-        public static void GetFriends(string name)
+        public static string[] GetFriends(string name)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
                 User user = ctx.User.Where(u => u.Username == name).First();
 
                 IEnumerable<UserFriend> res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
-                StringBuilder sb = new StringBuilder();
-
-                foreach (UserFriend r in res)
+                string[] arr = new string[res.Count()];
+                for(int i = 0; i < arr.Length; i++)
                 {
-                    sb.Append(
-                    ctx.User.Where(a => a.UserId == r.FriendId).First().Username + ",");
+                    arr[i] = ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Username;
                 }
-                return;
+                return arr;
             }
         }
 
@@ -77,7 +76,15 @@ namespace Shared.Users
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                return ctx.User.Where(u => u.Username == username).First();
+                User u = null;
+                try
+                {
+                    u = ctx.User.Where(n => n.Username == username).First();
+                }
+                catch {
+                    return null;
+                        }
+                return u;
             }
         }
 
@@ -86,6 +93,81 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 return ctx.User.Where(u => u.UniqueIdentifier == uid).First();
+            }
+        }
+
+        public static void CreateNewUser(string username, string password)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                ctx.User.Add(new User()
+                {
+                    Username = username,
+                    Password = Security.Security.GetHashString(password),
+                    Email = "admin@thwamp.com",
+                    UniqueIdentifier = Guid.NewGuid().ToString(),
+                    CreationDate = DateTime.UtcNow,
+                    Level = 0,
+                    NormalElo = 1250,
+                    RankedElo = 1250,
+                    Verified = true
+                });
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void AddExp(string username, int exp)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(username);
+                ctx.Entry(u).State = EntityState.Modified;
+                Levels.ProgressCalculator calc = new Levels.ProgressCalculator();
+                u.Exp = u.Exp + exp;
+                u.Level = calc.GetLevelByExperience(u.Exp);
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void SetExp(string username, int exp)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(username);
+                ctx.Entry(u).State = EntityState.Modified;
+                Levels.ProgressCalculator calc = new Levels.ProgressCalculator();
+                u.Exp = exp;
+                u.Level = calc.GetLevelByExperience(u.Exp);
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void SetLevel(string username, int lvl)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(username);
+                ctx.Entry(u).State = EntityState.Modified;
+                Levels.ProgressCalculator calc = new Levels.ProgressCalculator();
+                u.Level = lvl;
+                u.Exp = calc.getExperienceByLevel(u.Level);
+                ctx.SaveChanges();
+            }
+        }
+
+        public static int GetLevel(string username)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return GetUserByUsername(username).Level;
+            }
+        }
+
+        public static int GetExp(string username)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return GetUserByUsername(username).Exp;
             }
         }
 
