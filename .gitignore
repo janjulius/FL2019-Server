@@ -249,3 +249,5 @@ Desktop.ini
 .DS_Store
 
 FLServer/\.idea/\.idea\.FLServer/\.idea/
+
+FLServer/FL-Game_Server/Properties/launchSettings\.json
