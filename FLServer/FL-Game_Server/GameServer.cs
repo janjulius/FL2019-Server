@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Threading;
 using FLServer.Models;
 using LiteNetLib;
@@ -12,14 +14,17 @@ namespace FL_Game_Server
         private int serverPort = 10000;
         private bool stopServer = false;
         private int serverFreq = 10;
-        private int maxConnections = 8;
+        private int maxConnections = 4;
+        private string masterKey;
+        private byte roomType;
+        private string serverName;
 
         private EventBasedNetListener listener;
         private NetManager server;
 
         public Dictionary<int, Player> Players = new Dictionary<int, Player>();
         public Dictionary<int, NetworkObject> NetworkObjects = new Dictionary<int, NetworkObject>();
-        
+
         public Random rand = new Random();
 
         public void Run(string[] args)
@@ -28,7 +33,9 @@ namespace FL_Game_Server
             {
                 Console.WriteLine(args[0]);
                 serverPort = int.Parse(args[0]);
-
+                masterKey = args[1];
+                roomType = byte.Parse(args[2]);
+                serverName = args[3];
                 listener = new EventBasedNetListener();
                 server = new NetManager(listener);
 
@@ -48,11 +55,29 @@ namespace FL_Game_Server
                 listener.PeerConnectedEvent += PeerConnected;
                 listener.NetworkReceiveEvent += ReceivePackage;
 
+                NetDataWriter UWriter = new NetDataWriter();
+
+                UWriter.Put((ulong) 1);
+                UWriter.Put(serverPort);
+                UWriter.Put(masterKey);
+                UWriter.Put(roomType);
+                UWriter.Put(maxConnections);
+                UWriter.Put(serverName);
+
+                SendMaster(UWriter);
+
+                UWriter.Reset();
+
                 while (!stopServer)
                 {
                     server.PollEvents();
                     Thread.Sleep(serverFreq);
                 }
+
+                UWriter.Put((ulong) 2);
+                UWriter.Put(serverPort);
+
+                SendMaster(UWriter);
 
                 server.Stop();
             }
@@ -61,7 +86,7 @@ namespace FL_Game_Server
         private void GetConnectionRequest(ConnectionRequest request)
         {
             if (server.PeersCount < maxConnections)
-                request.AcceptIfKey("SomeConnectionKey");
+                request.AcceptIfKey(masterKey);
             else
                 request.Reject();
         }
@@ -70,7 +95,13 @@ namespace FL_Game_Server
         {
             Console.WriteLine("We got connection: {0}", peer.EndPoint);
 
-            
+            NetDataWriter UWriter = new NetDataWriter();
+
+            UWriter.Put((ulong) 3);
+            UWriter.Put(serverPort);
+
+            SendMaster(UWriter);
+
             NetDataWriter writer = new NetDataWriter();
             writer.Put((ushort) 1);
             writer.Put(peer.Id);
@@ -103,12 +134,27 @@ namespace FL_Game_Server
 
         private void PeerDisconnect(NetPeer peer, DisconnectInfo disconnectinfo)
         {
+            NetDataWriter UWriter = new NetDataWriter();
+
+            UWriter.Put((ulong) 4);
+            UWriter.Put(serverPort);
+
+            SendMaster(UWriter);
+
             List<int> playersToRemove = new List<int>();
             List<int> objectsToRemove = new List<int>();
             foreach (var player in Players)
             {
                 if (player.Value.peer == peer)
                 {
+                    if (roomType == 0)
+                    {
+                        if (player.Value.isHost)
+                        {
+                            stopServer = true;
+                        }
+                    }
+
                     playersToRemove.Add(player.Key);
                     foreach (var networkObject in NetworkObjects)
                     {
@@ -139,7 +185,7 @@ namespace FL_Game_Server
 
         private void ReceivePackage(NetPeer peer, NetPacketReader dataReader, DeliveryMethod deliverymethod)
         {
-        ushort msgid = dataReader.GetUShort();
+            ushort msgid = dataReader.GetUShort();
 
             NetDataWriter writer = new NetDataWriter();
 
@@ -244,7 +290,7 @@ namespace FL_Game_Server
 
             dataReader.Recycle();
         }
-        
+
         private void SendOthers(NetPeer peer, NetDataWriter writer, DeliveryMethod deliveryMethod)
         {
             foreach (NetPeer netPeer in server.ConnectedPeerList)
@@ -254,7 +300,7 @@ namespace FL_Game_Server
                 netPeer.Send(writer, deliveryMethod);
             }
         }
-        
+
         private void SendOthers(NetPeer peer, byte[] data, DeliveryMethod deliveryMethod)
         {
             foreach (NetPeer netPeer in server.ConnectedPeerList)
@@ -263,6 +309,15 @@ namespace FL_Game_Server
 
                 netPeer.Send(data, deliveryMethod);
             }
+        }
+
+        private void SendMaster(NetDataWriter writer)
+        {
+            IPAddress mServerAdress = IPAddress.Parse("127.0.0.1");
+            IPEndPoint mServer = new IPEndPoint(mServerAdress, 9052);
+
+
+            server.SendUnconnectedMessage(writer, mServer);
         }
     }
 }

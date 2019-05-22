@@ -71,7 +71,7 @@ namespace FLServer
             while (running)
             {
                 server.PollEvents();
-                Thread.Sleep(15);
+                Thread.Sleep(1000);
             }
 
             server.Stop();

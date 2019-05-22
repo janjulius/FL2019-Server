@@ -6,6 +6,10 @@ using Shared.Security;
 using Shared.Users;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -20,18 +24,30 @@ namespace FL_Master_Server
 
         List<NetworkUser> NetworkUsers = new List<NetworkUser>();
 
+        Dictionary<int, GameServerInfo> GameServers = new Dictionary<int, GameServerInfo>();
+        Dictionary<int, NetPeer[]> playersWaiting = new Dictionary<int, NetPeer[]>();
+
         public void Run()
         {
             Console.WriteLine("Starting Master server..");
             Console.WriteLine("Assigning serverlistener..");
             listener = new EventBasedNetListener();
             Console.WriteLine($"Serverlistener assigned: {listener.ToString()}");
-            
+
 
             Console.WriteLine("Assigning NetManager with serverlistener");
             server = new NetManager(listener);
+            server.UnconnectedMessagesEnabled = true;
             Console.WriteLine("Attempting to run server");
-            try { server.Start(Constants.Port); } catch (Exception e) { Console.WriteLine(e); }
+            try
+            {
+                server.Start(Constants.Port);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
             listener.ConnectionRequestEvent += request =>
             {
                 if (server.PeersCount < Constants.MaxConnections)
@@ -49,18 +65,72 @@ namespace FL_Master_Server
 
             listener.PeerDisconnectedEvent += OnListenerOnPeerDisconnectedEvent;
 
+            listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
+
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
+            StartGameServer("testServerName", 10000, "SomeConnectionKey", 0);
+
             while (running)
             {
                 server.PollEvents();
-                Thread.Sleep(15);
+                Thread.Sleep(200);
             }
 
             server.Stop();
         }
 
-        private void OnListenerOnNetworkReceiveEvent(NetPeer fromPeer, NetPacketReader dataReader,
-          DeliveryMethod deliveryMethod)
+        private void ReceiveUnconnectedMessage(IPEndPoint remoteendpoint, NetPacketReader reader, UnconnectedMessageType messagetype)
+        {
+            //Console.WriteLine("test: " + reader.GetString());
+
+            ulong msgid = reader.GetULong();
+
+            switch (msgid)
+            {
+                case 1:
+                {
+                    int serverPort = reader.GetInt();
+                    string masterKey = reader.GetString();
+                    byte roomType = reader.GetByte();
+                    byte maxPlayers = reader.GetByte();
+                    string serverName = reader.GetString();
+
+                    GameServers.Add(serverPort, new GameServerInfo(serverName, serverPort, masterKey, roomType, maxPlayers));
+
+                    Console.WriteLine($"GameServer opened on port {serverPort}");
+
+                    foreach (NetPeer player in playersWaiting[serverPort])
+                    {
+                        //send server info
+                    }
+
+                    playersWaiting.Remove(serverPort);
+                }
+                    break;
+                case 2:
+                {
+                    int serverPort = reader.GetInt();
+
+                    GameServers.Remove(serverPort);
+                    Console.WriteLine($"GameServer closed on port {serverPort}");
+                }
+                    break;
+                case 3:
+                {
+                    int serverPort = reader.GetInt();
+                    GameServers[serverPort].totalPlayers++;
+                }
+                    break;
+                case 4:
+                {
+                    int serverPort = reader.GetInt();
+                    GameServers[serverPort].totalPlayers--;
+                }
+                    break;
+            }
+        }
+
+        private void OnListenerOnNetworkReceiveEvent(NetPeer fromPeer, NetPacketReader dataReader, DeliveryMethod deliveryMethod)
         {
             ushort msgid = dataReader.GetUShort();
 
@@ -81,7 +151,7 @@ namespace FL_Master_Server
                 {
                     NetDataWriter writer = new NetDataWriter();
                     FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                    writer.Put((ushort)2004);
+                    writer.Put((ushort) 2004);
                     writer.Put(u.Balance);
                     writer.Put(u.PremiumBalance);
                     writer.Put(u.Username);
@@ -89,42 +159,67 @@ namespace FL_Master_Server
                     writer.Put(u.Level);
                     writer.Put(u.Exp);
                     writer.PutArray(friends);
-                    fromPeer.Send(writer, DeliveryMethod.Unreliable);  
+                    fromPeer.Send(writer, DeliveryMethod.Unreliable);
                 }
-
             }
-            else if(msgid == 424) //get player profile PACKETS:PROFILEACCOUNTINFO
+            else if (msgid == 424) //get player profile PACKETS:PROFILEACCOUNTINFO
             {
                 string id = dataReader.GetString();
                 NetDataWriter writer = new NetDataWriter();
                 FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                if(u != null) //player exists
+                if (u != null) //player exists
                 {
-                    writer.Put((ushort)2005);
+                    writer.Put((ushort) 2005);
                     writer.Put(u.Username);
                     writer.Put(u.Avatar);
                     writer.Put(u.Level);
                     writer.Put(u.Exp);
                     writer.Put(u.LastOnline.ToString());
                     fromPeer.Send(writer, DeliveryMethod.Unreliable);
-                } else
+                }
+                else
                 {
-                    writer.Put((ushort)2006);
+                    writer.Put((ushort) 2006);
                     writer.Put(Constants.CantFindProfile);
                     fromPeer.Send(writer, DeliveryMethod.Unreliable);
                 }
             }
             else if (msgid == 88)
             {
-
             }
             else
             {
-
             }
 
             dataReader.Recycle();
         }
+
+        private void StartGameServer(string serverName, int port, string masterKey, byte roomType)
+        {
+            //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
+            string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
+                                "\\GameServer\\FL_Game_Server.dll";
+            try
+            {
+                var process = new Process()
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = "dotnet",
+                        Arguments = $"{pathToFile} {port} {masterKey} {roomType} {serverName}",
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                    }
+                };
+
+                process.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Could not start program " + ex);
+            }
+        }
+
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
             Console.WriteLine($"peer disconnected: {peer.EndPoint}");

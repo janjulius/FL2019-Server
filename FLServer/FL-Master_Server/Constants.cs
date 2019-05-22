@@ -9,6 +9,7 @@ namespace FL_Master_Server
     {
         internal static int Port = 9052;
         internal static int MaxConnections = 1000;
+        internal static int StartGameServerPort = 10000;
         internal static string ConnectionKey = "masterserver";
 
         internal const string CantFindProfile = "User does not exist";
