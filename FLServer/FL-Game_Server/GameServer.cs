@@ -36,6 +36,7 @@ namespace FL_Game_Server
                 masterKey = args[1];
                 roomType = byte.Parse(args[2]);
                 serverName = args[3];
+                maxConnections = byte.Parse(args[4]);
                 listener = new EventBasedNetListener();
                 server = new NetManager(listener);
 
@@ -57,11 +58,11 @@ namespace FL_Game_Server
 
                 NetDataWriter UWriter = new NetDataWriter();
 
-                UWriter.Put((ulong) 1);
+                UWriter.Put((ushort) 1);
                 UWriter.Put(serverPort);
                 UWriter.Put(masterKey);
                 UWriter.Put(roomType);
-                UWriter.Put(maxConnections);
+                UWriter.Put((byte) maxConnections);
                 UWriter.Put(serverName);
 
                 SendMaster(UWriter);
@@ -74,7 +75,7 @@ namespace FL_Game_Server
                     Thread.Sleep(serverFreq);
                 }
 
-                UWriter.Put((ulong) 2);
+                UWriter.Put((ushort) 2);
                 UWriter.Put(serverPort);
 
                 SendMaster(UWriter);
@@ -97,7 +98,7 @@ namespace FL_Game_Server
 
             NetDataWriter UWriter = new NetDataWriter();
 
-            UWriter.Put((ulong) 3);
+            UWriter.Put((ushort) 3);
             UWriter.Put(serverPort);
 
             SendMaster(UWriter);
@@ -136,7 +137,7 @@ namespace FL_Game_Server
         {
             NetDataWriter UWriter = new NetDataWriter();
 
-            UWriter.Put((ulong) 4);
+            UWriter.Put((ushort) 4);
             UWriter.Put(serverPort);
 
             SendMaster(UWriter);

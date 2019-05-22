@@ -25,7 +25,9 @@ namespace FL_Master_Server
         List<NetworkUser> NetworkUsers = new List<NetworkUser>();
 
         Dictionary<int, GameServerInfo> GameServers = new Dictionary<int, GameServerInfo>();
-        Dictionary<int, NetPeer[]> playersWaiting = new Dictionary<int, NetPeer[]>();
+        Dictionary<int, List<NetPeer>> playersWaiting = new Dictionary<int, List<NetPeer>>();
+
+        Random random = new Random();
 
         public void Run()
         {
@@ -68,7 +70,6 @@ namespace FL_Master_Server
             listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
-            StartGameServer("testServerName", 10000, "SomeConnectionKey", 0);
 
             while (running)
             {
@@ -83,7 +84,8 @@ namespace FL_Master_Server
         {
             //Console.WriteLine("test: " + reader.GetString());
 
-            ulong msgid = reader.GetULong();
+
+            ushort msgid = reader.GetUShort();
 
             switch (msgid)
             {
@@ -102,6 +104,12 @@ namespace FL_Master_Server
                     foreach (NetPeer player in playersWaiting[serverPort])
                     {
                         //send server info
+                        NetDataWriter writer = new NetDataWriter();
+                        writer.Put((ushort) 600);
+                        writer.Put(serverPort);
+                        writer.Put(masterKey);
+
+                        player.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
 
                     playersWaiting.Remove(serverPort);
@@ -134,67 +142,89 @@ namespace FL_Master_Server
         {
             ushort msgid = dataReader.GetUShort();
 
-
-            if (msgid == 423) //load into master server PACKETS:PROFILEPARTINFO
+            switch (msgid)
             {
-                string id = dataReader.GetString();
-                string pwd = Security.GetHashString(dataReader.GetString());
-                Console.WriteLine($"Got a conection from UniquePlayer: {id}");
-                Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
-                string[] friends = UserMethods.GetFriends(id);
-                if (!UserAuth.VerifyPassword(id, pwd))
+                case 423:
                 {
-                    Console.WriteLine("Authetication failed disconnectin the user");
-                    fromPeer.Disconnect();
+                    string id = dataReader.GetString();
+                    string pwd = Security.GetHashString(dataReader.GetString());
+                    Console.WriteLine($"Got a conection from UniquePlayer: {id}");
+                    Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
+                    string[] friends = UserMethods.GetFriends(id);
+                    if (!UserAuth.VerifyPassword(id, pwd))
+                    {
+                        Console.WriteLine("Authetication failed disconnectin the user");
+                        fromPeer.Disconnect();
+                    }
+                    else
+                    {
+                        NetDataWriter writer = new NetDataWriter();
+                        FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+                        writer.Put((ushort) 2004);
+                        writer.Put(u.Balance);
+                        writer.Put(u.PremiumBalance);
+                        writer.Put(u.Username);
+                        writer.Put(u.Avatar);
+                        writer.Put(u.Level);
+                        writer.Put(u.Exp);
+                        writer.PutArray(friends);
+                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                    }
                 }
-                else
+                    break;
+                case 424:
                 {
+                    string id = dataReader.GetString();
                     NetDataWriter writer = new NetDataWriter();
                     FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                    writer.Put((ushort) 2004);
-                    writer.Put(u.Balance);
-                    writer.Put(u.PremiumBalance);
-                    writer.Put(u.Username);
-                    writer.Put(u.Avatar);
-                    writer.Put(u.Level);
-                    writer.Put(u.Exp);
-                    writer.PutArray(friends);
-                    fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                    if (u != null) //player exists
+                    {
+                        writer.Put((ushort) 2005);
+                        writer.Put(u.Username);
+                        writer.Put(u.Avatar);
+                        writer.Put(u.Level);
+                        writer.Put(u.Exp);
+                        writer.Put(u.LastOnline.ToString());
+                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                    }
+                    else
+                    {
+                        writer.Put((ushort) 2006);
+                        writer.Put(Constants.CantFindProfile);
+                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                    }
                 }
-            }
-            else if (msgid == 424) //get player profile PACKETS:PROFILEACCOUNTINFO
-            {
-                string id = dataReader.GetString();
-                NetDataWriter writer = new NetDataWriter();
-                FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                if (u != null) //player exists
+                    break;
+                case 88:
                 {
-                    writer.Put((ushort) 2005);
-                    writer.Put(u.Username);
-                    writer.Put(u.Avatar);
-                    writer.Put(u.Level);
-                    writer.Put(u.Exp);
-                    writer.Put(u.LastOnline.ToString());
-                    fromPeer.Send(writer, DeliveryMethod.Unreliable);
                 }
-                else
+                    break;
+                case 600:
                 {
-                    writer.Put((ushort) 2006);
-                    writer.Put(Constants.CantFindProfile);
-                    fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                    string serverName = dataReader.GetString();
+                    byte maxPlayers = dataReader.GetByte();
+
+                    int serverPort = Constants.StartGameServerPort;
+
+                    while (GameServers.ContainsKey(serverPort))
+                    {
+                        serverPort++;
+                    }
+
+                    string masterKey = random.Next(1000000, 9999999).ToString();
+
+
+                    playersWaiting.Add(serverPort, new List<NetPeer> {fromPeer});
+
+                    StartGameServer(serverName, serverPort, masterKey, 0, maxPlayers);
                 }
-            }
-            else if (msgid == 88)
-            {
-            }
-            else
-            {
+                    break;
             }
 
             dataReader.Recycle();
         }
 
-        private void StartGameServer(string serverName, int port, string masterKey, byte roomType)
+        private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
@@ -206,9 +236,9 @@ namespace FL_Master_Server
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "dotnet",
-                        Arguments = $"{pathToFile} {port} {masterKey} {roomType} {serverName}",
+                        Arguments = $"{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}",
                         UseShellExecute = false,
-                        CreateNoWindow = true,
+                        CreateNoWindow = false,
                     }
                 };
 
