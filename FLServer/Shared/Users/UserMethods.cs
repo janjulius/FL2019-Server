@@ -171,5 +171,16 @@ namespace Shared.Users
             }
         }
 
+        public static void SetAvatar(string username, int id)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(username);
+                u.Avatar = id;
+                ctx.Entry(u).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
     }
 }
