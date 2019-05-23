@@ -8,6 +8,7 @@ namespace FL_Master_Server
         public byte roomType;
         public byte totalPlayers = 0;
         public byte maxPlayers;
+        public bool open = true;
 
         public GameServerInfo(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {

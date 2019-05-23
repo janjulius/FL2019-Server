@@ -219,6 +219,30 @@ namespace FL_Master_Server
                     StartGameServer(serverName, serverPort, masterKey, 0, maxPlayers);
                 }
                     break;
+
+                case 601:
+                {
+                    NetDataWriter writer = new NetDataWriter();
+
+                    foreach (var gameServer in GameServers)
+                    {
+                        if (gameServer.Value.open)
+                        {
+
+                            writer.Put((ushort) 601);
+                            writer.Put(gameServer.Value.serverName);
+                            writer.Put(gameServer.Value.totalPlayers);
+                            writer.Put(gameServer.Value.maxPlayers);
+                            writer.Put("127.0.0.1");
+                            writer.Put(gameServer.Value.masterKey);
+                            writer.Put(gameServer.Value.port);
+
+                            fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                            writer.Reset();
+                        }
+                    }
+                }
+                    break;
             }
 
             dataReader.Recycle();
