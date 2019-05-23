@@ -199,6 +199,13 @@ namespace FL_Master_Server
                 {
                 }
                     break;
+                case 470: //setting avatarTODO: safety
+                    {
+                        string name = dataReader.GetString();
+                        int id = dataReader.GetInt();
+                        UserMethods.SetAvatar(name, id);
+                    }
+                    break;
                 case 600:
                 {
                     string serverName = dataReader.GetString();
