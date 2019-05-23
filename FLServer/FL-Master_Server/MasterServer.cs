@@ -262,7 +262,7 @@ namespace FL_Master_Server
                         FileName = "dotnet",
                         Arguments = $"{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}",
                         UseShellExecute = false,
-                        CreateNoWindow = false,
+                        CreateNoWindow = true,
                     }
                 };
 
