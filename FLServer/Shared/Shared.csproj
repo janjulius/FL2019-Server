@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <UserSecretsId>72ac5fbf4-6991-4274-a481-ce319b79d6e7</UserSecretsId>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.0.1</Version>
