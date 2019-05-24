@@ -200,11 +200,11 @@ namespace FL_Master_Server
                 }
                     break;
                 case 470: //setting avatarTODO: safety
-                    {
-                        string name = dataReader.GetString();
-                        int id = dataReader.GetInt();
-                        UserMethods.SetAvatar(name, id);
-                    }
+                {
+                    string name = dataReader.GetString();
+                    int id = dataReader.GetInt();
+                    UserMethods.SetAvatar(name, id);
+                }
                     break;
                 case 600:
                 {
@@ -233,9 +233,8 @@ namespace FL_Master_Server
 
                     foreach (var gameServer in GameServers)
                     {
-                        if (gameServer.Value.open)
+                        if (gameServer.Value.open && gameServer.Value.roomType == 0)
                         {
-
                             writer.Put((ushort) 601);
                             writer.Put(gameServer.Value.serverName);
                             writer.Put(gameServer.Value.totalPlayers);
@@ -260,7 +259,7 @@ namespace FL_Master_Server
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                                 "\\GameServer\\FL_Game_Server.dll";
-            Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
+            //Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
             try
             {
                 var process = new Process()
