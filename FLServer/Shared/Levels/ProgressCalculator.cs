@@ -31,8 +31,12 @@ namespace Shared.Levels
                 if (lvl >= minlevel)
 
                     output = Math.Floor(points / divider);
+
                 lvlExpValues.Add(lvl, output);
             }
+
+            lvlExpValues[1] = 0;
+
             return lvlExpValues;
         }
 
