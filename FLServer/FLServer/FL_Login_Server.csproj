@@ -15,14 +15,16 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="LiteNetLib">
       <HintPath>bin\Debug\netcoreapp2.1\LiteNetLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Shared">
-      <HintPath>..\Shared\bin\Release\netcoreapp2.1\Shared.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <HintPath>System</HintPath>
