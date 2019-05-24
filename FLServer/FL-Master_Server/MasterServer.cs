@@ -2,6 +2,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Authentication;
+using Shared.Extensions;
 using Shared.Security;
 using Shared.Users;
 using System;
@@ -145,32 +146,32 @@ namespace FL_Master_Server
             switch (msgid)
             {
                 case 423:
-                {
-                    string id = dataReader.GetString();
-                    string pwd = Security.GetHashString(dataReader.GetString());
-                    Console.WriteLine($"Got a conection from UniquePlayer: {id}");
-                    Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
-                    string[] friends = UserMethods.GetFriends(id);
-                    if (!UserAuth.VerifyPassword(id, pwd))
                     {
-                        Console.WriteLine("Authetication failed disconnectin the user");
-                        fromPeer.Disconnect();
+                        string id = dataReader.GetString();
+                        string pwd = Security.GetHashString(dataReader.GetString());
+                        Console.WriteLine($"Got a conection from UniquePlayer: {id}");
+                        Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
+                        var friends = UserMethods.GetFriendsAsPacket(id);
+                        if (!UserAuth.VerifyPassword(id, pwd))
+                        {
+                            Console.WriteLine("Authetication failed disconnectin the user");
+                            fromPeer.Disconnect();
+                        }
+                        else
+                        {
+                            NetDataWriter writer = new NetDataWriter();
+                            FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+                            writer.Put((ushort)2004);
+                            writer.Put(u.Balance);
+                            writer.Put(u.PremiumBalance);
+                            writer.Put(u.Username);
+                            writer.Put(u.Avatar);
+                            writer.Put(u.Level);
+                            writer.Put(u.Exp);
+                            writer.PutFriendSlotPackets(UserMethods.GetFriendsAsPacket(u.Username));
+                            fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                        }
                     }
-                    else
-                    {
-                        NetDataWriter writer = new NetDataWriter();
-                        FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                        writer.Put((ushort) 2004);
-                        writer.Put(u.Balance);
-                        writer.Put(u.PremiumBalance);
-                        writer.Put(u.Username);
-                        writer.Put(u.Avatar);
-                        writer.Put(u.Level);
-                        writer.Put(u.Exp);
-                        writer.PutArray(friends);
-                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
-                    }
-                }
                     break;
                 case 424:
                 {

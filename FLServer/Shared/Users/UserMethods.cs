@@ -1,5 +1,6 @@
 ﻿using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Packets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,6 +63,24 @@ namespace Shared.Users
                 for(int i = 0; i < arr.Length; i++)
                 {
                     arr[i] = ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Username;
+                }
+                return arr;
+            }
+        }
+
+        public static FriendSlotPacket[] GetFriendsAsPacket(string name)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User user = ctx.User.Where(u => u.Username == name).First();
+
+                IEnumerable<UserFriend> res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
+                FriendSlotPacket[] arr = new FriendSlotPacket[res.Count()];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = new FriendSlotPacket(ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Username,
+                    ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Status,
+                    ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Avatar);
                 }
                 return arr;
             }
