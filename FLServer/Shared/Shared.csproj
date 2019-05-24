@@ -156,6 +156,7 @@
   <ItemGroup>
     <Compile Include="Authentication\UserAuth.cs" />
     <Compile Include="Combat\Formulas.cs" />
+    <Compile Include="Extensions\NetDataWriterExtension.cs" />
     <Compile Include="General\General.cs" />
     <Compile Include="Levels\ProgressCalculator.cs" />
     <Compile Include="Migrations\20190507121349_201957_0.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Models\UserMatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\Security.cs" />
+    <Compile Include="Packets\FriendSlotPacket.cs" />
     <Compile Include="Users\UserMethods.cs" />
   </ItemGroup>
   <ItemGroup>
