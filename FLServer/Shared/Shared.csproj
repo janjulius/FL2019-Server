@@ -186,6 +186,7 @@
     <Compile Include="Models\UserCharacter.cs" />
     <Compile Include="Models\UserFriend.cs" />
     <Compile Include="Models\UserMatch.cs" />
+    <Compile Include="Packets\Packet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\Security.cs" />
     <Compile Include="Packets\FriendSlotPacket.cs" />

@@ -1,6 +1,6 @@
 ﻿namespace Shared.Packets
 {
-    public class FriendSlotPacket
+    public class FriendSlotPacket : Packet
     {
         public string Name { get; set; }
         public string Status { get;set; }

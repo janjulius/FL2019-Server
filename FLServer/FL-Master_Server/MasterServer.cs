@@ -168,7 +168,7 @@ namespace FL_Master_Server
                             writer.Put(u.Avatar);
                             writer.Put(u.Level);
                             writer.Put(u.Exp);
-                            writer.PutFriendSlotPackets(UserMethods.GetFriendsAsPacket(u.Username));
+                            writer.PutPackets(UserMethods.GetFriendsAsPacket(u.Username));
                             fromPeer.Send(writer, DeliveryMethod.Unreliable);
                         }
                     }
