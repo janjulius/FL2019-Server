@@ -86,6 +86,18 @@ namespace Shared.Users
             }
         }
 
+        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(string name)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(name);
+                ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
+                    , u.Avatar, u.Level, u.Exp);
+
+                return result;
+            }
+        }
+
         /// <summary>
         /// gets the user by name
         /// </summary>
@@ -187,6 +199,24 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 return GetUserByUsername(username).Exp;
+            }
+        }
+
+        public static ProfileAccountInfo GetProfileAccountInfoPacket(string id)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(id);
+                if (u != null)
+                {
+                    return new ProfileAccountInfo(u.Username,
+                        u.Avatar,
+                        u.Level,
+                        u.Exp,
+                        u.LastOnline.ToString(),
+                        String.Empty);
+                }
+                return null;
             }
         }
 

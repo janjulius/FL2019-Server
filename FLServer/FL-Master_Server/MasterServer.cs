@@ -3,6 +3,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Authentication;
 using Shared.Extensions;
+using Shared.Packets;
 using Shared.Security;
 using Shared.Users;
 using System;
@@ -162,6 +163,7 @@ namespace FL_Master_Server
                             NetDataWriter writer = new NetDataWriter();
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                             writer.Put((ushort)2004);
+
                             writer.Put(u.Balance);
                             writer.Put(u.PremiumBalance);
                             writer.Put(u.Username);
@@ -169,6 +171,8 @@ namespace FL_Master_Server
                             writer.Put(u.Level);
                             writer.Put(u.Exp);
                             writer.PutPackets(UserMethods.GetFriendsAsPacket(u.Username));
+                            //writer.PutPacket(UserMethods.GetUserAsProfilePartInfoPacket(id));
+                            //writer.PutPackets(UserMethods.GetFriendsAsPacket(id));
                             fromPeer.Send(writer, DeliveryMethod.Unreliable);
                         }
                     }
@@ -177,21 +181,19 @@ namespace FL_Master_Server
                 {
                     string id = dataReader.GetString();
                     NetDataWriter writer = new NetDataWriter();
-                    FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                    if (u != null) //player exists
+                        //FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id);
+
+                    if(string.IsNullOrEmpty(pai.ErrorMessage))
                     {
-                        writer.Put((ushort) 2005);
-                        writer.Put(u.Username);
-                        writer.Put(u.Avatar);
-                        writer.Put(u.Level);
-                        writer.Put(u.Exp);
-                        writer.Put(u.LastOnline.ToString());
+                        writer.Put((ushort)2005);
+                        writer.PutPacket(pai);
                         fromPeer.Send(writer, DeliveryMethod.Unreliable);
                     }
                     else
                     {
                         writer.Put((ushort) 2006);
-                        writer.Put(Constants.CantFindProfile);
+                        writer.PutPacket(pai);
                         fromPeer.Send(writer, DeliveryMethod.Unreliable);
                     }
                 }

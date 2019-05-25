@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using Shared.Attributes;
 using Shared.Packets;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Extensions
 {
+    [Author("Jan Julius de Lang", version = 1.0)]
     public static class NetDataWriterExtension
     {
         public static void PutPacket<T>(this NetDataWriter ndw, T packet) where T : Packet
