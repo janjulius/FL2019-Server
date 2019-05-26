@@ -17,7 +17,13 @@ namespace Shared.Extensions
         {
             foreach(var property in packet.GetType().GetProperties())
             {
+                Console.WriteLine($"{property} is {property}" );
                 dynamic variable = property.GetValue(packet);
+                if (property.PropertyType.IsArray)
+                {
+                    Console.WriteLine($"{property} is array");
+                    PutPackets(ndw, variable);
+                }
                 PutVariable(property.PropertyType, ndw, false, variable);
             }
         }

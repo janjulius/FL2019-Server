@@ -154,6 +154,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\Author.cs" />
     <Compile Include="Authentication\UserAuth.cs" />
     <Compile Include="Combat\Formulas.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
