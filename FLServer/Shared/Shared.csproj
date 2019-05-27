@@ -156,6 +156,7 @@
   <ItemGroup>
     <Compile Include="Attributes\Author.cs" />
     <Compile Include="Authentication\UserAuth.cs" />
+    <Compile Include="Characters\Characters.cs" />
     <Compile Include="Combat\Formulas.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
     <Compile Include="General\General.cs" />
