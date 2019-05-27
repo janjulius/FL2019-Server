@@ -168,21 +168,9 @@
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
     <Compile Include="General\General.cs" />
     <Compile Include="Levels\ProgressCalculator.cs" />
-    <Compile Include="Migrations\20190507121349_201957_0.cs" />
-    <Compile Include="Migrations\20190507121349_201957_0.Designer.cs">
-      <DependentUpon>20190507121349_201957_0.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20190507121432_201957_1.cs" />
-    <Compile Include="Migrations\20190507121432_201957_1.Designer.cs">
-      <DependentUpon>20190507121432_201957_1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20190527171957_2019519_0.cs" />
-    <Compile Include="Migrations\20190527171957_2019519_0.designer.cs">
-      <DependentUpon>20190527171957_2019519_0.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\20190527172829_2019519_1.cs" />
-    <Compile Include="Migrations\20190527172829_2019519_1.designer.cs">
-      <DependentUpon>20190527172829_2019519_1.cs</DependentUpon>
+    <Compile Include="Migrations\20190527225601_2019519_0.cs" />
+    <Compile Include="Migrations\20190527225601_2019519_0.designer.cs">
+      <DependentUpon>20190527225601_2019519_0.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
