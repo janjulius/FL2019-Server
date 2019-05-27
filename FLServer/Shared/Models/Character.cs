@@ -24,8 +24,7 @@ namespace FLServer.Models
         public DateTime ReleaseDate { get; set; }
         public int Price { get; set; }
         public int PremiumPrice { get; set; }
-        public Player Player { get; set; }
-        [ForeignKey("Player")]
-        public int PlayerFK { get; set; }
+        public CharacterAbility[] Abilities { get; set; }
+        public Passive Passive { get; set; }
     }
 }

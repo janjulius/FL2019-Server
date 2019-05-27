@@ -4,14 +4,16 @@ using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FL_Login_Server.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    partial class FLDBContextModelSnapshot : ModelSnapshot
+    [Migration("20190527171957_2019519_0")]
+    partial class _2019519_0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,6 +68,8 @@ namespace FL_Login_Server.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int>("PlayerFK");
+
                     b.Property<int>("PremiumPrice");
 
                     b.Property<int>("Price");
@@ -81,6 +85,8 @@ namespace FL_Login_Server.Migrations
                     b.Property<int>("Weight");
 
                     b.HasKey("CharacterId");
+
+                    b.HasIndex("PlayerFK");
 
                     b.ToTable("Character");
                 });
@@ -177,8 +183,7 @@ namespace FL_Login_Server.Migrations
 
                     b.HasKey("PassiveId");
 
-                    b.HasIndex("CharacterFK")
-                        .IsUnique();
+                    b.HasIndex("CharacterFK");
 
                     b.ToTable("Passive");
                 });
@@ -293,6 +298,14 @@ namespace FL_Login_Server.Migrations
                     b.ToTable("UserFriend");
                 });
 
+            modelBuilder.Entity("FLServer.Models.Character", b =>
+                {
+                    b.HasOne("FLServer.Models.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerFK")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("FLServer.Models.CharacterAbility", b =>
                 {
                     b.HasOne("FLServer.Models.Character")
@@ -320,8 +333,8 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.Passive", b =>
                 {
                     b.HasOne("FLServer.Models.Character", "Character")
-                        .WithOne("Passive")
-                        .HasForeignKey("FLServer.Models.Passive", "CharacterFK")
+                        .WithMany()
+                        .HasForeignKey("CharacterFK")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

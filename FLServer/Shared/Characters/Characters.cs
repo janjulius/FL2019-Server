@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Shared.Characters
 {
-    class Characters
+    public static class Characters
     {
 
-        public void CreateCharacter(
+        public static void CreateCharacter(
          string name,
          string desc,
          string undertitle,
