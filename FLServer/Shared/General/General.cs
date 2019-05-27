@@ -21,16 +21,39 @@ namespace Shared.General
             }
         }
 
-        public static void SetNewVersion(string versionNumber)
+        public static void UpdateVersion(string versionNumber)
         {
             using (var ctx = new FLDBContext())
             {
-                var n = ctx.ServerVersion.First().VersionNr;
+                string n = string.Empty;
+                try
+                {
+                    n = ctx.ServerVersion.First().VersionNr;
+                }
+                catch { }
                 if (n == versionNumber)
                 {
                     return;
                 }
                 ctx.ServerVersion.First().VersionNr = versionNumber;
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void SetVersion(string versionNumber)
+        {
+            using (var ctx = new FLDBContext())
+            {
+                string n = string.Empty;
+                ServerVersion s = new ServerVersion() { VersionId = new Guid().ToString(), VersionNr = versionNumber };
+                try
+                {
+                    n = ctx.ServerVersion.First().VersionNr;
+                }
+                catch {
+
+                    ctx.Add(s);
+                }
                 ctx.SaveChanges();
             }
         }

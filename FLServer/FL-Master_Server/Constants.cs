@@ -13,5 +13,9 @@ namespace FL_Master_Server
         internal static string ConnectionKey = "masterserver";
 
         internal const string CantFindProfile = "User does not exist";
+
+        internal const string ServerVersion = "0.2";
+        internal const bool InitializeDatabase = false;
+        internal const bool UpdateDatabase = false;
     }
 }
