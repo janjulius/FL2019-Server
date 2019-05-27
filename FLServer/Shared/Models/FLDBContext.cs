@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace FLServer.Models
 {
@@ -33,7 +34,7 @@ namespace FLServer.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=fl2019.database.windows.net;Database=FLDB;Trusted_Connection=False;Encrypt=True;uid=FLDbLogin;password=P7QrZ)s#xnZTE(q7");
+                optionsBuilder.UseMySql("Server=78.141.211.160;Database=FLDB;User=FLDblogin;Password=P7QrZ)s#xnZTE(q7");
             }
         }
 
