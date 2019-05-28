@@ -16,6 +16,7 @@ namespace FLServer.Models
         {
         }
 
+        public virtual DbSet<Admin> Admin { get; set; }
         public virtual DbSet<Purchase> Purchase { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserFriend> UserFriend { get; set; }
@@ -34,7 +35,7 @@ namespace FLServer.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("Server=78.141.211.160;Database=FLDB;User=FLDblogin;Password=P7QrZ)s#xnZTE(q7");
+                optionsBuilder.UseMySql("Server=78.141.211.160;Database=FLDB;User=FLDblogin;Password=P7QrZ)s#xnZTE(q7;SslMode=Preferred;Connection Timeout=30;");
             }
         }
 
