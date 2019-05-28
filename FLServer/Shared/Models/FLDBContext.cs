@@ -16,6 +16,7 @@ namespace FLServer.Models
         {
         }
 
+        public virtual DbSet<Admin> Admin { get; set; }
         public virtual DbSet<Purchase> Purchase { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserFriend> UserFriend { get; set; }
