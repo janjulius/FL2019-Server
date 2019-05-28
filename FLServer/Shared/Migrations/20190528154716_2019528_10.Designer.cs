@@ -3,15 +3,16 @@ using System;
 using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Shared.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    partial class FLDBContextModelSnapshot : ModelSnapshot
+    [Migration("20190528154716_2019528_10")]
+    partial class _2019528_10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,12 +83,6 @@ namespace Shared.Migrations
                     b.Property<int>("Weight");
 
                     b.HasKey("CharacterId");
-
-                    b.HasIndex("CharacterId")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Character");
                 });
@@ -172,16 +167,15 @@ namespace Shared.Migrations
             modelBuilder.Entity("FLServer.Models.Player", b =>
                 {
                     b.Property<int>("PlayerId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CharacterId");
+                    b.Property<int?>("CharacterId");
 
-                    b.Property<int>("StatsId");
+                    b.Property<int?>("StatsId");
 
                     b.Property<int?>("TeamId");
 
-                    b.Property<int>("UserId");
+                    b.Property<int?>("UserId");
 
                     b.HasKey("PlayerId");
 
@@ -351,13 +345,11 @@ namespace Shared.Migrations
                 {
                     b.HasOne("FLServer.Models.Character", "Character")
                         .WithMany()
-                        .HasForeignKey("CharacterId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CharacterId");
 
                     b.HasOne("FLServer.Models.Stats", "Stats")
                         .WithMany()
-                        .HasForeignKey("StatsId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("StatsId");
 
                     b.HasOne("FLServer.Models.Team")
                         .WithMany("Players")
@@ -365,8 +357,7 @@ namespace Shared.Migrations
 
                     b.HasOne("FLServer.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("FLServer.Models.Team", b =>

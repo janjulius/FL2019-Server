@@ -166,11 +166,85 @@
     <Compile Include="Characters\Characters.cs" />
     <Compile Include="Combat\Formulas.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
+    <Compile Include="General\Gamemode.cs" />
     <Compile Include="General\General.cs" />
+    <Compile Include="General\Map.cs" />
     <Compile Include="Levels\ProgressCalculator.cs" />
-    <Compile Include="Migrations\20190527225601_2019519_0.cs" />
-    <Compile Include="Migrations\20190527225601_2019519_0.designer.cs">
-      <DependentUpon>20190527225601_2019519_0.cs</DependentUpon>
+    <Compile Include="Matches\Matches.cs" />
+    <Compile Include="Matches\Players.cs" />
+    <Compile Include="Matches\Stats.cs" />
+    <Compile Include="Matches\Teams.cs" />
+    <Compile Include="Migrations\20190528122444_initial_create.cs" />
+    <Compile Include="Migrations\20190528122444_initial_create.designer.cs">
+      <DependentUpon>20190528122444_initial_create.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528123056_2019528_0.cs" />
+    <Compile Include="Migrations\20190528123056_2019528_0.designer.cs">
+      <DependentUpon>20190528123056_2019528_0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528123142_2019528_1.cs" />
+    <Compile Include="Migrations\20190528123142_2019528_1.designer.cs">
+      <DependentUpon>20190528123142_2019528_1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528123205_2019528_2.cs" />
+    <Compile Include="Migrations\20190528123205_2019528_2.designer.cs">
+      <DependentUpon>20190528123205_2019528_2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528123407_2019528_3.cs" />
+    <Compile Include="Migrations\20190528123407_2019528_3.designer.cs">
+      <DependentUpon>20190528123407_2019528_3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528142402_2019528_4.cs" />
+    <Compile Include="Migrations\20190528142402_2019528_4.designer.cs">
+      <DependentUpon>20190528142402_2019528_4.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528150054_2019528_6.cs" />
+    <Compile Include="Migrations\20190528150054_2019528_6.designer.cs">
+      <DependentUpon>20190528150054_2019528_6.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528150404_2019528_7.cs" />
+    <Compile Include="Migrations\20190528150404_2019528_7.designer.cs">
+      <DependentUpon>20190528150404_2019528_7.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528154316_2019528_8.cs" />
+    <Compile Include="Migrations\20190528154316_2019528_8.designer.cs">
+      <DependentUpon>20190528154316_2019528_8.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528154555_2019528_9.cs" />
+    <Compile Include="Migrations\20190528154555_2019528_9.designer.cs">
+      <DependentUpon>20190528154555_2019528_9.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528154716_2019528_10.cs" />
+    <Compile Include="Migrations\20190528154716_2019528_10.designer.cs">
+      <DependentUpon>20190528154716_2019528_10.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528163845_2019528_11.cs" />
+    <Compile Include="Migrations\20190528163845_2019528_11.designer.cs">
+      <DependentUpon>20190528163845_2019528_11.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528171438_2019528_12.cs" />
+    <Compile Include="Migrations\20190528171438_2019528_12.designer.cs">
+      <DependentUpon>20190528171438_2019528_12.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528171458_2019528_13.cs" />
+    <Compile Include="Migrations\20190528171458_2019528_13.designer.cs">
+      <DependentUpon>20190528171458_2019528_13.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528171930_2019528_14.cs" />
+    <Compile Include="Migrations\20190528171930_2019528_14.designer.cs">
+      <DependentUpon>20190528171930_2019528_14.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528172632_2019528_15.cs" />
+    <Compile Include="Migrations\20190528172632_2019528_15.designer.cs">
+      <DependentUpon>20190528172632_2019528_15.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528172850_2019528_16.cs" />
+    <Compile Include="Migrations\20190528172850_2019528_16.designer.cs">
+      <DependentUpon>20190528172850_2019528_16.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190528172911_2019528_17.cs" />
+    <Compile Include="Migrations\20190528172911_2019528_17.designer.cs">
+      <DependentUpon>20190528172911_2019528_17.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
@@ -185,6 +259,7 @@
     <Compile Include="Models\Player.cs" />
     <Compile Include="Models\Purchase.cs" />
     <Compile Include="Models\ServerVersion.cs" />
+    <Compile Include="Models\Stats.cs" />
     <Compile Include="Models\Team.cs" />
     <Compile Include="Models\TeamPlayer.cs" />
     <Compile Include="Models\User.cs" />

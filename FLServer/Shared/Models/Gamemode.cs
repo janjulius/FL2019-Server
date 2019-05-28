@@ -12,9 +12,5 @@ namespace FLServer.Models
         public int GamemodeId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public Match Match { get; set; }
-        [ForeignKey("Match")]
-        public int GameModeFK { get;set;}
-
     }
 }

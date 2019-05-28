@@ -12,7 +12,9 @@ namespace FLServer.Models
         public int Winner { get; set; }
         public int MatchTime { get; set; }
         public DateTime MatchPlayed { get; set; }
-        public int Map { get; set; }
-        public string GameMode { get; set; }
+        public Map Map { get; set; }
+        public Gamemode Gamemode { get; set; }
+
+        public ICollection<Team> Teams { get; set; }
     }
 }

@@ -131,19 +131,26 @@ namespace Shared.Users
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                ctx.User.Add(new User()
+                try
                 {
-                    Username = username,
-                    Password = Security.Security.GetHashString(password),
-                    Email = "admin@thwamp.com",
-                    UniqueIdentifier = Guid.NewGuid().ToString(),
-                    CreationDate = DateTime.UtcNow,
-                    Level = 0,
-                    NormalElo = 1250,
-                    RankedElo = 1250,
-                    Verified = true
-                });
-                ctx.SaveChanges();
+                    ctx.User.Add(new User()
+                    {
+                        Username = username,
+                        Password = Security.Security.GetHashString(password),
+                        Email = $"{username}{password}@thwamp.com",
+                        UniqueIdentifier = Guid.NewGuid().ToString(),
+                        CreationDate = DateTime.UtcNow,
+                        Level = 0,
+                        NormalElo = 1250,
+                        RankedElo = 1250,
+                        Verified = true
+                    });
+                    ctx.SaveChanges();
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         }
 
@@ -231,5 +238,23 @@ namespace Shared.Users
             }
         }
 
+        public static void AddMatch(User u, Match m)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                u.Matches.Add(m);
+                ctx.Entry(u).State = EntityState.Modified;
+
+                ctx.SaveChanges();
+            }
+        }
+
+        public static IEnumerable<Match> GetMatches(User u)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return u.Matches.AsEnumerable();
+            }
+        }
     }
 }

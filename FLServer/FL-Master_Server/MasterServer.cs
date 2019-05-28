@@ -163,14 +163,6 @@ namespace FL_Master_Server
                             NetDataWriter writer = new NetDataWriter();
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                             writer.Put((ushort)2004);
-
-                            //writer.Put(u.Balance);
-                            //writer.Put(u.PremiumBalance);
-                            //writer.Put(u.Username);
-                            //writer.Put(u.Avatar);
-                            //writer.Put(u.Level);
-                            //writer.Put(u.Exp);
-                            //writer.PutPackets(UserMethods.GetFriendsAsPacket(u.Username));
                             writer.PutPacket(UserMethods.GetUserAsProfilePartInfoPacket(id));
                             writer.PutPackets(UserMethods.GetFriendsAsPacket(id));
                             fromPeer.Send(writer, DeliveryMethod.Unreliable);

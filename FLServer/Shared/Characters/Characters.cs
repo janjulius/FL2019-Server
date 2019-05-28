@@ -20,7 +20,7 @@ namespace Shared.Characters
          int attackspeed,
          int range,
          int size,
-         int def ,
+         int def,
          DateTime releasedate,
          int price,
          int premiumprice)
@@ -44,6 +44,37 @@ namespace Shared.Characters
                     PremiumPrice = premiumprice
                 };
                 ctx.Character.Add(newChar);
+                ctx.SaveChanges();
+            }
+        }
+
+        public static Character GetCharacterById(int id)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return ctx.Character.Where(c => c.CharacterId == id).FirstOrDefault();
+            }
+        }
+
+        public static Character GetCharacterByName(string name)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return ctx.Character.Where(c => c.Name == name).FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// do not use
+        /// </summary>
+        public static void Truncate()
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                foreach(Character c in ctx.Character)
+                {
+                    ctx.Character.Remove(c);
+                }
                 ctx.SaveChanges();
             }
         }

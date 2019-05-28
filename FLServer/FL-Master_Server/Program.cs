@@ -7,10 +7,6 @@ namespace FL_Master_Server
     {
         static void Main(string[] args)
         {
-            Shared.Characters.Characters.CreateCharacter("Default Char", "Description", "the Undertitle",
-                100, 100, 100, 100, 100, 100, 100,
-                DateTime.UtcNow, 1000, 1000);
-
             if (Constants.UpdateDatabase)
             {
                 Shared.General.General.UpdateVersion(Constants.ServerVersion);

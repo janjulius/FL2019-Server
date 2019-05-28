@@ -28,6 +28,7 @@ namespace FLServer.Models
         public virtual DbSet<Player> Player { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<ServerVersion> ServerVersion {get; set;}
+        public virtual DbSet<Stats> Stats { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,6 +45,21 @@ namespace FLServer.Models
             {
 
             });
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<Character>().HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<Character>().HasIndex(c => c.CharacterId).IsUnique();
+
+            modelBuilder.Entity<Player>().Property(p => p.PlayerId).UseMySqlIdentityColumn();
+            //modelBuilder.Entity<Player>().HasIndex(c => c.PlayerId).IsUnique();
+
+            //modelBuilder.Entity<Player>().HasOne(p => p.User).WithOne().HasForeignKey<User>(u => u.UserId);
+            //modelBuilder.Entity<Player>().HasOne(p => p.Stats).WithOne().HasForeignKey<Stats>(s => s.StatsId);
+            //modelBuilder.Entity<Player>().HasOne(p => p.Character).WithOne().HasForeignKey<Character>(s => s.CharacterId);
         }
     }
 }

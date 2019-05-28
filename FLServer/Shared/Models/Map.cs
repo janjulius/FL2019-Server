@@ -13,8 +13,5 @@ namespace FLServer.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public int Image { get; set; }
-        public Match Match { get; set; }
-        [ForeignKey("Match")]
-        public int MapFK {get; set;}
     }
 }

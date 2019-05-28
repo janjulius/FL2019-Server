@@ -3,15 +3,16 @@ using System;
 using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Shared.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    partial class FLDBContextModelSnapshot : ModelSnapshot
+    [Migration("20190528123205_2019528_2")]
+    partial class _2019528_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,12 +84,6 @@ namespace Shared.Migrations
 
                     b.HasKey("CharacterId");
 
-                    b.HasIndex("CharacterId")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("Character");
                 });
 
@@ -99,9 +94,13 @@ namespace Shared.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<int>("GameModeFK");
+
                     b.Property<string>("Name");
 
                     b.HasKey("GamemodeId");
+
+                    b.HasIndex("GameModeFK");
 
                     b.ToTable("Gamemode");
                 });
@@ -115,9 +114,13 @@ namespace Shared.Migrations
 
                     b.Property<int>("Image");
 
+                    b.Property<int>("MapFK");
+
                     b.Property<string>("Name");
 
                     b.HasKey("MapId");
+
+                    b.HasIndex("MapFK");
 
                     b.ToTable("Map");
                 });
@@ -127,9 +130,9 @@ namespace Shared.Migrations
                     b.Property<int>("MatchId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("GamemodeId");
+                    b.Property<string>("GameMode");
 
-                    b.Property<int?>("MapId");
+                    b.Property<int>("Map");
 
                     b.Property<DateTime>("MatchPlayed");
 
@@ -140,10 +143,6 @@ namespace Shared.Migrations
                     b.Property<int>("Winner");
 
                     b.HasKey("MatchId");
-
-                    b.HasIndex("GamemodeId");
-
-                    b.HasIndex("MapId");
 
                     b.HasIndex("UserId");
 
@@ -172,22 +171,17 @@ namespace Shared.Migrations
             modelBuilder.Entity("FLServer.Models.Player", b =>
                 {
                     b.Property<int>("PlayerId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CharacterId");
-
-                    b.Property<int>("StatsId");
+                    b.Property<int?>("CharacterId");
 
                     b.Property<int?>("TeamId");
 
-                    b.Property<int>("UserId");
+                    b.Property<int?>("UserId");
 
                     b.HasKey("PlayerId");
 
                     b.HasIndex("CharacterId");
-
-                    b.HasIndex("StatsId");
 
                     b.HasIndex("TeamId");
 
@@ -218,26 +212,6 @@ namespace Shared.Migrations
                     b.HasKey("VersionId");
 
                     b.ToTable("ServerVersion");
-                });
-
-            modelBuilder.Entity("FLServer.Models.Stats", b =>
-                {
-                    b.Property<int>("StatsId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("DamageDealt");
-
-                    b.Property<int>("DamageTaken");
-
-                    b.Property<int>("Deaths");
-
-                    b.Property<int>("HighestPercentage");
-
-                    b.Property<int>("Kills");
-
-                    b.HasKey("StatsId");
-
-                    b.ToTable("Stats");
                 });
 
             modelBuilder.Entity("FLServer.Models.Team", b =>
@@ -294,12 +268,6 @@ namespace Shared.Migrations
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("Username")
-                        .IsUnique();
-
                     b.ToTable("User");
                 });
 
@@ -324,16 +292,24 @@ namespace Shared.Migrations
                         .HasForeignKey("CharacterId1");
                 });
 
+            modelBuilder.Entity("FLServer.Models.Gamemode", b =>
+                {
+                    b.HasOne("FLServer.Models.Match", "Match")
+                        .WithMany()
+                        .HasForeignKey("GameModeFK")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("FLServer.Models.Map", b =>
+                {
+                    b.HasOne("FLServer.Models.Match", "Match")
+                        .WithMany()
+                        .HasForeignKey("MapFK")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("FLServer.Models.Match", b =>
                 {
-                    b.HasOne("FLServer.Models.Gamemode", "Gamemode")
-                        .WithMany()
-                        .HasForeignKey("GamemodeId");
-
-                    b.HasOne("FLServer.Models.Map", "Map")
-                        .WithMany()
-                        .HasForeignKey("MapId");
-
                     b.HasOne("FLServer.Models.User")
                         .WithMany("Matches")
                         .HasForeignKey("UserId");
@@ -351,13 +327,7 @@ namespace Shared.Migrations
                 {
                     b.HasOne("FLServer.Models.Character", "Character")
                         .WithMany()
-                        .HasForeignKey("CharacterId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("FLServer.Models.Stats", "Stats")
-                        .WithMany()
-                        .HasForeignKey("StatsId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("CharacterId");
 
                     b.HasOne("FLServer.Models.Team")
                         .WithMany("Players")
@@ -365,8 +335,7 @@ namespace Shared.Migrations
 
                     b.HasOne("FLServer.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("FLServer.Models.Team", b =>
