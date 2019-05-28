@@ -10,12 +10,12 @@ namespace Shared.Characters
 {
     public static class CharacterMethods
     {
-        public static CharacterInfo GetCharacterAsCharacterInfoPacket(string name)
+        public static CharacterInformation GetCharacterAsCharacterInfoPacket(string name)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
                 Character c = GetCharacterByName(name);
-                CharacterInfo result = new CharacterInfo(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense);
+                CharacterInformation result = new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense);
                 return result;
             }
         }

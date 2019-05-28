@@ -2,6 +2,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Authentication;
+using Shared.Characters;
 using Shared.Extensions;
 using Shared.Packets;
 using Shared.Security;
@@ -190,6 +191,16 @@ namespace FL_Master_Server
                     }
                 }
                     break;
+                case 425://Send character
+                    {
+                        string name = dataReader.GetString();
+                        NetDataWriter writer = new NetDataWriter();
+                        CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
+                        writer.Put((ushort)2016);
+                        writer.PutPacket(charinfo);
+                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                        break;
+                    }
                 case 88:
                 {
                 }
