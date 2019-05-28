@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Packets
 {
-    public class CharacterInfo
+    public class CharacterInformation : Packet
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -20,8 +20,8 @@ namespace Shared.Packets
         public int Size { get; set; }
         public int Defense { get; set; }
 
-        public CharacterInfo() { }
-        public CharacterInfo(string name, string description, string underTitle, int damage, int movementspeed, int weight, int attackspeed, int range, int size, int defense)
+        public CharacterInformation() { }
+        public CharacterInformation(string name, string description, string underTitle, int damage, int movementspeed, int weight, int attackspeed, int range, int size, int defense)
         {
             Name = name;
             Description = description;

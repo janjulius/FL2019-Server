@@ -163,6 +163,7 @@
   <ItemGroup>
     <Compile Include="Attributes\Author.cs" />
     <Compile Include="Authentication\UserAuth.cs" />
+    <Compile Include="Characters\CharacterMethods.cs" />
     <Compile Include="Characters\Characters.cs" />
     <Compile Include="Combat\Formulas.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
@@ -191,6 +192,7 @@
     <Compile Include="Models\UserCharacter.cs" />
     <Compile Include="Models\UserFriend.cs" />
     <Compile Include="Models\UserMatch.cs" />
+    <Compile Include="Packets\CharacterInformation.cs" />
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
