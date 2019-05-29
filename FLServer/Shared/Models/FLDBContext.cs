@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using MySql.Data.EntityFrameworkCore.Extensions;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace FLServer.Models
@@ -50,12 +51,22 @@ namespace FLServer.Models
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
+
+            //modelBuilder.Entity<User>(u =>
+            //{
+            //    u.Property(p => p.Username).ForMySQLHasCollation("utf8_bin");
+            //    u.Property(p => p.Username).ForMySQLHasCharset("utf8");
+            //    u.Property(p => p.Status).ForMySQLHasCollation("utf8_bin");
+            //    u.Property(p => p.Status).ForMySQLHasCharset("utf8");
+            //});
+
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
 
             modelBuilder.Entity<Character>().HasIndex(c => c.Name).IsUnique();
             modelBuilder.Entity<Character>().HasIndex(c => c.CharacterId).IsUnique();
 
             modelBuilder.Entity<Player>().Property(p => p.PlayerId).UseMySqlIdentityColumn();
+            
             //modelBuilder.Entity<Player>().HasIndex(c => c.PlayerId).IsUnique();
 
             //modelBuilder.Entity<Player>().HasOne(p => p.User).WithOne().HasForeignKey<User>(u => u.UserId);
