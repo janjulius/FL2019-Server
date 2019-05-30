@@ -203,6 +203,15 @@ namespace FL_Master_Server
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         break;
                     }
+                case 426:  // send all chars
+                    {
+                        NetDataWriter writer = new NetDataWriter();
+                        CharacterInformationArray charinfo = CharacterMethods.GetAllCharactersAsCharacterInfoPackets();
+                        writer.Put((ushort)2017);
+                        writer.PutPacketStruct(charinfo);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                        break;
+                    }
                 case 88:
                 {
                 }

@@ -297,6 +297,7 @@
     <Compile Include="Models\UserFriend.cs" />
     <Compile Include="Models\UserMatch.cs" />
     <Compile Include="Packets\CharacterInformation.cs" />
+    <Compile Include="Packets\CharacterInformationArray.cs" />
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
@@ -311,6 +312,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="FLServer\Migrations\" />
+    <Folder Include="Packets\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
