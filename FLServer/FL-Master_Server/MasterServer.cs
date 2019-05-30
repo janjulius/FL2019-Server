@@ -2,6 +2,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Authentication;
+using Shared.Characters;
 using Shared.Extensions;
 using Shared.Packets;
 using Shared.Security;
@@ -163,14 +164,6 @@ namespace FL_Master_Server
                             NetDataWriter writer = new NetDataWriter();
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                             writer.Put((ushort)2004);
-
-                            //writer.Put(u.Balance);
-                            //writer.Put(u.PremiumBalance);
-                            //writer.Put(u.Username);
-                            //writer.Put(u.Avatar);
-                            //writer.Put(u.Level);
-                            //writer.Put(u.Exp);
-                            //writer.PutPackets(UserMethods.GetFriendsAsPacket(u.Username));
                             writer.PutPacket(UserMethods.GetUserAsProfilePartInfoPacket(id));
                             writer.PutPackets(UserMethods.GetFriendsAsPacket(id));
                             fromPeer.Send(writer, DeliveryMethod.Unreliable);
@@ -198,6 +191,16 @@ namespace FL_Master_Server
                     }
                 }
                     break;
+                case 425://Send character
+                    {
+                        string name = dataReader.GetString();
+                        NetDataWriter writer = new NetDataWriter();
+                        CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
+                        writer.Put((ushort)2016);
+                        writer.PutPacket(charinfo);
+                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                        break;
+                    }
                 case 88:
                 {
                 }

@@ -10,9 +10,6 @@ namespace FLServer.Models
     {
         [Key]
         public int TeamId { get; set; }
-        public Match Match { get; set; }
-        [ForeignKey("Match")]
-        public int MatchFK { get; set; }
-        
+        public ICollection<Player> Players { get; set; }
     }
 }

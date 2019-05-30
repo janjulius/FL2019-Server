@@ -7,9 +7,15 @@ namespace FL_Master_Server
     {
         static void Main(string[] args)
         {
-            Shared.Users.UserMethods.SetExp("wesketa", 10);
-            var a = new Shared.Levels.ProgressCalculator();
-            var b = a.Curve();
+            if (Constants.UpdateDatabase)
+            {
+                Shared.General.General.UpdateVersion(Constants.ServerVersion);
+            }
+            if (Constants.InitializeDatabase)
+            {
+                Shared.General.General.SetVersion(Constants.ServerVersion);
+            }
+
             MasterServer server = new MasterServer();
             server.Run();
             Console.ReadKey();

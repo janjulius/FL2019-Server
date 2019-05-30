@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FLServer.Models
 {
@@ -8,6 +9,7 @@ namespace FLServer.Models
     {
         [Key]
         public int UserId { get; set; }
+        
         [Required]
         public string Username { get; set; }
         [Required]
@@ -26,5 +28,7 @@ namespace FLServer.Models
         public int Avatar { get; set; }
         public string Status { get; set; }
         public bool Verified { get; set; }
+
+        public ICollection<Match> Matches { get; set; }
     }
 }

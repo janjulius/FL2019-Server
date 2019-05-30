@@ -34,7 +34,7 @@ namespace FLServer
             if (Constants.UpdateVersion)
             {
                 Console.WriteLine("Updating server version.");
-                General.SetNewVersion(Constants.ServerVersion);
+                General.UpdateVersion(Constants.ServerVersion);
             }
 
             Console.WriteLine("Assigning NetManager with serverlistener");

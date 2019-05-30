@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using MySql.Data.EntityFrameworkCore.Extensions;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace FLServer.Models
 {
@@ -15,6 +17,7 @@ namespace FLServer.Models
         {
         }
 
+        //public virtual DbSet<Admin> Admin { get; set; }
         public virtual DbSet<Purchase> Purchase { get; set; }
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<UserFriend> UserFriend { get; set; }
@@ -27,13 +30,14 @@ namespace FLServer.Models
         public virtual DbSet<Player> Player { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<ServerVersion> ServerVersion {get; set;}
+        public virtual DbSet<Stats> Stats { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=fl2019.database.windows.net;Database=FLDB;Trusted_Connection=False;Encrypt=True;uid=FLDbLogin;password=P7QrZ)s#xnZTE(q7");
+                optionsBuilder.UseMySql("Server=78.141.211.160;Database=FLDB;User=FLDblogin;Password=P7QrZ)s#xnZTE(q7;SslMode=Preferred;Connection Timeout=30;");
             }
         }
 
@@ -43,6 +47,31 @@ namespace FLServer.Models
             {
 
             });
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+            //modelBuilder.Entity<User>(u =>
+            //{
+            //    u.Property(p => p.Username).ForMySQLHasCollation("utf8_bin");
+            //    u.Property(p => p.Username).ForMySQLHasCharset("utf8");
+            //    u.Property(p => p.Status).ForMySQLHasCollation("utf8_bin");
+            //    u.Property(p => p.Status).ForMySQLHasCharset("utf8");
+            //});
+
+            modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+
+            modelBuilder.Entity<Character>().HasIndex(c => c.Name).IsUnique();
+            modelBuilder.Entity<Character>().HasIndex(c => c.CharacterId).IsUnique();
+
+            modelBuilder.Entity<Player>().Property(p => p.PlayerId).UseMySqlIdentityColumn();
+            
+            //modelBuilder.Entity<Player>().HasIndex(c => c.PlayerId).IsUnique();
+
+            //modelBuilder.Entity<Player>().HasOne(p => p.User).WithOne().HasForeignKey<User>(u => u.UserId);
+            //modelBuilder.Entity<Player>().HasOne(p => p.Stats).WithOne().HasForeignKey<Stats>(s => s.StatsId);
+            //modelBuilder.Entity<Player>().HasOne(p => p.Character).WithOne().HasForeignKey<Character>(s => s.CharacterId);
         }
     }
 }

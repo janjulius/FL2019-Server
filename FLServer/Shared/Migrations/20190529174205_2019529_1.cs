@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace FL_Login_Server.Migrations
+namespace Shared.Migrations
 {
-    public partial class _201957_0 : Migration
+    public partial class _2019529_1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

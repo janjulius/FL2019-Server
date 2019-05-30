@@ -7,27 +7,27 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace FL_Login_Server.Migrations
+namespace Shared.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    [Migration("20190507121349_201957_0")]
-    partial class _201957_0
+    [Migration("20190529174205_2019529_1")]
+    partial class _2019529_1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("FLServer.Models.Ability", b =>
                 {
                     b.Property<int>("CharacterId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("CastTime");
+
+                    b.Property<int?>("CharacterId1");
 
                     b.Property<int>("Cooldown");
 
@@ -45,14 +45,15 @@ namespace FL_Login_Server.Migrations
 
                     b.HasKey("CharacterId");
 
+                    b.HasIndex("CharacterId1");
+
                     b.ToTable("Ability");
                 });
 
             modelBuilder.Entity("FLServer.Models.Character", b =>
                 {
                     b.Property<int>("CharacterId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("AttackSpeed");
 
@@ -67,8 +68,6 @@ namespace FL_Login_Server.Migrations
                     b.Property<int>("MovementSpeed");
 
                     b.Property<string>("Name");
-
-                    b.Property<int>("PlayerFK");
 
                     b.Property<int>("PremiumPrice");
 
@@ -86,7 +85,11 @@ namespace FL_Login_Server.Migrations
 
                     b.HasKey("CharacterId");
 
-                    b.HasIndex("PlayerFK");
+                    b.HasIndex("CharacterId")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Character");
                 });
@@ -94,18 +97,13 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.Gamemode", b =>
                 {
                     b.Property<int>("GamemodeId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description");
-
-                    b.Property<int>("GameModeFK");
 
                     b.Property<string>("Name");
 
                     b.HasKey("GamemodeId");
-
-                    b.HasIndex("GameModeFK");
 
                     b.ToTable("Gamemode");
                 });
@@ -113,20 +111,15 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.Map", b =>
                 {
                     b.Property<int>("MapId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Description");
 
                     b.Property<int>("Image");
 
-                    b.Property<int>("MapFK");
-
                     b.Property<string>("Name");
 
                     b.HasKey("MapId");
-
-                    b.HasIndex("MapFK");
 
                     b.ToTable("Map");
                 });
@@ -134,20 +127,27 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.Match", b =>
                 {
                     b.Property<int>("MatchId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("GameMode");
+                    b.Property<int?>("GamemodeId");
 
-                    b.Property<int>("Map");
+                    b.Property<int?>("MapId");
 
                     b.Property<DateTime>("MatchPlayed");
 
                     b.Property<int>("MatchTime");
 
+                    b.Property<int?>("UserId");
+
                     b.Property<int>("Winner");
 
                     b.HasKey("MatchId");
+
+                    b.HasIndex("GamemodeId");
+
+                    b.HasIndex("MapId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Match");
                 });
@@ -155,8 +155,7 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.Passive", b =>
                 {
                     b.Property<int>("PassiveId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("CharacterFK");
 
@@ -166,7 +165,8 @@ namespace FL_Login_Server.Migrations
 
                     b.HasKey("PassiveId");
 
-                    b.HasIndex("CharacterFK");
+                    b.HasIndex("CharacterFK")
+                        .IsUnique();
 
                     b.ToTable("Passive");
                 });
@@ -175,9 +175,25 @@ namespace FL_Login_Server.Migrations
                 {
                     b.Property<int>("PlayerId")
                         .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CharacterId");
+
+                    b.Property<int>("StatsId");
+
+                    b.Property<int?>("TeamId");
+
+                    b.Property<int>("UserId");
 
                     b.HasKey("PlayerId");
+
+                    b.HasIndex("CharacterId");
+
+                    b.HasIndex("StatsId");
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Player");
                 });
@@ -185,8 +201,7 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.Purchase", b =>
                 {
                     b.Property<int>("PurchaseId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("PurchaseDate");
 
@@ -207,17 +222,36 @@ namespace FL_Login_Server.Migrations
                     b.ToTable("ServerVersion");
                 });
 
+            modelBuilder.Entity("FLServer.Models.Stats", b =>
+                {
+                    b.Property<int>("StatsId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("DamageDealt");
+
+                    b.Property<int>("DamageTaken");
+
+                    b.Property<int>("Deaths");
+
+                    b.Property<int>("HighestPercentage");
+
+                    b.Property<int>("Kills");
+
+                    b.HasKey("StatsId");
+
+                    b.ToTable("Stats");
+                });
+
             modelBuilder.Entity("FLServer.Models.Team", b =>
                 {
                     b.Property<int>("TeamId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<int>("MatchFK");
+                    b.Property<int?>("MatchId");
 
                     b.HasKey("TeamId");
 
-                    b.HasIndex("MatchFK");
+                    b.HasIndex("MatchId");
 
                     b.ToTable("Team");
                 });
@@ -225,8 +259,7 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.User", b =>
                 {
                     b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("Avatar");
 
@@ -252,14 +285,26 @@ namespace FL_Login_Server.Migrations
 
                     b.Property<int>("RankedElo");
 
-                    b.Property<string>("Status");
+                    b.Property<string>("Status")
+                        .HasAnnotation("MySQL:Charset", "utf8")
+                        .HasAnnotation("MySQL:Collation", "utf8_bin");
+
+                    b.Property<string>("UniqueIdentifier");
 
                     b.Property<string>("Username")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasAnnotation("MySQL:Charset", "utf8")
+                        .HasAnnotation("MySQL:Collation", "utf8_bin");
 
                     b.Property<bool>("Verified");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("User");
                 });
@@ -267,8 +312,7 @@ namespace FL_Login_Server.Migrations
             modelBuilder.Entity("FLServer.Models.UserFriend", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("FriendId");
 
@@ -279,44 +323,63 @@ namespace FL_Login_Server.Migrations
                     b.ToTable("UserFriend");
                 });
 
-            modelBuilder.Entity("FLServer.Models.Character", b =>
+            modelBuilder.Entity("FLServer.Models.Ability", b =>
                 {
-                    b.HasOne("FLServer.Models.Player", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerFK")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("FLServer.Models.Character")
+                        .WithMany("Abilities")
+                        .HasForeignKey("CharacterId1");
                 });
 
-            modelBuilder.Entity("FLServer.Models.Gamemode", b =>
+            modelBuilder.Entity("FLServer.Models.Match", b =>
                 {
-                    b.HasOne("FLServer.Models.Match", "Match")
+                    b.HasOne("FLServer.Models.Gamemode", "Gamemode")
                         .WithMany()
-                        .HasForeignKey("GameModeFK")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
+                        .HasForeignKey("GamemodeId");
 
-            modelBuilder.Entity("FLServer.Models.Map", b =>
-                {
-                    b.HasOne("FLServer.Models.Match", "Match")
+                    b.HasOne("FLServer.Models.Map", "Map")
                         .WithMany()
-                        .HasForeignKey("MapFK")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("MapId");
+
+                    b.HasOne("FLServer.Models.User")
+                        .WithMany("Matches")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("FLServer.Models.Passive", b =>
                 {
                     b.HasOne("FLServer.Models.Character", "Character")
+                        .WithOne("Passive")
+                        .HasForeignKey("FLServer.Models.Passive", "CharacterFK")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("FLServer.Models.Player", b =>
+                {
+                    b.HasOne("FLServer.Models.Character", "Character")
                         .WithMany()
-                        .HasForeignKey("CharacterFK")
+                        .HasForeignKey("CharacterId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("FLServer.Models.Stats", "Stats")
+                        .WithMany()
+                        .HasForeignKey("StatsId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("FLServer.Models.Team")
+                        .WithMany("Players")
+                        .HasForeignKey("TeamId");
+
+                    b.HasOne("FLServer.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("FLServer.Models.Team", b =>
                 {
-                    b.HasOne("FLServer.Models.Match", "Match")
-                        .WithMany()
-                        .HasForeignKey("MatchFK")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("FLServer.Models.Match")
+                        .WithMany("Teams")
+                        .HasForeignKey("MatchId");
                 });
 #pragma warning restore 612, 618
         }
