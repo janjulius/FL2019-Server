@@ -92,7 +92,7 @@ namespace Shared.Users
             {
                 User u = GetUserByUsername(name);
                 ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
-                    , u.Avatar, u.Level, u.Exp);
+                    , u.Avatar, u.Level, u.Exp, GetFriendsAsPacket(name));
 
                 return result;
             }
