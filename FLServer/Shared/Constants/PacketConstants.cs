@@ -9,5 +9,6 @@ namespace Shared.Constants
     class PacketConstants
     {
         internal const int maxFriends = 200;
+        internal const int DefaultStringSize = 100;
     }
 }

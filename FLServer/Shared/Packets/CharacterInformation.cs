@@ -1,26 +1,30 @@
-﻿using System;
+﻿using Shared.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Shared.Packets
 {
-    public class CharacterInformation : Packet
+    public struct CharacterInformation
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string UnderTitle { get; set; }
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        public string Name;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        public string Description;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        public string UnderTitle;
 
-        public int Damage { get; set; }
-        public int MovementSpeed { get; set; }
-        public int Weight { get; set; }
-        public int AttackSpeed { get; set; }
-        public int Range { get; set; }
-        public int Size { get; set; }
-        public int Defense { get; set; }
-
-        public CharacterInformation() { }
+        public int Damage;
+        public int MovementSpeed;
+        public int Weight;
+        public int AttackSpeed;
+        public int Range;
+        public int Size;
+        public int Defense;
+        
         public CharacterInformation(string name, string description, string underTitle, int damage, int movementspeed, int weight, int attackspeed, int range, int size, int defense)
         {
             Name = name;

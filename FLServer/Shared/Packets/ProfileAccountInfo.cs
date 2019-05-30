@@ -1,23 +1,24 @@
-﻿using System;
+﻿using Shared.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Shared.Packets
 {
-    public class ProfileAccountInfo : Packet
+    public struct ProfileAccountInfo
     {
-        public string Username { get; internal set; } = "Not found";
-        public int Avatar { get; internal set; }
-        public int Level { get; internal set; } = 0;
-        public int Exp { get; internal set; } = 0;
-        public string LastOnline { get; internal set; }
-        public string ErrorMessage { get; internal set; }
-
-        public ProfileAccountInfo()
-        {
-        }
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        public string Username;
+        public int Avatar;
+        public int Level;
+        public int Exp;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        public string LastOnline;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        public string ErrorMessage;
 
         public ProfileAccountInfo(string username, int avatar, int level, int exp, string lastOnline, string errorMessage)
         {

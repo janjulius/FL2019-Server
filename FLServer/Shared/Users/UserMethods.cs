@@ -215,16 +215,12 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(id);
-                if (u != null)
-                {
                     return new ProfileAccountInfo(u.Username,
                         u.Avatar,
                         u.Level,
                         u.Exp,
                         u.LastOnline.ToString(),
                         String.Empty);
-                }
-                return null;
             }
         }
 

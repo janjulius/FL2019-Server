@@ -182,13 +182,13 @@ namespace FL_Master_Server
                     if(string.IsNullOrEmpty(pai.ErrorMessage))
                     {
                         writer.Put((ushort)2005);
-                        writer.PutPacket(pai);
+                        writer.PutPacketStruct(pai);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
                     else
                     {
                         writer.Put((ushort) 2006);
-                        writer.PutPacket(pai);
+                        writer.PutPacketStruct(pai);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
                 }
@@ -199,7 +199,7 @@ namespace FL_Master_Server
                         NetDataWriter writer = new NetDataWriter();
                         CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
                         writer.Put((ushort)2016);
-                        writer.PutPacket(charinfo);
+                        writer.PutPacketStruct(charinfo);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         break;
                     }
