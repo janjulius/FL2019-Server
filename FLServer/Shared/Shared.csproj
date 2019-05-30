@@ -185,6 +185,7 @@
     <Compile Include="Characters\CharacterMethods.cs" />
     <Compile Include="Characters\Characters.cs" />
     <Compile Include="Combat\Formulas.cs" />
+    <Compile Include="Constants\PacketConstants.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
     <Compile Include="Extensions\StructExtension.cs" />
     <Compile Include="General\Gamemode.cs" />

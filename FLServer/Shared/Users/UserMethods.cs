@@ -91,8 +91,9 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(name);
+                FriendSlotPacket[] friends = GetFriendsAsPacket(name);
                 ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
-                    , u.Avatar, u.Level, u.Exp, GetFriendsAsPacket(name));
+                    , u.Avatar, u.Level, u.Exp, friends.Length, friends);
 
                 return result;
             }

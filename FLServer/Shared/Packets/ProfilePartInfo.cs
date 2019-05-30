@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shared.Constants;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Shared.Packets
@@ -13,9 +14,11 @@ namespace Shared.Packets
         public int Avatar;
         public int Level;
         public int Exp;
+        public int AmountOfFriends;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PacketConstants.maxFriends)]
         public FriendSlotPacket[] Friends;
 
-        public ProfilePartInfo(string userName, int currency, int premiumCurrency, int avatar, int level, int exp, FriendSlotPacket[] friends) : this()
+        public ProfilePartInfo(string userName, int currency, int premiumCurrency, int avatar, int level, int exp, int amountoffriends, FriendSlotPacket[] friends) : this()
         {
             UserName = userName;
             Currency = currency;
@@ -23,7 +26,9 @@ namespace Shared.Packets
             Avatar = avatar;
             Level = level;
             Exp = exp;
-            Friends = friends;
+            AmountOfFriends = amountoffriends;
+            Friends = new FriendSlotPacket[PacketConstants.maxFriends];
+            for (int i = 0; i < friends.Length; i++) { Friends[i] = friends[i]; }
         }
     }
 }
