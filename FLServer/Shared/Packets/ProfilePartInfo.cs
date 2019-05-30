@@ -1,24 +1,29 @@
-﻿namespace Shared.Packets
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace Shared.Packets
 {
-        public class ProfilePartInfo : Packet
+    [Serializable]
+    public struct ProfilePartInfo
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
+        public string UserName;
+        public int Currency;
+        public int PremiumCurrency;
+        public int Avatar;
+        public int Level;
+        public int Exp;
+        public FriendSlotPacket[] Friends;
+
+        public ProfilePartInfo(string userName, int currency, int premiumCurrency, int avatar, int level, int exp, FriendSlotPacket[] friends) : this()
         {
-            public string UserName { get; set; }
-            public int Currency { get; set; }
-            public int PremiumCurrency { get; set; }
-            public int Avatar { get; set; }
-            public int Level { get; set; }
-            public int Exp { get; set; }
-
-            public ProfilePartInfo() { }
-
-            public ProfilePartInfo(string userName, int currency, int premiumCurrency, int avatar, int level, int exp)
-            {
-                UserName = userName;
-                Currency = currency;
-                PremiumCurrency = premiumCurrency;
-                Avatar = avatar;
-                Level = level;
-                Exp = exp;
-            }
+            UserName = userName;
+            Currency = currency;
+            PremiumCurrency = premiumCurrency;
+            Avatar = avatar;
+            Level = level;
+            Exp = exp;
+            Friends = friends;
         }
+    }
 }

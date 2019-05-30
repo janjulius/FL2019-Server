@@ -164,9 +164,11 @@ namespace FL_Master_Server
                             NetDataWriter writer = new NetDataWriter();
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                             writer.Put((ushort)2004);
-                            writer.PutPacket(UserMethods.GetUserAsProfilePartInfoPacket(id));
-                            writer.PutPackets(UserMethods.GetFriendsAsPacket(id));
-                            fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                            writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(id));
+                            //writer.PutPacketsStruct(UserMethods.GetFriendsAsPacket(id));
+                            //writer.PutPacketsStruct(UserMethods.GetFriendsAsPacket(id));
+                            //writer.PutPacket(UserMethods.GetUserAsProfilePartInfoPacket(id));
+                            fromPeer.Send(writer, DeliveryMethod.ReliableOrdered); 
                         }
                     }
                     break;
@@ -181,13 +183,13 @@ namespace FL_Master_Server
                     {
                         writer.Put((ushort)2005);
                         writer.PutPacket(pai);
-                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
                     else
                     {
                         writer.Put((ushort) 2006);
                         writer.PutPacket(pai);
-                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
                 }
                     break;
@@ -198,7 +200,7 @@ namespace FL_Master_Server
                         CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
                         writer.Put((ushort)2016);
                         writer.PutPacket(charinfo);
-                        fromPeer.Send(writer, DeliveryMethod.Unreliable);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         break;
                     }
                 case 88:
