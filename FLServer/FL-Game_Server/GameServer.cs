@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
@@ -18,6 +19,7 @@ namespace FL_Game_Server
         private string masterKey;
         private byte roomType;
         private string serverName;
+        private GameState inGame = GameState.InLobby;
 
         private EventBasedNetListener listener;
         private NetManager server;
@@ -27,6 +29,14 @@ namespace FL_Game_Server
 
         public Random rand = new Random();
 
+
+        enum GameState
+        {
+            InLobby = 0,
+            InGame = 1,
+            InPostGame = 2,
+        }
+        
         public void Run(string[] args)
         {
             if (args.Length > 0)
@@ -86,7 +96,7 @@ namespace FL_Game_Server
 
         private void GetConnectionRequest(ConnectionRequest request)
         {
-            if (server.PeersCount < maxConnections)
+            if (server.PeersCount < maxConnections && inGame == GameState.InLobby)
                 request.AcceptIfKey(masterKey);
             else
                 request.Reject();
@@ -193,6 +203,7 @@ namespace FL_Game_Server
             switch (msgid)
             {
                 case 1:
+                {
                     var playerId = dataReader.GetInt();
                     var pName = dataReader.GetString();
                     var isHost = dataReader.GetBool();
@@ -204,7 +215,7 @@ namespace FL_Game_Server
                     Players.Add(playerId, player);
                     player.SendNewPlayerData(writer);
                     SendOthers(peer, writer, DeliveryMethod.ReliableOrdered);
-
+                }
                     break;
                 case 4:
                     var playerUpdateId = dataReader.GetInt();
@@ -213,7 +224,7 @@ namespace FL_Game_Server
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                     break;
                 case 101: //create networkObject
-
+                {
                     int objectId;
 
                     do
@@ -237,17 +248,21 @@ namespace FL_Game_Server
 
                     netObj.SendObjectData(writer);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
                     break;
 
                 case 102:
+                {
                     var objectToDelete = dataReader.GetInt();
                     NetworkObjects.Remove(objectToDelete);
 
                     writer.Put((ushort) 102);
                     writer.Put(objectToDelete);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
                     break;
                 case 103:
+                {
                     var objectToUpdate = dataReader.GetInt();
                     if (NetworkObjects.ContainsKey(objectToUpdate))
                     {
@@ -255,9 +270,10 @@ namespace FL_Game_Server
                         NetworkObjects[objectToUpdate].WriteData(writer);
                         SendOthers(peer, writer, DeliveryMethod.Unreliable);
                     }
-
+                }
                     break;
                 case 201:
+                {
                     byte[] data = new byte[dataReader.UserDataSize];
                     Array.Copy(dataReader.RawData, dataReader.UserDataOffset, data, 0, dataReader.UserDataSize);
                     var target = dataReader.GetByte();
@@ -275,17 +291,34 @@ namespace FL_Game_Server
                             server.SendToAll(data, DeliveryMethod.ReliableUnordered);
                             break;
                     }
-
+                }
                     break;
 
+                case 300:
+                {
+                    //to post game
+                }
+                    break;
+                
                 case 301:
+                {
                     var levelId = dataReader.GetInt();
+
+                    if (levelId == -2)
+                        inGame = GameState.InLobby;
+                    else if (levelId == -3)
+                        inGame = GameState.InPostGame;
+                    else
+                        inGame = GameState.InGame;
+
+
                     writer.Put((ushort) 301);
                     writer.Put(levelId);
 
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
 
                     NetworkObjects.Clear();
+                }
                     break;
             }
 
