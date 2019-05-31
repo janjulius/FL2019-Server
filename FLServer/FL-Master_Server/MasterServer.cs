@@ -73,7 +73,7 @@ namespace FL_Master_Server
             listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
-
+            
             while (running)
             {
                 server.PollEvents();

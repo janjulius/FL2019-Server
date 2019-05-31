@@ -26,7 +26,7 @@ namespace Shared.Characters
                 Character c = null;
                 try
                 {
-                    c = ctx.Character.Where(n => n.Name == name).First();
+                    c = ctx.Character.Where(character => character.Name == name).First();
                 }
                 catch
                 {
