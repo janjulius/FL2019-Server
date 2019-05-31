@@ -26,7 +26,7 @@ namespace Shared.Characters
                 Character c = null;
                 try
                 {
-                    c = ctx.Character.Where(n => n.Name == name).First();
+                    c = ctx.Character.Where(character => character.Name == name).First();
                 }
                 catch
                 {
@@ -34,6 +34,31 @@ namespace Shared.Characters
                 }
                 return c;
             }
+        }
+
+        public static CharacterInformationArray GetAllCharactersAsCharacterInfoPackets()
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                CharacterInformationArray cia = new CharacterInformationArray();
+                List<CharacterInformation> chars = new List<CharacterInformation>();
+                for(int i = 0; i < Constants.PacketConstants.CharacterCount; i++)
+                {
+                    chars.Add(CharacterToCharacterInformationPacket(ctx.Character.FirstOrDefault()));
+                }
+                var realchars = ctx.Character.Where(c => c.Name != "Default Char").AsEnumerable().ToList();
+                for (int i = 0; i < realchars.Count(); i++)
+                {
+                    chars[i] = CharacterToCharacterInformationPacket(realchars[i]);
+                }
+                cia.chars = chars.ToArray();
+                return cia;
+            }
+        }
+
+        public static CharacterInformation CharacterToCharacterInformationPacket(Character c)
+        {
+            return new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense);
         }
     }
 }

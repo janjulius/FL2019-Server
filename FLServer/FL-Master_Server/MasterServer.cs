@@ -73,7 +73,7 @@ namespace FL_Master_Server
             listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
-
+            
             while (running)
             {
                 server.PollEvents();
@@ -165,9 +165,6 @@ namespace FL_Master_Server
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                             writer.Put((ushort)2004);
                             writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(id));
-                            //writer.PutPacketsStruct(UserMethods.GetFriendsAsPacket(id));
-                            //writer.PutPacketsStruct(UserMethods.GetFriendsAsPacket(id));
-                            //writer.PutPacket(UserMethods.GetUserAsProfilePartInfoPacket(id));
                             fromPeer.Send(writer, DeliveryMethod.ReliableOrdered); 
                         }
                     }
@@ -176,19 +173,18 @@ namespace FL_Master_Server
                 {
                     string id = dataReader.GetString();
                     NetDataWriter writer = new NetDataWriter();
-                        //FLServer.Models.User u = UserMethods.GetUserByUsername(id);
                     ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id);
 
                     if(string.IsNullOrEmpty(pai.ErrorMessage))
                     {
                         writer.Put((ushort)2005);
-                        writer.PutPacket(pai);
+                        writer.PutPacketStruct(pai);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
                     else
                     {
                         writer.Put((ushort) 2006);
-                        writer.PutPacket(pai);
+                        writer.PutPacketStruct(pai);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
                 }
@@ -199,7 +195,16 @@ namespace FL_Master_Server
                         NetDataWriter writer = new NetDataWriter();
                         CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
                         writer.Put((ushort)2016);
-                        writer.PutPacket(charinfo);
+                        writer.PutPacketStruct(charinfo);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                        break;
+                    }
+                case 426:  // send all chars
+                    {
+                        NetDataWriter writer = new NetDataWriter();
+                        CharacterInformationArray charinfo = CharacterMethods.GetAllCharactersAsCharacterInfoPackets();
+                        writer.Put((ushort)2017);
+                        writer.PutPacketStruct(charinfo);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         break;
                     }
@@ -213,6 +218,14 @@ namespace FL_Master_Server
                     int id = dataReader.GetInt();
                     UserMethods.SetAvatar(name, id);
                 }
+                break;
+
+                case 471://setting status text
+                    {
+                        string name = dataReader.GetString();
+                        string id = dataReader.GetString();
+                        UserMethods.SetStatusText(name, id);
+                    }
                     break;
                 case 600:
                 {
@@ -247,7 +260,7 @@ namespace FL_Master_Server
                             writer.Put(gameServer.Value.serverName);
                             writer.Put(gameServer.Value.totalPlayers);
                             writer.Put(gameServer.Value.maxPlayers);
-                            writer.Put("127.0.0.1");
+                            writer.Put("localhost");
                             writer.Put(gameServer.Value.masterKey);
                             writer.Put(gameServer.Value.port);
 
@@ -267,7 +280,7 @@ namespace FL_Master_Server
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                                 "\\GameServer\\FL_Game_Server.dll";
-            //Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
+            Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
             try
             {
                 var process = new Process()

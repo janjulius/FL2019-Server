@@ -91,8 +91,9 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(name);
+                FriendSlotPacket[] friends = GetFriendsAsPacket(name);
                 ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
-                    , u.Avatar, u.Level, u.Exp, GetFriendsAsPacket(name));
+                    , u.Avatar, u.Level, u.Exp, friends.Length, friends);
 
                 return result;
             }
@@ -214,16 +215,12 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(id);
-                if (u != null)
-                {
                     return new ProfileAccountInfo(u.Username,
                         u.Avatar,
                         u.Level,
                         u.Exp,
                         u.LastOnline.ToString(),
                         String.Empty);
-                }
-                return null;
             }
         }
 
@@ -233,6 +230,17 @@ namespace Shared.Users
             {
                 User u = GetUserByUsername(username);
                 u.Avatar = id;
+                ctx.Entry(u).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void SetStatusText(string name, string text)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(name);
+                u.Status = text;
                 ctx.Entry(u).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
