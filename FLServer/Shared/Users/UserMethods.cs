@@ -144,7 +144,8 @@ namespace Shared.Users
                         Level = 0,
                         NormalElo = 1250,
                         RankedElo = 1250,
-                        Verified = true
+                        Verified = true,
+                        Rights = 0
                     });
                     ctx.SaveChanges();
                 }

@@ -186,6 +186,7 @@
     <Compile Include="Characters\Characters.cs" />
     <Compile Include="Combat\Formulas.cs" />
     <Compile Include="Constants\PacketConstants.cs" />
+    <Compile Include="Encoder\PacketEncoder.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
     <Compile Include="Extensions\StructExtension.cs" />
     <Compile Include="General\Gamemode.cs" />
@@ -276,6 +277,10 @@
     <Compile Include="Migrations\20190529174205_2019529_1.designer.cs">
       <DependentUpon>20190529174205_2019529_1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190531185000_2019531_0.cs" />
+    <Compile Include="Migrations\20190531185000_2019531_0.designer.cs">
+      <DependentUpon>20190531185000_2019531_0.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />
@@ -305,6 +310,7 @@
     <Compile Include="Ranked\RankedFormulas.cs" />
     <Compile Include="Security\Security.cs" />
     <Compile Include="Packets\FriendSlotPacket.cs" />
+    <Compile Include="Users\Content\Commands.cs" />
     <Compile Include="Users\UserMethods.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -312,6 +318,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Enums\" />
     <Folder Include="FLServer\Migrations\" />
     <Folder Include="Packets\Interfaces\" />
   </ItemGroup>

@@ -227,6 +227,11 @@ namespace FL_Master_Server
                         UserMethods.SetStatusText(name, id);
                     }
                     break;
+
+                case 476:
+                    {
+                        //TODO
+                    } break;
                 case 600:
                 {
                     string serverName = dataReader.GetString();
@@ -288,13 +293,12 @@ namespace FL_Master_Server
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "dotnet",
-                        Arguments = $"{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}",
+                        Arguments = $"\"{pathToFile}\" {port} {masterKey} {roomType} {serverName} {maxPlayers}",
                         UseShellExecute = false,
-                        CreateNoWindow = true,
+                        CreateNoWindow = false,
                     }
-                };
-
-                process.Start();
+                }; Console.WriteLine(process.Start());
+                //process.Start();
             }
             catch (Exception ex)
             {
