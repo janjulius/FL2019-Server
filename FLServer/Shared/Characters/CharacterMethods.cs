@@ -46,6 +46,11 @@ namespace Shared.Characters
                 {
                     chars.Add(CharacterToCharacterInformationPacket(ctx.Character.FirstOrDefault()));
                 }
+                var realchars = ctx.Character.Where(c => c.Name != "Default Char").AsEnumerable().ToList();
+                for (int i = 0; i < realchars.Count(); i++)
+                {
+                    chars[i] = CharacterToCharacterInformationPacket(realchars[i]);
+                }
                 cia.chars = chars.ToArray();
                 return cia;
             }
