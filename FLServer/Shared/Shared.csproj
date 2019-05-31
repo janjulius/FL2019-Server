@@ -299,6 +299,7 @@
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ranked\RankedFormulas.cs" />
     <Compile Include="Security\Security.cs" />
     <Compile Include="Packets\FriendSlotPacket.cs" />
     <Compile Include="Users\UserMethods.cs" />
