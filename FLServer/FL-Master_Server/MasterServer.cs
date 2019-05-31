@@ -73,7 +73,7 @@ namespace FL_Master_Server
             listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
-
+            
             while (running)
             {
                 server.PollEvents();
@@ -199,6 +199,15 @@ namespace FL_Master_Server
                         NetDataWriter writer = new NetDataWriter();
                         CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
                         writer.Put((ushort)2016);
+                        writer.PutPacketStruct(charinfo);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                        break;
+                    }
+                case 426:  // send all chars
+                    {
+                        NetDataWriter writer = new NetDataWriter();
+                        CharacterInformationArray charinfo = CharacterMethods.GetAllCharactersAsCharacterInfoPackets();
+                        writer.Put((ushort)2017);
                         writer.PutPacketStruct(charinfo);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         break;
