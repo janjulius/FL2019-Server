@@ -185,7 +185,9 @@
     <Compile Include="Characters\CharacterMethods.cs" />
     <Compile Include="Characters\Characters.cs" />
     <Compile Include="Combat\Formulas.cs" />
+    <Compile Include="Constants\PacketConstants.cs" />
     <Compile Include="Extensions\NetDataWriterExtension.cs" />
+    <Compile Include="Extensions\StructExtension.cs" />
     <Compile Include="General\Gamemode.cs" />
     <Compile Include="General\General.cs" />
     <Compile Include="General\Map.cs" />
@@ -295,6 +297,7 @@
     <Compile Include="Models\UserFriend.cs" />
     <Compile Include="Models\UserMatch.cs" />
     <Compile Include="Packets\CharacterInformation.cs" />
+    <Compile Include="Packets\CharacterInformationArray.cs" />
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
@@ -310,6 +313,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="FLServer\Migrations\" />
+    <Folder Include="Packets\Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

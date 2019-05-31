@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,14 @@ namespace Shared.Extensions
     [Author("Jan Julius de Lang", version = 1.0)]
     public static class NetDataWriterExtension
     {
+        public static void PutPacketStruct<T>(this NetDataWriter ndw, T packet) where T : struct
+        {
+            ndw.Put(packet.ToByteArray());
+        }
+
+        
+
+        [Obsolete("Is obsolete use PutPacketStruct instead")]
         public static void PutPacket<T>(this NetDataWriter ndw, T packet) where T : Packet
         {
             foreach(var property in packet.GetType().GetProperties())
@@ -28,6 +37,7 @@ namespace Shared.Extensions
             }
         }
 
+        [Obsolete("Is obsolete use PutPacketStruct instead")]
         public static void PutPackets<T>(this NetDataWriter ndw, T[] packets) where T : Packet
         {
             if (packets.Length > 0)
@@ -126,7 +136,7 @@ namespace Shared.Extensions
                     ndw.Put((float)item);
             }
         }
-        
+
 
         //public static void PutFriendSlotPacket(this NetDataWriter ndw, FriendSlotPacket fsp)
         //{
@@ -139,6 +149,68 @@ namespace Shared.Extensions
         //    ndw.PutArray(fsp.Select(friend => friend.Status).ToArray());
         //    ndw.PutArray(fsp.Select(friend => friend.AvatarId).ToArray());
         //}
+
+        //static byte[] getBytes<T>(T str) where T : struct
+        //{
+        //    int size = Marshal.SizeOf(str);
+        //    byte[] arr = new byte[size];
+        //
+        //    IntPtr ptr = Marshal.AllocHGlobal(size);
+        //    Marshal.StructureToPtr(str, ptr, true);
+        //    Marshal.Copy(ptr, arr, 0, size);
+        //    Marshal.FreeHGlobal(ptr);
+        //    return arr;
+        //}
+        //
+        //public static void PutPacketsStruct<T>(this NetDataWriter ndw, T[] packets) where T : struct
+        //{
+        //    int sizetest = Marshal.SizeOf(packets[0]);
+        //    byte[] put = new byte[sizetest * packets.Length];
+        //    
+        //    ndw.Put((ushort)packets.Length);
+        //    ndw.Put((ushort)sizetest);
+        //
+        //    int pos = 0;
+        //    foreach(T packet in packets)
+        //    {
+        //        foreach(byte b in getBytes(packet))
+        //        {
+        //            put[pos] = b;
+        //            pos++;
+        //        }
+        //    }
+        //
+        //    ndw.Put(put);
+        //    //foreach()
+        //    //ndw.Put((ushort)packets.Length);
+        //    //
+        //    //ndw.Put((ushort)packets[0].Length);
+        //    //ndw.Put(bytes);
+        //}
+        //
+        //static byte[][] getBytesArray<T>(T[] str) where T : struct
+        //{
+        //    int size = Marshal.SizeOf(str);
+        //    byte[][] total = new byte[str.Length][];
+        //    for(int i = 0; i < str.Length; i++)
+        //    {
+        //        total[i] = new byte[size];
+        //        total[i] = getBytes(str[i]);
+        //    }
+        //    return total;
+        //}
+
+        // static byte[] getBytes<T>(T[] str) where T : struct
+        // {   
+        //     int size = Marshal.SizeOf(str);
+        //     byte[] arr = new byte[size];
+        //
+        //     IntPtr ptr = Marshal.AllocHGlobal(size);
+        //     Marshal.StructureToPtr(str, ptr, true);
+        //     Marshal.Copy(ptr, arr, 0, size);
+        //     Marshal.FreeHGlobal(ptr);
+        //     return arr;
+        // }
 
     }
 }
