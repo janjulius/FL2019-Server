@@ -235,6 +235,17 @@ namespace Shared.Users
             }
         }
 
+        public static void SetStatusText(string name, string text)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                User u = GetUserByUsername(name);
+                u.Status = text;
+                ctx.Entry(u).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
         public static void AddMatch(User u, Match m)
         {
             using (FLDBContext ctx = new FLDBContext())
