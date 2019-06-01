@@ -1,4 +1,4 @@
-﻿using FL_Master_Server.User;
+﻿using FL_Master_Server.Player;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Authentication;
@@ -9,12 +9,14 @@ using Shared.Security;
 using Shared.Users;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using FLServer.Models;
 
 namespace FL_Master_Server
 {
@@ -64,6 +66,7 @@ namespace FL_Master_Server
             listener.PeerConnectedEvent += peer =>
             {
                 Console.WriteLine("We got connection: {0}", peer.EndPoint); // Show peer ip
+                NetworkUsers.Add(new NetworkUser(peer, null));
             };
 
             listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
@@ -151,8 +154,7 @@ namespace FL_Master_Server
                     {
                         string id = dataReader.GetString();
                         string pwd = Security.GetHashString(dataReader.GetString());
-                        Console.WriteLine($"Got a conection from UniquePlayer: {id}");
-                        Console.WriteLine($"Verifying the user {id}({id.Length}):{pwd}({pwd.Length})");
+                        Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})");
                         var friends = UserMethods.GetFriendsAsPacket(id);
                         if (!UserAuth.VerifyPassword(id, pwd))
                         {
@@ -163,6 +165,13 @@ namespace FL_Master_Server
                         {
                             NetDataWriter writer = new NetDataWriter();
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+
+                            NetworkUser me = GetNetworkUserFromPeer(fromPeer);
+                            if (me != null)
+                                me.User = u;
+                            else
+                                break; //user not found somehow not connected
+
                             writer.Put((ushort)2004);
                             writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(id));
                             fromPeer.Send(writer, DeliveryMethod.ReliableOrdered); 
@@ -309,6 +318,15 @@ namespace FL_Master_Server
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
             Console.WriteLine($"peer disconnected: {peer.EndPoint}");
+        }
+
+        private NetworkUser GetNetworkUserFromPeer(NetPeer fpeer)
+        {
+            NetworkUser result = NetworkUsers.Where(nu => nu.Peer == fpeer).FirstOrDefault();
+            if (result != null)
+                return result;
+
+            return null;
         }
     }
 }
