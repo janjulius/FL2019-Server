@@ -379,7 +379,7 @@ namespace FL_Master_Server
 
         private NetworkUser GetNetworkUserFromPeer(NetPeer fpeer)
         {
-            NetworkUser result = NetworkUsers.Where(nu => nu.Peer == fpeer && nu.User != null).FirstOrDefault();
+            NetworkUser result = NetworkUsers.Where(nu => nu.Peer == fpeer).FirstOrDefault();
             if (result != null)
                 return result;
 
