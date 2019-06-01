@@ -11,6 +11,10 @@ namespace FL_Master_Server.Player
         public NetPeer Peer { get; set; }
         public User User { get; set; }
         
-        public NetworkUser(NetPeer peer, User user) { }
+        public NetworkUser(NetPeer peer, User user)
+        {
+            Peer = peer;
+            User = user;
+        }
     }
 }

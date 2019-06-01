@@ -154,7 +154,7 @@ namespace FL_Master_Server
                     {
                         string id = dataReader.GetString();
                         string pwd = Security.GetHashString(dataReader.GetString());
-                        Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})");
+                        Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})peer:{fromPeer}");
                         var friends = UserMethods.GetFriendsAsPacket(id);
                         if (!UserAuth.VerifyPassword(id, pwd))
                         {
@@ -221,11 +221,14 @@ namespace FL_Master_Server
                 {
                 }
                     break;
-                case 470: //setting avatarTODO: safety
+                case 470: //setting avatar
                 {
                     string name = dataReader.GetString();
                     int id = dataReader.GetInt();
-                    UserMethods.SetAvatar(name, id);
+                    if (GetNetworkUserFromPeer(fromPeer).User.Username == name)
+                    {
+                        UserMethods.SetAvatar(name, id);
+                    }
                 }
                 break;
 
@@ -233,7 +236,10 @@ namespace FL_Master_Server
                     {
                         string name = dataReader.GetString();
                         string id = dataReader.GetString();
-                        UserMethods.SetStatusText(name, id);
+                        if (GetNetworkUserFromPeer(fromPeer).User.Username == name)
+                        {
+                            UserMethods.SetStatusText(name, id);
+                        }
                     }
                     break;
 
