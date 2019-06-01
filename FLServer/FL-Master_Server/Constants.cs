@@ -18,6 +18,6 @@ namespace FL_Master_Server
         internal const bool InitializeDatabase = true;
         internal const bool UpdateDatabase = false;
 
-        internal const bool ValidateNetworkUsers = false;
+        internal const bool ValidateNetworkUsers = true;
     }
 }
