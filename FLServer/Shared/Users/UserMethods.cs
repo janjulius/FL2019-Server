@@ -102,13 +102,14 @@ namespace Shared.Users
                 return arr;
             }
         }
-
-
+        
         public static void AddPremiumBalance(User target, int v)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
                 target.PremiumBalance = target.PremiumBalance + v;
+                if (target.PremiumBalance <= 0)
+                    target.PremiumBalance = 0;
                 ctx.Entry(target).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
@@ -119,6 +120,9 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 target.Balance = target.Balance + v;
+                if (target.Balance <= 0)
+                    target.Balance = 0;
+
                 ctx.Entry(target).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
