@@ -47,58 +47,77 @@ namespace FL_Master_Server.Player.Content
                     for (int i = 1; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.AddFriend(user, target);
-                    UserMethods.AddFriend(target, user);
+                    if (target != null)
+                    {
+                        UserMethods.AddFriend(user, target);
+                        UserMethods.AddFriend(target, user);
 
-                    MasterServer.Instance.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
-                        UserMethods.GetUserAsProfilePartInfoPacket(user));
-                    MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
-                         UserMethods.GetUserAsProfilePartInfoPacket(target));
+                        MasterServer.Instance.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                            UserMethods.GetUserAsProfilePartInfoPacket(user));
+                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                             UserMethods.GetUserAsProfilePartInfoPacket(target));
+                    }
 
                     return true;
                 case "forceremovefriend":
                     for (int i = 1; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.RemoveFriend(user, target);
-                    UserMethods.RemoveFriend(target, user);
+                    if (target != null)
+                    {
+                        UserMethods.RemoveFriend(user, target);
+                        UserMethods.RemoveFriend(target, user);
 
-                    MasterServer.Instance.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
-                        UserMethods.GetUserAsProfilePartInfoPacket(user));
-                    MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
-                         UserMethods.GetUserAsProfilePartInfoPacket(target));
-
+                        MasterServer.Instance.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                            UserMethods.GetUserAsProfilePartInfoPacket(user));
+                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                             UserMethods.GetUserAsProfilePartInfoPacket(target));
+                    }
                     return true;
-
-               //case "addfriend":
-               //    for (int i = 1; i < cmd.Length; i++)
-               //        name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
-               //    target = UserMethods.GetUserByUsername(name);
-               //    UserMethods.AddFriend(user, target);
-               //    return true;
                 case "addbalance":
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.AddBalance(target, Convert.ToInt32(cmd[1]));
+                    if (target != null)
+                    {
+                        UserMethods.AddBalance(target, Convert.ToInt32(cmd[1]));
+
+                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                            UserMethods.GetUserAsProfilePartInfoPacket(target));
+                    }
                     return true;
                 case "addpbalance":
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.AddPremiumBalance(target, Convert.ToInt32(cmd[1]));
+                    if (target != null)
+                    {
+                        UserMethods.AddPremiumBalance(target, Convert.ToInt32(cmd[1]));
+                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                            UserMethods.GetUserAsProfilePartInfoPacket(target));
+                    }
                     return true;
                 case "removebalance":
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.AddBalance(target, -Convert.ToInt32(cmd[1]));
+                    if (target != null)
+                    {
+                        UserMethods.AddBalance(target, -Convert.ToInt32(cmd[1]));
+                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                            UserMethods.GetUserAsProfilePartInfoPacket(target));
+                    }
                     return true;
                 case "removepbalance":
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.AddPremiumBalance(target, -Convert.ToInt32(cmd[1]));
+                    if (target != null)
+                    {
+                        UserMethods.AddPremiumBalance(target, -Convert.ToInt32(cmd[1]));
+                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                            UserMethods.GetUserAsProfilePartInfoPacket(target));
+                    }
                     return true;
                 case "getuserinfo":
                     for (int i = 2; i < cmd.Length; i++)
@@ -109,7 +128,8 @@ namespace FL_Master_Server.Player.Content
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.SetRights(target, 2);
+                    if (target != null)
+                        UserMethods.SetRights(target, 2);
                     return true;
 
             }
@@ -128,7 +148,6 @@ namespace FL_Master_Server.Player.Content
                     target = UserMethods.GetUserByUsername(name);
                     UserMethods.SetRights(target, -1);
                     return true;
-
                 case "unban":
                     for (int i = 1; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
@@ -139,7 +158,8 @@ namespace FL_Master_Server.Player.Content
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    UserMethods.SetRights(target, 1);
+                    if (target != null)
+                        UserMethods.SetRights(target, 1);
                 return true;
             }
             return false;
