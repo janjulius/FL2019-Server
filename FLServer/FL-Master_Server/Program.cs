@@ -15,9 +15,8 @@ namespace FL_Master_Server
             {
                 Shared.General.General.SetVersion(Constants.ServerVersion);
             }
-
-            MasterServer server = new MasterServer();
-            server.Run();
+            
+            MasterServer.Instance.Run();
             Console.ReadKey();
         }
     }

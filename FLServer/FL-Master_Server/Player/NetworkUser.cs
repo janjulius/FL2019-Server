@@ -6,7 +6,7 @@ using FLServer.Models;
 
 namespace FL_Master_Server.Player
 {
-    class NetworkUser
+    public class NetworkUser
     {
         public NetPeer Peer { get; set; }
         public User User { get; set; }

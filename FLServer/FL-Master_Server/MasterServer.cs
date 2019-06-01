@@ -17,23 +17,40 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using FLServer.Models;
+using FL_Master_Server.Player.Content;
 
 namespace FL_Master_Server
 {
-    class MasterServer
+    public class MasterServer
     {
+        //singleton
+        private static MasterServer instance = null;
+        private MasterServer() { }
+
+        public static MasterServer Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new MasterServer();
+                }
+                return instance;
+            }
+        }
+
         private EventBasedNetListener listener;
         private NetManager server;
 
         private bool running = true;
 
-        List<NetworkUser> NetworkUsers = new List<NetworkUser>();
+        public List<NetworkUser> NetworkUsers = new List<NetworkUser>();
 
         Dictionary<int, GameServerInfo> GameServers = new Dictionary<int, GameServerInfo>();
         Dictionary<int, List<NetPeer>> playersWaiting = new Dictionary<int, List<NetPeer>>();
 
         Random random = new Random();
-
+        
         public void Run()
         {
             Console.WriteLine("Starting Master server..");
@@ -165,6 +182,12 @@ namespace FL_Master_Server
                         {
                             NetDataWriter writer = new NetDataWriter();
                             FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+                            
+                            if(u.Rights < 0)
+                            {
+                                Console.WriteLine($"Disconnected banned user {u.Username}");
+                                fromPeer.Disconnect();
+                            }
 
                             NetworkUser me = GetNetworkUserFromPeer(fromPeer);
                             if (me != null)
@@ -245,7 +268,13 @@ namespace FL_Master_Server
 
                 case 476:
                     {
-                        //TODO
+                        string name = dataReader.GetString();
+                        string cmd = dataReader.GetString();
+                        NetworkUser user = GetNetworkUserFromPeer(fromPeer);
+                        if (ValidateNetworkUser(fromPeer, user))
+                        {
+                            Commands.ProcessCommand(user.User, cmd);
+                        }
                     } break;
                 case 600:
                 {
@@ -295,6 +324,28 @@ namespace FL_Master_Server
             dataReader.Recycle();
         }
 
+        public void SendNetworkEvent<T>(NetworkUser target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put(msgid);
+            writer.PutPacketStruct(packet);
+            target.Peer.Send(writer, dm);
+        }
+
+        public void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
+        {
+            NetworkUser user = GetNetworkUserFromUser(target);
+            if (user != null)
+                SendNetworkEvent(user, dm, msgid, packet);
+        }
+
+        public void SendNetworkEvent<T>(NetPeer target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
+        {
+            NetworkUser user = GetNetworkUserFromPeer(target);
+            if (user != null)
+                SendNetworkEvent(user, dm, msgid, packet);
+        }
+
         private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
@@ -333,6 +384,22 @@ namespace FL_Master_Server
                 return result;
 
             return null;
+        }
+
+        private NetworkUser GetNetworkUserFromUser(User user)
+        {
+            NetworkUser result = NetworkUsers.Where(nu => nu.User == user).FirstOrDefault();
+            if (result != null)
+                return result;
+
+            return null;
+        }
+
+        private bool ValidateNetworkUser(NetPeer frompeer, NetworkUser user)
+        {
+            if (Constants.ValidateNetworkUsers)
+                return (frompeer == user.Peer) && user.User != null;
+            return true;
         }
     }
 }
