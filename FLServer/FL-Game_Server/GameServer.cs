@@ -296,7 +296,13 @@ namespace FL_Game_Server
 
                 case 300:
                 {
+
+                    inGame = GameState.InPostGame;
+
                     //to post game
+                    writer.Put((ushort) 300);
+
+                    server.SendToAll(writer,DeliveryMethod.ReliableOrdered);
                 }
                     break;
                 
@@ -314,7 +320,8 @@ namespace FL_Game_Server
 
                     writer.Put((ushort) 301);
                     writer.Put(levelId);
-
+                    
+                    
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
 
                     NetworkObjects.Clear();
@@ -340,7 +347,7 @@ namespace FL_Game_Server
             foreach (NetPeer netPeer in server.ConnectedPeerList)
             {
                 if (peer == netPeer) continue;
-
+                
                 netPeer.Send(data, deliveryMethod);
             }
         }
