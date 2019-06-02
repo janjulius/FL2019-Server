@@ -14,7 +14,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using FLServer.Models;
 using FL_Master_Server.Player.Content;
@@ -331,7 +330,7 @@ namespace FL_Master_Server
             writer.PutPacketStruct(packet);
             target.Peer.Send(writer, dm);
         }
-
+        
         public void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
             NetworkUser user = GetNetworkUserFromUser(target);
@@ -344,6 +343,19 @@ namespace FL_Master_Server
             NetworkUser user = GetNetworkUserFromPeer(target);
             if (user != null)
                 SendNetworkEvent(user, dm, msgid, packet);
+        }
+
+        public void SendConsoleMessage(User target, string message)
+        {
+            SendNetworkEvent(GetNetworkUserFromUser(target), 20000, DeliveryMethod.Unreliable, message);
+        }
+
+        private void SendNetworkEvent(NetworkUser target, ushort msgid, DeliveryMethod dm, string msg)
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put(msgid);
+            writer.Put(msg);
+            target.Peer.Send(writer, dm);
         }
 
         private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)

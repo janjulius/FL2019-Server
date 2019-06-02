@@ -159,7 +159,27 @@ namespace FL_Master_Server.Player.Content
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
                     if (target != null)
+                    {
                         UserMethods.SetRights(target, 1);
+                        MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} was set to manager.");
+                    }
+                    return true;
+                case "demote":
+                    for (int i = 1; i < cmd.Length; i++)
+                        name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
+                    target = UserMethods.GetUserByUsername(name);
+                    if (target.Rights > 2)
+                    {
+                        MasterServer.Instance.SendConsoleMessage(user, $"Cannot set rights on {target.Username} rights too high.");
+                        return true;
+                    }
+                    if (string.Equals(target.Username, "jan julius", StringComparison.OrdinalIgnoreCase))
+                    {
+                        MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} is immume to demotions.");
+                        return true;
+                    }
+                    UserMethods.SetRights(target, 0);
+                    MasterServer.Instance.SendConsoleMessage(user, $"Set {target.Username} to default rights");
                 return true;
             }
             return false;
@@ -173,7 +193,15 @@ namespace FL_Master_Server.Player.Content
 
         private static bool ProcessDefaultCommand(User user, string[] cmd)
         {
+            string name = string.Empty;
+            User target = null;
+            switch (cmd[0])
+            {
+                case "rank":
+                    MasterServer.Instance.SendConsoleMessage(user, user.Rights.ToString());
+                    return true;
 
+            } 
             return false;
         }
     }
