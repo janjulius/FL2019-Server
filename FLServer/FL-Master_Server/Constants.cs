@@ -17,5 +17,7 @@ namespace FL_Master_Server
         internal const string ServerVersion = "0.2";
         internal const bool InitializeDatabase = true;
         internal const bool UpdateDatabase = false;
+
+        internal const bool ValidateNetworkUsers = true;
     }
 }

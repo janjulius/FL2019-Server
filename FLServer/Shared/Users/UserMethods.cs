@@ -52,6 +52,23 @@ namespace Shared.Users
             return true;
         }
 
+        public static bool RemoveFriend(User user, User target)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                int uId = ctx.User.Where(u => u == user).First().UserId;
+                int tId = ctx.User.Where(f => f == target).First().UserId;
+
+                if (ctx.UserFriend.Where(a => a.UserId == uId && a.FriendId == tId).Any())
+                {
+                    UserFriend todelete = ctx.UserFriend.Where(a => a.UserId == uId && a.FriendId == tId).FirstOrDefault();
+                    ctx.UserFriend.Remove(todelete);
+                }
+                ctx.SaveChanges();
+            }
+            return true;
+        }
+
         public static string[] GetFriends(string name)
         {
             using (FLDBContext ctx = new FLDBContext())
@@ -85,6 +102,41 @@ namespace Shared.Users
                 return arr;
             }
         }
+        
+        public static void AddPremiumBalance(User target, int v)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                target.PremiumBalance = target.PremiumBalance + v;
+                if (target.PremiumBalance <= 0)
+                    target.PremiumBalance = 0;
+                ctx.Entry(target).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void AddBalance(User target, int v)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                target.Balance = target.Balance + v;
+                if (target.Balance <= 0)
+                    target.Balance = 0;
+
+                ctx.Entry(target).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
+        public static void SetRights(User target, int v)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                target.Rights = v;
+                ctx.Entry(target).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
 
         public static ProfilePartInfo GetUserAsProfilePartInfoPacket(string name)
         {
@@ -94,6 +146,18 @@ namespace Shared.Users
                 FriendSlotPacket[] friends = GetFriendsAsPacket(name);
                 ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
                     , u.Avatar, u.Level, u.Exp, friends.Length, friends);
+
+                return result;
+            }
+        }
+
+        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(User user)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                FriendSlotPacket[] friends = GetFriendsAsPacket(user.Username);
+                ProfilePartInfo result = new ProfilePartInfo(user.Username, user.Balance, user.PremiumBalance
+                    , user.Avatar, user.Level, user.Exp, friends.Length, friends);
 
                 return result;
             }
@@ -144,7 +208,8 @@ namespace Shared.Users
                         Level = 0,
                         NormalElo = 1250,
                         RankedElo = 1250,
-                        Verified = true
+                        Verified = true,
+                        Rights = 0
                     });
                     ctx.SaveChanges();
                 }

@@ -96,38 +96,39 @@ namespace FLServer
             ushort msgid = dataReader.GetUShort();
 
 
-            if (msgid == 3) //login
+            switch (msgid) //login
             {
-                string u = dataReader.GetString();
-                string p = dataReader.GetString();
+                case 3:
+                    {
+                        string u = dataReader.GetString();
+                        string p = dataReader.GetString();
 
-                NetDataWriter response = new NetDataWriter();
+                        NetDataWriter response = new NetDataWriter();
 
-                string a = Security.GetHashString(p);
-                if (UserAuth.VerifyPassword(u, a))
-                {
-                    response.Put((ushort)2002); //succesful login
-                    User user = UserMethods.GetUserByUsername(u);
-                    string t = user.UniqueIdentifier;
-                    response.Put(t);
-                    UserMethods.UpdateLastLogin(u);
-                }
-                else
-                {
-                    response.Put((ushort)2001); //bad credentials
-                }
+                        string a = Security.GetHashString(p);
+                        if (UserAuth.VerifyPassword(u, a))
+                        {
+                            if (UserMethods.GetUserByUsername(u).Rights < 0)
+                                response.Put((ushort)2007);
+                            else
+                            {
+                                response.Put((ushort)2002); //succesful login
+                                User user = UserMethods.GetUserByUsername(u);
+                                string t = user.UniqueIdentifier;
+                                response.Put(t);
+                                UserMethods.UpdateLastLogin(u);
+                            }
+                        }
+                        else
+                        {
+                            response.Put((ushort)2001); //bad credentials
+                        }
 
-                
-                fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
-                response.Reset();
-            }
-            else if (msgid == 4) //Send server version
-            {
 
-            }
-            else
-            {
-
+                        fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
+                        response.Reset();
+                    }
+                    break;
             }
 
             dataReader.Recycle();

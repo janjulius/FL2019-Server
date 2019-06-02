@@ -21,6 +21,7 @@ namespace FLServer.Models
         public int RankedElo { get; set; }
         public int Exp { get; set; }
         public int Level { get; set; }
+        public int Rights { get; set; } = 0;
         public DateTime CreationDate { get; set; }
         public DateTime LastOnline { get; set; }
         public int Balance { get; set; }
@@ -28,7 +29,7 @@ namespace FLServer.Models
         public int Avatar { get; set; }
         public string Status { get; set; }
         public bool Verified { get; set; }
-
+        
         public ICollection<Match> Matches { get; set; }
     }
 }
