@@ -281,6 +281,14 @@
     <Compile Include="Migrations\20190531185000_2019531_0.designer.cs">
       <DependentUpon>20190531185000_2019531_0.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190603194627_201963_0.cs" />
+    <Compile Include="Migrations\20190603194627_201963_0.designer.cs">
+      <DependentUpon>20190603194627_201963_0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190603202715_201963_1.cs" />
+    <Compile Include="Migrations\20190603202715_201963_1.designer.cs">
+      <DependentUpon>20190603202715_201963_1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />
