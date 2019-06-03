@@ -24,8 +24,11 @@ namespace Shared.Packets
         public int Range;
         public int Size;
         public int Defense;
-        
-        public CharacterInformation(string name, string description, string underTitle, int damage, int movementspeed, int weight, int attackspeed, int range, int size, int defense)
+
+        public int PremiumPrice;
+        public int RegularPrice;
+
+        public CharacterInformation(string name, string description, string underTitle, int damage, int movementspeed, int weight, int attackspeed, int range, int size, int defense, int premiumprice, int regularprice)
         {
             Name = name;
             Description = description;
@@ -37,6 +40,8 @@ namespace Shared.Packets
             Range = range;
             Size = size;
             Defense = defense;
+            PremiumPrice = premiumprice;
+            RegularPrice = regularprice;
         }
     }
 }

@@ -15,10 +15,11 @@ namespace Shared.Characters
             using (FLDBContext ctx = new FLDBContext())
             {
                 Character c = GetCharacterByName(name);
-                CharacterInformation result = new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense);
+                CharacterInformation result = new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense, c.PremiumPrice, c.Price);
                 return result;
             }
         }
+
         public static Character GetCharacterByName(string name)
         {
             using(FLDBContext ctx = new FLDBContext())
@@ -58,7 +59,7 @@ namespace Shared.Characters
 
         public static CharacterInformation CharacterToCharacterInformationPacket(Character c)
         {
-            return new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense);
+            return new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense, c.PremiumPrice, c.Price);
         }
     }
 }
