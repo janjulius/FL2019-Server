@@ -38,8 +38,8 @@ namespace FL_Master_Server
             }
         }
 
-        private Validation validation;
-        private Util util;
+        private Validation validation = new Validation();
+        private Util util = new Util();
 
         private EventBasedNetListener listener;
         private NetManager server;
@@ -107,9 +107,6 @@ namespace FL_Master_Server
 
         private void ReceiveUnconnectedMessage(IPEndPoint remoteendpoint, NetPacketReader reader, UnconnectedMessageType messagetype)
         {
-            //Console.WriteLine("test: " + reader.GetString());
-
-
             ushort msgid = reader.GetUShort();
 
             switch (msgid)
