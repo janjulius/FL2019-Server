@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Shared.Constants;
+using Shared.Encoder;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,7 +32,15 @@ namespace FLServer.Models
         public string Status { get; set; }
         public bool Verified { get; set; }
         
-        public List<Character> OwnedCharacters { get; set; }
+        [NotMapped]
+        public List<bool> OwnedCharacters
+        {
+            get { return EFEncoder.DecodeStringToBoolList(OwnedCharactersString); }
+            set { OwnedCharactersString = EFEncoder.EncodeBoolListToString(value); }
+        }
+
+        public string OwnedCharactersString { get; set; }
+
         public ICollection<Match> Matches { get; set; }
     }
 }

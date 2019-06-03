@@ -18,9 +18,7 @@ namespace Shared.Extensions
         {
             ndw.Put(packet.ToByteArray());
         }
-
         
-
         [Obsolete("Is obsolete use PutPacketStruct instead")]
         public static void PutPacket<T>(this NetDataWriter ndw, T packet) where T : Packet
         {

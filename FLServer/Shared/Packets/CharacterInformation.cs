@@ -28,7 +28,11 @@ namespace Shared.Packets
         public int PremiumPrice;
         public int RegularPrice;
 
-        public CharacterInformation(string name, string description, string underTitle, int damage, int movementspeed, int weight, int attackspeed, int range, int size, int defense, int premiumprice, int regularprice)
+        public int ReferenceId;
+
+        public CharacterInformation(string name, string description, string underTitle, int damage,
+            int movementspeed, int weight, int attackspeed, int range, int size, int defense, int premiumprice, int regularprice,
+            int referenceId)
         {
             Name = name;
             Description = description;
@@ -42,6 +46,7 @@ namespace Shared.Packets
             Defense = defense;
             PremiumPrice = premiumprice;
             RegularPrice = regularprice;
+            ReferenceId = referenceId;
         }
     }
 }

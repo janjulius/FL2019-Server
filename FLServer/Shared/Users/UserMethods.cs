@@ -145,7 +145,7 @@ namespace Shared.Users
                 User u = GetUserByUsername(name);
                 FriendSlotPacket[] friends = GetFriendsAsPacket(name);
                 ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
-                    , u.Avatar, u.Level, u.Exp, friends.Length, friends);
+                    , u.Avatar, u.Level, u.Exp, friends.Length, friends, u.OwnedCharacters.ToArray());
 
                 return result;
             }
@@ -157,7 +157,7 @@ namespace Shared.Users
             {
                 FriendSlotPacket[] friends = GetFriendsAsPacket(user.Username);
                 ProfilePartInfo result = new ProfilePartInfo(user.Username, user.Balance, user.PremiumBalance
-                    , user.Avatar, user.Level, user.Exp, friends.Length, friends);
+                    , user.Avatar, user.Level, user.Exp, friends.Length, friends, user.OwnedCharacters.ToArray());
 
                 return result;
             }
@@ -327,6 +327,18 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 return u.Matches.AsEnumerable();
+            }
+        }
+
+        public static void SetCharacterOwnedState(User u, int referenceId, bool v)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                var set = new List<bool>(u.OwnedCharacters);
+                set[referenceId] = v;
+                u.OwnedCharacters = set;
+                ctx.Entry(u).State = EntityState.Modified;
+                ctx.SaveChanges();
             }
         }
     }

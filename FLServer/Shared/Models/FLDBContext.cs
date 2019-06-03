@@ -66,6 +66,7 @@ namespace FLServer.Models
             modelBuilder.Entity<Character>().HasIndex(c => c.CharacterId).IsUnique();
 
             modelBuilder.Entity<Player>().Property(p => p.PlayerId).UseMySqlIdentityColumn();
+
             
             //modelBuilder.Entity<Player>().HasIndex(c => c.PlayerId).IsUnique();
 

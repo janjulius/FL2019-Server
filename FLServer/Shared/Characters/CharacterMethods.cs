@@ -15,7 +15,7 @@ namespace Shared.Characters
             using (FLDBContext ctx = new FLDBContext())
             {
                 Character c = GetCharacterByName(name);
-                CharacterInformation result = new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense, c.PremiumPrice, c.Price);
+                CharacterInformation result = new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense, c.PremiumPrice, c.Price, c.ReferenceId);
                 return result;
             }
         }
@@ -28,6 +28,23 @@ namespace Shared.Characters
                 try
                 {
                     c = ctx.Character.Where(character => character.Name == name).First();
+                }
+                catch
+                {
+                    return null;
+                }
+                return c;
+            }
+        }
+
+        public static Character GetCharacterByReferenceId(int id)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                Character c = null;
+                try
+                {
+                    c = ctx.Character.Where(character => character.ReferenceId == id).First();
                 }
                 catch
                 {
@@ -59,7 +76,7 @@ namespace Shared.Characters
 
         public static CharacterInformation CharacterToCharacterInformationPacket(Character c)
         {
-            return new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense, c.PremiumPrice, c.Price);
+            return new CharacterInformation(c.Name, c.Description, c.UnderTitle, c.Damage, c.MovementSpeed, c.Weight, c.AttackSpeed, c.Range, c.Size, c.Defense, c.PremiumPrice, c.Price, c.ReferenceId);
         }
     }
 }

@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Threading;
 using FLServer.Models;
 using FL_Master_Server.Player.Content;
+using Shared.Packets.UserState;
 
 namespace FL_Master_Server
 {
@@ -317,6 +318,47 @@ namespace FL_Master_Server
                         }
                     }
                 }
+                break;
+
+                case 3010: //set character owned state of user frompeer after validation
+                    {
+                        CharacterOwned packet = dataReader.GetPacketStruct<CharacterOwned>();
+                        bool success = false;
+                        
+                        if(validation.ValidateSender(fromPeer, packet.OwnerUsername))
+                        {
+                            User user = NetworkUsers.Where(p => p.Peer == fromPeer).FirstOrDefault().User;
+                            Character character = CharacterMethods.GetCharacterByReferenceId(packet.Id);
+                            if (packet.State) //purchase
+                            {
+                                if (packet.PremiumPayment)
+                                {
+                                    if (character.PremiumPrice <= user.PremiumBalance)
+                                    {
+                                        UserMethods.AddPremiumBalance(user, -character.Price);
+                                        success = true;
+                                    }
+                                }
+                                if (!packet.PremiumPayment)
+                                {
+                                    if (character.Price <= user.Balance)
+                                    {
+                                        UserMethods.AddBalance(user, -character.Price);
+                                        success = true;
+                                    }
+                                }
+                                if (success)
+                                {
+                                    UserMethods.SetCharacterOwnedState(user, character.ReferenceId, true);
+                                    SendNetworkEvent(user, DeliveryMethod.ReliableOrdered, 3007, UserMethods.GetUserAsProfilePartInfoPacket(user));
+                                }
+                            }
+                            else //refund check history 
+                            {
+
+                            }
+                        }
+                    }
                     break;
             }
 
