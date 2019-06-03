@@ -38,6 +38,9 @@ namespace FL_Master_Server
             }
         }
 
+        private Validation validation;
+        private Util util;
+
         private EventBasedNetListener listener;
         private NetManager server;
 
@@ -188,7 +191,7 @@ namespace FL_Master_Server
                                 fromPeer.Disconnect();
                             }
 
-                            NetworkUser me = GetNetworkUserFromPeer(fromPeer);
+                            NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
                             if (me != null)
                                 me.User = u;
                             else
@@ -247,7 +250,7 @@ namespace FL_Master_Server
                 {
                     string name = dataReader.GetString();
                     int id = dataReader.GetInt();
-                    if (GetNetworkUserFromPeer(fromPeer).User.Username == name)
+                    if (util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
                     {
                         UserMethods.SetAvatar(name, id);
                     }
@@ -258,7 +261,7 @@ namespace FL_Master_Server
                     {
                         string name = dataReader.GetString();
                         string id = dataReader.GetString();
-                        if (GetNetworkUserFromPeer(fromPeer).User.Username == name)
+                        if (util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
                         {
                             UserMethods.SetStatusText(name, id);
                         }
@@ -269,8 +272,8 @@ namespace FL_Master_Server
                     {
                         string name = dataReader.GetString();
                         string cmd = dataReader.GetString();
-                        NetworkUser user = GetNetworkUserFromPeer(fromPeer);
-                        if (ValidateNetworkUser(fromPeer, user))
+                        NetworkUser user = util.GetNetworkUserFromPeer(fromPeer);
+                        if (validation.ValidateNetworkUser(fromPeer, user))
                         {
                             Commands.ProcessCommand(user.User, cmd);
                         }
@@ -322,32 +325,10 @@ namespace FL_Master_Server
 
             dataReader.Recycle();
         }
-
-        public void SendNetworkEvent<T>(NetworkUser target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(msgid);
-            writer.PutPacketStruct(packet);
-            target.Peer.Send(writer, dm);
-        }
         
-        public void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
-        {
-            NetworkUser user = GetNetworkUserFromUser(target);
-            if (user != null)
-                SendNetworkEvent(user, dm, msgid, packet);
-        }
-
-        public void SendNetworkEvent<T>(NetPeer target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
-        {
-            NetworkUser user = GetNetworkUserFromPeer(target);
-            if (user != null)
-                SendNetworkEvent(user, dm, msgid, packet);
-        }
-
         public void SendConsoleMessage(User target, string message)
         {
-            SendNetworkEvent(GetNetworkUserFromUser(target), 20000, DeliveryMethod.Unreliable, message);
+            SendNetworkEvent(util.GetNetworkUserFromUser(target), 20000, DeliveryMethod.Unreliable, message);
         }
 
         private void SendNetworkEvent(NetworkUser target, ushort msgid, DeliveryMethod dm, string msg)
@@ -389,30 +370,26 @@ namespace FL_Master_Server
             Console.WriteLine($"peer disconnected: {peer.EndPoint}");
         }
 
-        private NetworkUser GetNetworkUserFromPeer(NetPeer fpeer)
+        public void SendNetworkEvent<T>(NetworkUser target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            NetworkUser result = NetworkUsers.Where(nu => nu.Peer == fpeer).FirstOrDefault();
-            if (result != null)
-                return result;
-
-            return null;
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put(msgid);
+            writer.PutPacketStruct(packet);
+            target.Peer.Send(writer, dm);
         }
 
-        private NetworkUser GetNetworkUserFromUser(User user)
+        public void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            NetworkUser result = NetworkUsers.Where(nu => nu.User.UniqueIdentifier == user.UniqueIdentifier
-                                                    && nu.Peer != null).FirstOrDefault();
-            if (result != null)
-                return result;
-
-            return null;
+            NetworkUser user = util.GetNetworkUserFromUser(target);
+            if (user != null)
+                SendNetworkEvent(user, dm, msgid, packet);
         }
 
-        private bool ValidateNetworkUser(NetPeer frompeer, NetworkUser user)
+        public void SendNetworkEvent<T>(NetPeer target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            if (Constants.ValidateNetworkUsers)
-                return (frompeer == user.Peer) && user.User != null;
-            return true;
+            NetworkUser user = util.GetNetworkUserFromPeer(target);
+            if (user != null)
+                SendNetworkEvent(user, dm, msgid, packet);
         }
     }
 }
