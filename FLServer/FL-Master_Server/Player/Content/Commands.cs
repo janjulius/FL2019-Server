@@ -131,7 +131,19 @@ namespace FL_Master_Server.Player.Content
                     if (target != null)
                         UserMethods.SetRights(target, 2);
                     return true;
-
+                case "resetownedchars":
+                case "resetownedcharacters":
+                case "resetchars":
+                    if (cmd.Length > 1)
+                    {
+                        for (int i = 1; i < cmd.Length; i++)
+                            name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
+                        target = UserMethods.GetUserByUsername(name);
+                    }
+                    UserMethods.ResetOwnedCharacters(target ?? user);
+                    MasterServer.Instance.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                             UserMethods.GetUserAsProfilePartInfoPacket(target ?? user));
+                    return true;
             }
             return false;
         }

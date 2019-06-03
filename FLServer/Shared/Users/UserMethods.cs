@@ -192,6 +192,19 @@ namespace Shared.Users
             }
         }
 
+        public static void ResetOwnedCharacters(User user)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                char[] arr = new char[Constants.PacketConstants.CharacterCount];
+                for (int a = 0; a < arr.Length; a++)
+                    arr[a] = '0';
+                user.OwnedCharactersString = arr.ToString();
+                ctx.Entry(user).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
         public static void CreateNewUser(string username, string password)
         {
             using (FLDBContext ctx = new FLDBContext())
