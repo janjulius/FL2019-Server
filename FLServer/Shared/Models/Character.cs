@@ -10,6 +10,7 @@ namespace FLServer.Models
     {
         [Key]
         public int CharacterId { get; set; }
+        public int ReferenceId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string UnderTitle { get; set; }

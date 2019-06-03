@@ -41,7 +41,8 @@ namespace Shared.Characters
                     Defense = def,
                     ReleaseDate = releasedate,
                     Price = price,
-                    PremiumPrice = premiumprice
+                    PremiumPrice = premiumprice,
+                    ReferenceId = ctx.Character.Count() == 0 ? 0 : ctx.Character.Last().ReferenceId + 1
                 };
                 ctx.Character.Add(newChar);
                 ctx.SaveChanges();

@@ -30,6 +30,7 @@ namespace FLServer.Models
         public string Status { get; set; }
         public bool Verified { get; set; }
         
+        public List<Character> OwnedCharacters { get; set; }
         public ICollection<Match> Matches { get; set; }
     }
 }
