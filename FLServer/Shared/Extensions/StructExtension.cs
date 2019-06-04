@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Extensions
 {
-    static class StructExtension
+    public static class StructExtension
     {
         public static byte[] ToByteArray<T>(this T structure) where T : struct
         {
