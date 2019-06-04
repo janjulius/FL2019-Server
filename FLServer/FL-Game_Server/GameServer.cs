@@ -7,6 +7,7 @@ using System.Threading;
 using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Shared.Extensions;
 
 namespace FL_Game_Server
 {
@@ -160,7 +161,7 @@ namespace FL_Game_Server
                 {
                     if (roomType == 0)
                     {
-                        if (player.Value.isHost)
+                        if (player.Value.playerInfo.isHost)
                         {
                             stopServer = true;
                         }
@@ -204,23 +205,17 @@ namespace FL_Game_Server
             {
                 case 1:
                 {
-                    var playerId = dataReader.GetInt();
-                    var pName = dataReader.GetString();
-                    var isHost = dataReader.GetBool();
-                    var charId = dataReader.GetInt();
-                    var pColorR = dataReader.GetFloat();
-                    var pColorG = dataReader.GetFloat();
-                    var pColorB = dataReader.GetFloat();
-                    var player = new Player(peer, playerId, isHost, pName, charId, pColorR, pColorG, pColorB);
-                    Players.Add(playerId, player);
+                    var player = new Player(peer, dataReader.GetBytesWithLength().ToStructure<Packets.PlayerInfo>());
+                    Players.Add(player.playerInfo.playerId, player);
                     player.SendNewPlayerData(writer);
                     SendOthers(peer, writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
                 case 4:
-                    var playerUpdateId = dataReader.GetInt();
-                    Players[playerUpdateId].ReadPlayerUpdate(dataReader);
-                    Players[playerUpdateId].SendNewPlayerUpdate(writer);
+                    var playerInfo = dataReader.GetBytesWithLength().ToStructure<Packets.PlayerInfo>();
+                    
+                    Players[playerInfo.playerId].ReadPlayerUpdate(playerInfo);
+                    Players[playerInfo.playerId].SendNewPlayerUpdate(writer);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                     break;
                 case 101: //create networkObject
