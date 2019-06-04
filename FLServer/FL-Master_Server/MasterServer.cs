@@ -406,8 +406,8 @@ namespace FL_Master_Server
 
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
-            Console.WriteLine($"peer disconnected: {peer.EndPoint}");
-            MasterServer.Instance.NetworkUsers.Remove(MasterServer.Instance.util.GetNetworkUserFromPeer(peer));
+            Console.WriteLine($"peer disconnected: {peer.EndPoint} user: {Instance.util.GetNetworkUserFromPeer(peer).User.Username}");
+            Instance.NetworkUsers.Remove(Instance.util.GetNetworkUserFromPeer(peer));
         }
 
         public void SendNetworkEvent<T>(NetworkUser target, DeliveryMethod dm, ushort msgid, T packet) where T : struct

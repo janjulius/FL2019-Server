@@ -4,14 +4,16 @@ using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Shared.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    partial class FLDBContextModelSnapshot : ModelSnapshot
+    [Migration("20190604215843_201964_5")]
+    partial class _201964_5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,22 +325,6 @@ namespace Shared.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserFriend");
-                });
-
-            modelBuilder.Entity("Shared.Models.FriendRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("From");
-
-                    b.Property<DateTime>("RequestDate");
-
-                    b.Property<int>("To");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FriendRequest");
                 });
 
             modelBuilder.Entity("Shared.Models.Message", b =>

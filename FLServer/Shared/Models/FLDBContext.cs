@@ -33,6 +33,7 @@ namespace FLServer.Models
         public virtual DbSet<ServerVersion> ServerVersion {get; set;}
         public virtual DbSet<Stats> Stats { get; set; }
         public virtual DbSet<Message> Message { get; set; }
+        public virtual DbSet<FriendRequest> FriendRequest { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
