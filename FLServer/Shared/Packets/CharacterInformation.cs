@@ -12,7 +12,7 @@ namespace Shared.Packets
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string Name;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.BigStringSize)]
         public string Description;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string UnderTitle;

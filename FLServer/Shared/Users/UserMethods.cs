@@ -45,7 +45,8 @@ namespace Shared.Users
                     new UserFriend()
                     {
                         UserId = uId,
-                        FriendId = fId
+                        FriendId = fId,
+                        AddedDate = DateTime.Now
                     });
                 ctx.SaveChanges();
             }
@@ -97,7 +98,8 @@ namespace Shared.Users
                 {
                     arr[i] = new FriendSlotPacket(ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Username,
                     ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Status,
-                    ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Avatar);
+                    ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Avatar,
+                    res.ElementAt(i).AddedDate.ToOADate());
                 }
                 return arr;
             }
@@ -222,7 +224,8 @@ namespace Shared.Users
                         NormalElo = 1250,
                         RankedElo = 1250,
                         Verified = true,
-                        Rights = 0
+                        Rights = 0,
+                        OwnedCharacters = new bool[Constants.PacketConstants.CharacterCount].ToList()
                     });
                     ctx.SaveChanges();
                 }
@@ -297,7 +300,7 @@ namespace Shared.Users
                         u.Avatar,
                         u.Level,
                         u.Exp,
-                        u.LastOnline.ToString(),
+                        u.LastOnline.ToOADate(),
                         String.Empty);
             }
         }

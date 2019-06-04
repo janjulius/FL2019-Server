@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using MySql.Data.EntityFrameworkCore.Extensions;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Shared.Models;
 
 namespace FLServer.Models
 {
@@ -31,6 +32,7 @@ namespace FLServer.Models
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<ServerVersion> ServerVersion {get; set;}
         public virtual DbSet<Stats> Stats { get; set; }
+        public virtual DbSet<Message> Message { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
