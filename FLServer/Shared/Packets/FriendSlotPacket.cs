@@ -11,12 +11,14 @@ namespace Shared.Packets
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
         public string Status;
         public int AvatarId;
+        public double AddedDate;
 
-        public FriendSlotPacket(string name, string status, int avatarId)
+        public FriendSlotPacket(string name, string status, int avatarId, double addedDate)
         {
             Name = name;
             Status = status;
             AvatarId = avatarId;
+            AddedDate = addedDate;
         }
     }
 }

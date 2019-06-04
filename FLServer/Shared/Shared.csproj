@@ -303,9 +303,13 @@
     <Compile Include="Migrations\20190604083547_201964_1.designer.cs">
       <DependentUpon>20190604083547_201964_1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20190604094032_201964_3.cs" />
-    <Compile Include="Migrations\20190604094032_201964_3.designer.cs">
-      <DependentUpon>20190604094032_201964_3.cs</DependentUpon>
+    <Compile Include="Migrations\20190604093739_201964_2.cs" />
+    <Compile Include="Migrations\20190604093739_201964_2.designer.cs">
+      <DependentUpon>20190604093739_201964_2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190604103345_201964_3.cs" />
+    <Compile Include="Migrations\20190604103345_201964_3.designer.cs">
+      <DependentUpon>20190604103345_201964_3.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />

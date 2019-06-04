@@ -4,14 +4,16 @@ using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Shared.Migrations
 {
     [DbContext(typeof(FLDBContext))]
-    partial class FLDBContextModelSnapshot : ModelSnapshot
+    [Migration("20190604103345_201964_3")]
+    partial class _201964_3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +63,8 @@ namespace Shared.Migrations
 
                     b.Property<int>("Defense");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .HasMaxLength(2500);
 
                     b.Property<int>("MovementSpeed");
 

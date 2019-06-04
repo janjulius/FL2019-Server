@@ -45,7 +45,8 @@ namespace Shared.Users
                     new UserFriend()
                     {
                         UserId = uId,
-                        FriendId = fId
+                        FriendId = fId,
+                        AddedDate = DateTime.Now
                     });
                 ctx.SaveChanges();
             }
@@ -97,7 +98,8 @@ namespace Shared.Users
                 {
                     arr[i] = new FriendSlotPacket(ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Username,
                     ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Status,
-                    ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Avatar);
+                    ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Avatar,
+                    res.ElementAt(i).AddedDate.ToOADate());
                 }
                 return arr;
             }
