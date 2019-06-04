@@ -52,6 +52,8 @@ namespace FL_Game_Server
         [Serializable]
         public struct ObjectPositionData
         {
+            public uint lastPacketId;
+            
             [MarshalAs(UnmanagedType.ByValArray,SizeConst = 3)]
             public float[] position;
 
@@ -62,6 +64,7 @@ namespace FL_Game_Server
             {
                 this.position = position;
                 this.rotation = rotation;
+                lastPacketId = 0;
             }
         }
 
