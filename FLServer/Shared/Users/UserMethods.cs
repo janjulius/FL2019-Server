@@ -224,7 +224,8 @@ namespace Shared.Users
                         NormalElo = 1250,
                         RankedElo = 1250,
                         Verified = true,
-                        Rights = 0
+                        Rights = 0,
+                        OwnedCharacters = new bool[Constants.PacketConstants.CharacterCount].ToList()
                     });
                     ctx.SaveChanges();
                 }
@@ -299,7 +300,7 @@ namespace Shared.Users
                         u.Avatar,
                         u.Level,
                         u.Exp,
-                        u.LastOnline.ToString(),
+                        u.LastOnline.ToOADate(),
                         String.Empty);
             }
         }
