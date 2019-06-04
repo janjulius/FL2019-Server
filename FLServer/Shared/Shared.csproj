@@ -299,6 +299,10 @@
     <Compile Include="Migrations\20190603225732_201964_0.designer.cs">
       <DependentUpon>20190603225732_201964_0.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190604083547_201964_1.cs" />
+    <Compile Include="Migrations\20190604083547_201964_1.designer.cs">
+      <DependentUpon>20190604083547_201964_1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />
