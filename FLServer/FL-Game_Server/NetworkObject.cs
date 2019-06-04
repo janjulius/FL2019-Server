@@ -19,12 +19,13 @@ namespace FL_Game_Server
         public void WriteData(NetDataWriter writer)
         {
             writer.Put((ushort) 103);
-            writer.PutBytesWithLength(objectData.ToByteArray());
+            writer.Put(objectData.objectId);
+            writer.PutBytesWithLength(objectData.positionData.ToByteArray());
         }
 
-        public void ReadData(Packets.ObjectData objectData)
+        public void ReadData(Packets.ObjectPositionData objectData)
         {
-            this.objectData = objectData;
+            this.objectData.positionData = objectData;
         }
 
         public void SendObjectData(NetDataWriter writer)
@@ -32,7 +33,6 @@ namespace FL_Game_Server
             writer.Put((ushort) 101);
             writer.Put(peer.Id);
             writer.PutBytesWithLength(objectData.ToByteArray());
-
         }
     }
 }

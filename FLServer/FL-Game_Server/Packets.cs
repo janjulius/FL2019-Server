@@ -37,20 +37,33 @@ namespace FL_Game_Server
             public int objectId;
             public int objectType;
 
-            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 3)]
-            public float[] position;
-
-            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 4)]
-            public float[] rotation;
+            public ObjectPositionData positionData;
 
             public ObjectData(int playerId, int objectId, int objectType, float[] position, float[] rotation)
             {
                 this.playerId = playerId;
                 this.objectId = objectId;
                 this.objectType = objectType;
+
+                positionData = new ObjectPositionData(position, rotation);
+            }
+        }
+        
+        [Serializable]
+        public struct ObjectPositionData
+        {
+            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 3)]
+            public float[] position;
+
+            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 4)]
+            public float[] rotation;
+
+            public ObjectPositionData(float[] position, float[] rotation)
+            {
                 this.position = position;
                 this.rotation = rotation;
             }
         }
+
     }
 }

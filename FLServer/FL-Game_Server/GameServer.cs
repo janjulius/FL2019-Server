@@ -250,11 +250,12 @@ namespace FL_Game_Server
                     break;
                 case 103:
                 {
-                    Packets.ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectData>();
-                    if (NetworkObjects.ContainsKey(objectData.objectId))
+                    int objectId = dataReader.GetInt();
+                    Packets.ObjectPositionData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectPositionData>();
+                    if (NetworkObjects.ContainsKey(objectId))
                     {
-                        NetworkObjects[objectData.objectId].ReadData(objectData);
-                        NetworkObjects[objectData.objectId].WriteData(writer);
+                        NetworkObjects[objectId].ReadData(objectData);
+                        NetworkObjects[objectId].WriteData(writer);
                         SendOthers(peer, writer, DeliveryMethod.Unreliable);
                     }
                 }
