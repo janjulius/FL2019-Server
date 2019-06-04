@@ -12,5 +12,6 @@ namespace Shared.Constants
         internal const int DefaultStringSize = 100;
         internal const int CharacterCount = 6;
         internal const int BigStringSize = 2500;
+        internal const int MaxIncomingFriendRequestSize = 25;
     }
 }
