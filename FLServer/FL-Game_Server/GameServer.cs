@@ -170,7 +170,7 @@ namespace FL_Game_Server
                     playersToRemove.Add(player.Key);
                     foreach (var networkObject in NetworkObjects)
                     {
-                        if (networkObject.Value.playerId == player.Key)
+                        if (networkObject.Value.objectData.playerId == player.Key)
                         {
                             objectsToRemove.Add(networkObject.Key);
                         }
@@ -221,24 +221,16 @@ namespace FL_Game_Server
                 case 101: //create networkObject
                 {
                     int objectId;
-
+                    Packets.ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectData>();
+                    
                     do
                     {
                         objectId = rand.Next(1000000, 9999999);
                     } while (NetworkObjects.ContainsKey(objectId));
 
-                    var netObj = new NetworkObject(
-                        peer,
-                        dataReader.GetInt(),
-                        objectId,
-                        dataReader.GetInt(),
-                        dataReader.GetFloat(),
-                        dataReader.GetFloat(),
-                        dataReader.GetFloat(),
-                        dataReader.GetFloat(),
-                        dataReader.GetFloat(),
-                        dataReader.GetFloat(),
-                        dataReader.GetFloat());
+                    objectData.objectId = objectId;
+                    
+                    var netObj = new NetworkObject(peer,objectData);
                     NetworkObjects.Add(objectId, netObj);
 
                     netObj.SendObjectData(writer);
@@ -258,11 +250,11 @@ namespace FL_Game_Server
                     break;
                 case 103:
                 {
-                    var objectToUpdate = dataReader.GetInt();
-                    if (NetworkObjects.ContainsKey(objectToUpdate))
+                    Packets.ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectData>();
+                    if (NetworkObjects.ContainsKey(objectData.objectId))
                     {
-                        NetworkObjects[objectToUpdate].ReadData(dataReader);
-                        NetworkObjects[objectToUpdate].WriteData(writer);
+                        NetworkObjects[objectData.objectId].ReadData(objectData);
+                        NetworkObjects[objectData.objectId].WriteData(writer);
                         SendOthers(peer, writer, DeliveryMethod.Unreliable);
                     }
                 }

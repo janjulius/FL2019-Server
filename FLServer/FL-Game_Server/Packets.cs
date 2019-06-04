@@ -29,5 +29,28 @@ namespace FL_Game_Server
                 this.playerColor = playerColor;
             }
         }
+        
+        [Serializable]
+        public struct ObjectData
+        {
+            public int playerId;
+            public int objectId;
+            public int objectType;
+
+            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 3)]
+            public float[] position;
+
+            [MarshalAs(UnmanagedType.ByValArray,SizeConst = 4)]
+            public float[] rotation;
+
+            public ObjectData(int playerId, int objectId, int objectType, float[] position, float[] rotation)
+            {
+                this.playerId = playerId;
+                this.objectId = objectId;
+                this.objectType = objectType;
+                this.position = position;
+                this.rotation = rotation;
+            }
+        }
     }
 }
