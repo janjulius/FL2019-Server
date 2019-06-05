@@ -69,20 +69,27 @@ namespace Shared.Users
             }
             return true;
         }
-
-        public static string[] GetFriends(string name)
+        
+        public static FriendRequest[] GetIncomingFriendRequests(User u)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                User user = ctx.User.Where(u => u.Username == name).First();
+                return ctx.FriendRequest.Where(req => req.To == u.UserId).AsEnumerable().ToArray();
+            }
+        }
 
-                IEnumerable<UserFriend> res = ctx.UserFriend.Where(u => u.UserId == user.UserId).AsEnumerable();
-                string[] arr = new string[res.Count()];
-                for(int i = 0; i < arr.Length; i++)
+        public static void CreateFriendRequest(User u, User target)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                FriendRequest rq = new FriendRequest()
                 {
-                    arr[i] = ctx.User.Where(a => a.UserId == res.ElementAt(i).FriendId).First().Username;
-                }
-                return arr;
+                    From = u.UserId,
+                    To = target.UserId,
+                    RequestDate = DateTime.Now
+                };
+                ctx.FriendRequest.Add(rq);
+                ctx.SaveChanges();
             }
         }
 

@@ -315,11 +315,20 @@
     <Compile Include="Migrations\20190604105137_201964_4.designer.cs">
       <DependentUpon>20190604105137_201964_4.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190604215843_201964_5.cs" />
+    <Compile Include="Migrations\20190604215843_201964_5.designer.cs">
+      <DependentUpon>20190604215843_201964_5.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\20190604220119_201964_6.cs" />
+    <Compile Include="Migrations\20190604220119_201964_6.designer.cs">
+      <DependentUpon>20190604220119_201964_6.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />
     <Compile Include="Models\CharacterAbility.cs" />
     <Compile Include="Models\FLDBContext.cs" />
+    <Compile Include="Models\FriendRequest.cs" />
     <Compile Include="Models\Gamemode.cs" />
     <Compile Include="Models\Map.cs" />
     <Compile Include="Models\Match.cs" />
