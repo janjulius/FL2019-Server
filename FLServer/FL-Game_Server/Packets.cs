@@ -16,10 +16,11 @@ namespace FL_Game_Server.Packets
         public int characterId;
         public int playerPlace;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public float[] playerColor;
+        public ColorPacket playerColor;
 
-        public PlayerInfo(int networkId, int playerId, bool isHost, string playerName, int characterId, int playerPlace, float[] playerColor)
+        public PlayerGameInfo gameInfo;
+
+        public PlayerInfo(int networkId, int playerId, bool isHost, string playerName, int characterId, int playerPlace, ColorPacket playerColor, PlayerGameInfo gameInfo)
         {
             this.networkId = networkId;
             this.playerId = playerId;
@@ -28,6 +29,22 @@ namespace FL_Game_Server.Packets
             this.characterId = characterId;
             this.playerPlace = playerPlace;
             this.playerColor = playerColor;
+            this.gameInfo = gameInfo;
+        }
+    }
+
+    [Serializable]
+    public struct PlayerGameInfo
+    {
+        public float damage;
+        public float health;
+        public byte lives;
+
+        public PlayerGameInfo(float damage, float health, byte lives)
+        {
+            this.damage = damage;
+            this.health = health;
+            this.lives = lives;
         }
     }
 
@@ -95,6 +112,21 @@ namespace FL_Game_Server.Packets
             this.y = y;
             this.z = z;
             this.w = w;
+        }
+    }
+
+    [Serializable]
+    public struct ColorPacket
+    {
+        public float r;
+        public float g;
+        public float b;
+
+        public ColorPacket(float r, float g, float b)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
         }
     }
 }
