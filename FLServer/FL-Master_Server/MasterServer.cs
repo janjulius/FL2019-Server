@@ -319,6 +319,14 @@ namespace FL_Master_Server
                     }
                 }
                 break;
+                case 888: //Receive message from client
+                    {
+                        SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
+                        
+                        //See if user is online
+                        util.GetNetworkUserFromUsername(sendMessage.ReceivingUser);
+                    }
+                    break;
 
                 case 3010: //set character owned state of user frompeer after validation
                     {

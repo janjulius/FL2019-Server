@@ -30,5 +30,15 @@ namespace FL_Master_Server
 
             return null;
         }
+
+        public NetworkUser GetNetworkUserFromUsername(string name)
+        {
+            NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User.Username == name).FirstOrDefault();
+
+            if (result != null)
+                return result;
+
+            return null;
+        }
     }
 }
