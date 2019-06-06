@@ -8,6 +8,7 @@ using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Extensions;
+using FL_Game_Server.Packets;
 
 namespace FL_Game_Server
 {
@@ -205,14 +206,14 @@ namespace FL_Game_Server
             {
                 case 1:
                 {
-                    var player = new Player(peer, dataReader.GetBytesWithLength().ToStructure<Packets.PlayerInfo>());
+                    var player = new Player(peer, dataReader.GetBytesWithLength().ToStructure<PlayerInfo>());
                     Players.Add(player.playerInfo.playerId, player);
                     player.SendNewPlayerData(writer);
                     SendOthers(peer, writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
                 case 4:
-                    var playerInfo = dataReader.GetBytesWithLength().ToStructure<Packets.PlayerInfo>();
+                    var playerInfo = dataReader.GetBytesWithLength().ToStructure<PlayerInfo>();
                     
                     Players[playerInfo.playerId].ReadPlayerUpdate(playerInfo);
                     Players[playerInfo.playerId].SendNewPlayerUpdate(writer);
@@ -221,7 +222,7 @@ namespace FL_Game_Server
                 case 101: //create networkObject
                 {
                     int objectId;
-                    Packets.ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectData>();
+                    ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<ObjectData>();
                     
                     do
                     {
@@ -251,7 +252,7 @@ namespace FL_Game_Server
                 case 103:
                 {
                     int objectId = dataReader.GetInt();
-                    Packets.ObjectPositionData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectPositionData>();
+                    ObjectPositionData objectData = dataReader.GetBytesWithLength().ToStructure<ObjectPositionData>();
                     if (NetworkObjects.ContainsKey(objectId))
                     {
                         NetworkObjects[objectId].ReadData(objectData);
@@ -289,7 +290,14 @@ namespace FL_Game_Server
 
                     //to post game
                     writer.Put((ushort) 300);
-
+                    writer.Put(Players.Count);
+                    foreach (var player in Players)
+                    {
+                        writer.PutBytesWithLength(player.Value.playerInfo.ToByteArray());
+                        
+                    }
+                    
+                    
                     server.SendToAll(writer,DeliveryMethod.ReliableOrdered);
                 }
                     break;

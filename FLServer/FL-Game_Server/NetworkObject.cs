@@ -1,3 +1,4 @@
+using FL_Game_Server.Packets;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Extensions;
@@ -7,10 +8,10 @@ namespace FL_Game_Server
     public class NetworkObject
     {
         public NetPeer peer;
-        public Packets.ObjectData objectData;
+        public ObjectData objectData;
 
 
-        public NetworkObject(NetPeer peer, Packets.ObjectData objectData)
+        public NetworkObject(NetPeer peer, ObjectData objectData)
         {
             this.peer = peer;
             this.objectData = objectData;
@@ -23,7 +24,7 @@ namespace FL_Game_Server
             writer.PutBytesWithLength(objectData.positionData.ToByteArray());
         }
 
-        public void ReadData(Packets.ObjectPositionData objectData)
+        public void ReadData(ObjectPositionData objectData)
         {
             this.objectData.positionData = objectData;
         }
