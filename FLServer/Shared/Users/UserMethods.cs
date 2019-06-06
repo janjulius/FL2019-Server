@@ -37,27 +37,37 @@ namespace Shared.Users
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                int uId = ctx.User.Where(u => u == source).First().UserId;
-                int fId = ctx.User.Where(f => f == target).First().UserId;
+                if (source != target)
+                {
 
-                if (ctx.UserFriend.Where(a => a.UserId == uId && a.FriendId == fId).Any())
-                    return false;
+                    int uId = ctx.User.Where(u => u == source).First().UserId;
+                    int fId = ctx.User.Where(f => f == target).First().UserId;
 
-                ctx.UserFriend.Add(
-                    new UserFriend()
-                    {
-                        UserId = uId,
-                        FriendId = fId,
-                        AddedDate = DateTime.Now
-                    });
-                ctx.SaveChanges();
+                    if (ctx.UserFriend.Where(a => a.UserId == uId && a.FriendId == fId).Any())
+                        return false;
+                    
+                    ctx.UserFriend.Add(
+                        new UserFriend()
+                        {
+                            UserId = uId,
+                            FriendId = fId,
+                            AddedDate = DateTime.Now
+                        });
+                    ctx.SaveChanges();
+                }
             }
             return true;
         }
 
-        public static void RemoveRequest(User source, User target)
+        public static void RemoveRequest(User source, User target, int reqType)
         {
-            throw new NotImplementedException();
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                FriendRequest req = ctx.FriendRequest.Where(r => r.From == source.UserId && r.To == target.UserId && r.RequestType == reqType).FirstOrDefault();
+                if(req != null)
+                    ctx.FriendRequest.Remove(req);
+                ctx.SaveChanges();
+            }
         }
 
         public static bool RemoveFriend(User user, User target)
@@ -177,7 +187,7 @@ namespace Shared.Users
                 for (int i = 0; i < arr.Length; i++)
                 {
                     arr[i] = new NotificationPacket(ctx.User.Where(usr => usr.UserId == res.ElementAt(i).From).FirstOrDefault().Username,
-                        res.ElementAt(i).RequestType);
+                        res.ElementAt(i).Content, res.ElementAt(i).RequestType);
                 }
                 return arr;
             }
@@ -187,20 +197,97 @@ namespace Shared.Users
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                if (ctx.FriendRequest.Where(a =>
-                 a.From == source.UserId && a.To == target.UserId).Any()) //request exists already
-                    return false;
-
-                ctx.FriendRequest.Add(
-                    new FriendRequest()
+                if (source != target)
+                {
+                    FriendRequest req = new FriendRequest()
                     {
                         From = source.UserId,
                         To = target.UserId,
                         RequestDate = DateTime.Now,
                         RequestType = type
-                    });
+                    };
+
+                    if (!ctx.FriendRequest.Contains(req))
+                        return false;
+                    else
+                        ctx.FriendRequest.Add(req);
+
+                    ctx.SaveChanges();
+                }
+            }
+            return true;
+        }
+
+        public static bool CreateNotification(User source, User target, int type, string content)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                    FriendRequest notification = new FriendRequest()
+                    {
+                        From = source.UserId,
+                        To = target.UserId,
+                        RequestDate = DateTime.Now,
+                        RequestType = type,
+                        Content = content
+                    };
+
+                    if (ctx.FriendRequest.Contains(notification))
+                        return false;
+                    else
+                        ctx.FriendRequest.Add(notification);
+
+                    ctx.SaveChanges();
+                
+            }
+            return true;
+        }
+
+        public static User[] BroadcastAll(User user, string msg)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                IQueryable<User> filteredUsers = ctx.User.Where(u => u.Rights >= 0);
+                foreach (var player in filteredUsers)
+                {
+                    CreateNotification(user, player, 1, msg);
+                }
+                return filteredUsers.ToArray();
+            }
+        }
+
+        public static void TruncateNotifications()
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                ctx.FriendRequest.RemoveRange(ctx.FriendRequest);
                 ctx.SaveChanges();
             }
+        }
+
+        public static bool CreateNotification(User source, User[] targets, int type, string content)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                foreach (User target in targets)
+                {
+                    FriendRequest notification = new FriendRequest()
+                    {
+                        From = source.UserId,
+                        To = target.UserId,
+                        RequestDate = DateTime.Now,
+                        RequestType = type,
+                        Content = content
+                    };
+
+                    if (!ctx.FriendRequest.Contains(notification))
+                        return false;
+                    else
+                        ctx.FriendRequest.Add(notification);
+
+                    ctx.SaveChanges();
+                }
+            }
+            
             return true;
         }
 

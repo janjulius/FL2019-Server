@@ -274,8 +274,8 @@ namespace FL_Master_Server
                         
                         UserMethods.AddFriend(me.User, targetUser);
                         UserMethods.AddFriend(targetUser, me.User);
-                        UserMethods.RemoveRequest(me.User, targetUser);
-                        UserMethods.RemoveRequest(targetUser, me.User);
+                        UserMethods.RemoveRequest(me.User, targetUser, 0);
+                        UserMethods.RemoveRequest(targetUser, me.User, 0);
                         if(targetNetworkUser != null)
                         {
                             SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
@@ -285,16 +285,38 @@ namespace FL_Master_Server
                     break;
                 case 473: //decling request / dismissing notification
                     {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
 
+                        UserMethods.RemoveRequest(targetUser, me.User, 0);
+                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                     }
                     break;
                 case 474: //removing friend
                     {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
 
+                        UserMethods.RemoveFriend(me.User, targetUser);
+                        UserMethods.RemoveFriend(targetUser, me.User);
+                        if(targetNetworkUser != null)
+                        {
+                            SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                        }
+                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                     }
                     break;
                 case 475: //remove request
                     {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+
+                        UserMethods.RemoveRequest(targetUser, me.User, 1);
+                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                     }
                     break;
                 case 476:

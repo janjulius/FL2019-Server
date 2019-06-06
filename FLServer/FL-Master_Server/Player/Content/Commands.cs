@@ -154,6 +154,45 @@ namespace FL_Master_Server.Player.Content
                     MasterServer.Instance.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
                              UserMethods.GetUserAsProfilePartInfoPacket(target ?? user));
                     return true;
+                case "broadcast":
+                    {
+                        string msg = string.Empty;
+                        for (int i = 1; i < cmd.Length; i++)
+                            msg += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
+                        List<User> users = new List<User>();
+                        MasterServer.Instance.NetworkUsers.ForEach(usr => users.Add(usr.User));
+                        UserMethods.CreateNotification(user, users.ToArray(), 1, msg);
+                    }
+                    return true;
+
+                case "broadcastoffline":
+                    {
+                        string msg = string.Empty;
+                        for (int i = 1; i < cmd.Length; i++)
+                            msg += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
+                        var a = UserMethods.BroadcastAll(user, msg);
+                        foreach(var usr in MasterServer.Instance.NetworkUsers)
+                        {
+                            MasterServer.Instance.SendNetworkEvent(usr, LiteNetLib.DeliveryMethod.ReliableOrdered, 3010,
+                                UserMethods.GetUserAsProfilePartInfoPacket(usr.User));
+                        }
+                    }
+                    return true;
+
+                case "refresh":
+                    if (cmd.Length > 1)
+                    {
+                        for (int i = 1; i < cmd.Length; i++)
+                            name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
+                        target = UserMethods.GetUserByUsername(name);
+                    }
+                    MasterServer.Instance.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
+                             UserMethods.GetUserAsProfilePartInfoPacket(target ?? user));
+                    return true;
+
+                case "clearnotifs":
+                    UserMethods.TruncateNotifications();
+                    return true;
             }
             return false;
         }

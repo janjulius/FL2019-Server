@@ -13,6 +13,7 @@ namespace FLServer.Models
         public int Id { get; set; }
         public int From { get; set; }
         public int To { get; set; }
+        public string Content { get; set; }
         public DateTime RequestDate { get; set; }
         public int RequestType { get; set; }
     }
