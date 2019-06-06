@@ -265,7 +265,38 @@ namespace FL_Master_Server
                         }
                     }
                     break;
+                case 472: //adding user after accepting request
+                    {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        
+                        UserMethods.AddFriend(me.User, targetUser);
+                        UserMethods.AddFriend(targetUser, me.User);
+                        UserMethods.RemoveRequest(me.User, targetUser);
+                        UserMethods.RemoveRequest(targetUser, me.User);
+                        if(targetNetworkUser != null)
+                        {
+                            SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
+                        }
+                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                    }
+                    break;
+                case 473: //decling request / dismissing notification
+                    {
 
+                    }
+                    break;
+                case 474: //removing friend
+                    {
+
+                    }
+                    break;
+                case 475: //remove request
+                    {
+                    }
+                    break;
                 case 476:
                     {
                         string name = dataReader.GetString();
@@ -319,6 +350,16 @@ namespace FL_Master_Server
                     }
                 }
                 break;
+                case 888: //Receive message from client
+                    {
+                        SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
+                        User user = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
+                        User receivingUser = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
+                        UserMethods.SaveMessageToDatabase(user.UserId, receivingUser.UserId, sendMessage.MessageText, sendMessage.TimeStamp);
+                        //See if user is online
+                        //util.GetNetworkUserFromUsername(sendMessage.ReceivingUser);
+                    }
+                    break;
 
                 case 3010: //set character owned state of user frompeer after validation
                     {
