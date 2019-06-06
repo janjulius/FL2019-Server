@@ -470,9 +470,11 @@ namespace FL_Game_Server
                         inGame = GameState.InGame;
                         playersLeftAlive = Players.Count;
 
-
+                        
                         foreach (var player in Players)
                         {
+                            
+                            player.Value.playerInfo.playerStats = new PlayerStats();
                             player.Value.playerInfo.gameInfo.lives = 3;
                             writer.Put((ushort) 152);
                             writer.Put(player.Key);
