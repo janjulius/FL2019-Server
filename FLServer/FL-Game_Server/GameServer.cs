@@ -290,7 +290,14 @@ namespace FL_Game_Server
 
                     //to post game
                     writer.Put((ushort) 300);
-
+                    writer.Put(Players.Count);
+                    foreach (var player in Players)
+                    {
+                        writer.PutBytesWithLength(player.Value.playerInfo.ToByteArray());
+                        
+                    }
+                    
+                    
                     server.SendToAll(writer,DeliveryMethod.ReliableOrdered);
                 }
                     break;

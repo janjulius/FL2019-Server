@@ -20,7 +20,9 @@ namespace FL_Game_Server.Packets
 
         public PlayerGameInfo gameInfo;
 
-        public PlayerInfo(int networkId, int playerId, bool isHost, string playerName, int characterId, int playerPlace, ColorPacket playerColor, PlayerGameInfo gameInfo)
+        public PlayerStats playerStats;
+
+        public PlayerInfo(int networkId, int playerId, bool isHost, string playerName, int characterId, int playerPlace, ColorPacket playerColor, PlayerGameInfo gameInfo, PlayerStats playerStats)
         {
             this.networkId = networkId;
             this.playerId = playerId;
@@ -30,6 +32,7 @@ namespace FL_Game_Server.Packets
             this.playerPlace = playerPlace;
             this.playerColor = playerColor;
             this.gameInfo = gameInfo;
+            this.playerStats = playerStats;
         }
     }
 
@@ -45,6 +48,31 @@ namespace FL_Game_Server.Packets
             this.damage = damage;
             this.health = health;
             this.lives = lives;
+        }
+    }
+    
+    [Serializable]
+    public struct PlayerStats
+    {
+        public int kills;
+        public int deaths;
+        public int ultsUsed;
+        public float damageDone;
+        public float damageTaken;
+        public float damageBlocked;
+        public float highestDamageSurvived;
+        public float damageHealed;
+
+        public PlayerStats(int kills, int deaths, int ultsUsed, float damageDone, float damageTaken, float damageBlocked, float highestDamageSurvived, float damageHealed)
+        {
+            this.kills = kills;
+            this.deaths = deaths;
+            this.ultsUsed = ultsUsed;
+            this.damageDone = damageDone;
+            this.damageTaken = damageTaken;
+            this.damageBlocked = damageBlocked;
+            this.highestDamageSurvived = highestDamageSurvived;
+            this.damageHealed = damageHealed;
         }
     }
 
