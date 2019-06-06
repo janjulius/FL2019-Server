@@ -74,6 +74,16 @@ namespace FL_Master_Server.Player.Content
                              UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
                     return true;
+                case "addfriend":
+                    for (int i = 1; i < cmd.Length; i++)
+                        name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
+                    target = UserMethods.GetUserByUsername(name);
+                    if(target != null)
+                    {
+                        UserMethods.CreateFriendRequest(user, target);
+
+                    }
+                    return true;
                 case "addbalance":
                     for (int i = 2; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
@@ -158,6 +168,11 @@ namespace FL_Master_Server.Player.Content
                     for (int i = 1; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
+                    if (string.Equals(target.Username, "jan julius", StringComparison.OrdinalIgnoreCase))
+                    {
+                        MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} is immume to bans.");
+                        return true;
+                    }
                     UserMethods.SetRights(target, -1);
                     return true;
                 case "unban":

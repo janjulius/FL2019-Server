@@ -8,6 +8,7 @@ using FLServer.Models;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Extensions;
+using FL_Game_Server.Packets;
 
 namespace FL_Game_Server
 {
@@ -28,6 +29,8 @@ namespace FL_Game_Server
         public Dictionary<int, Player> Players = new Dictionary<int, Player>();
         public Dictionary<int, NetworkObject> NetworkObjects = new Dictionary<int, NetworkObject>();
 
+        public List<Damage> damagePackets = new List<Damage>();
+
         public Random rand = new Random();
 
 
@@ -37,7 +40,7 @@ namespace FL_Game_Server
             InGame = 1,
             InPostGame = 2,
         }
-        
+
         public void Run(string[] args)
         {
             if (args.Length > 0)
@@ -205,15 +208,15 @@ namespace FL_Game_Server
             {
                 case 1:
                 {
-                    var player = new Player(peer, dataReader.GetBytesWithLength().ToStructure<Packets.PlayerInfo>());
+                    var player = new Player(peer, dataReader.GetBytesWithLength().ToStructure<PlayerInfo>());
                     Players.Add(player.playerInfo.playerId, player);
                     player.SendNewPlayerData(writer);
                     SendOthers(peer, writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
                 case 4:
-                    var playerInfo = dataReader.GetBytesWithLength().ToStructure<Packets.PlayerInfo>();
-                    
+                    var playerInfo = dataReader.GetBytesWithLength().ToStructure<PlayerInfo>();
+
                     Players[playerInfo.playerId].ReadPlayerUpdate(playerInfo);
                     Players[playerInfo.playerId].SendNewPlayerUpdate(writer);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
@@ -221,16 +224,16 @@ namespace FL_Game_Server
                 case 101: //create networkObject
                 {
                     int objectId;
-                    Packets.ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectData>();
-                    
+                    ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<ObjectData>();
+
                     do
                     {
                         objectId = rand.Next(1000000, 9999999);
                     } while (NetworkObjects.ContainsKey(objectId));
 
                     objectData.objectId = objectId;
-                    
-                    var netObj = new NetworkObject(peer,objectData);
+
+                    var netObj = new NetworkObject(peer, objectData);
                     NetworkObjects.Add(objectId, netObj);
 
                     netObj.SendObjectData(writer);
@@ -251,7 +254,7 @@ namespace FL_Game_Server
                 case 103:
                 {
                     int objectId = dataReader.GetInt();
-                    Packets.ObjectPositionData objectData = dataReader.GetBytesWithLength().ToStructure<Packets.ObjectPositionData>();
+                    ObjectPositionData objectData = dataReader.GetBytesWithLength().ToStructure<ObjectPositionData>();
                     if (NetworkObjects.ContainsKey(objectId))
                     {
                         NetworkObjects[objectId].ReadData(objectData);
@@ -260,6 +263,57 @@ namespace FL_Game_Server
                     }
                 }
                     break;
+
+                case 151:
+                {
+                    var damageBytes = dataReader.GetBytesWithLength();
+                    var damageData = damageBytes.ToStructure<Damage>();
+
+                    writer.Put((ushort) 151);
+                    writer.PutBytesWithLength(damageBytes);
+                    Players[damageData.damageTakerId].peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                }
+                    break;
+
+                case 152:
+                {
+                    var damageBytes = dataReader.GetBytesWithLength();
+                    var damageData = damageBytes.ToStructure<Damage>();
+
+
+                    switch (damageData.damageType)
+                    {
+                        case 50: //case damage blocked
+                        {
+                            Players[damageData.damageTakerId].playerInfo.playerStats.damageBlocked += damageData.damage;
+                            Players[damageData.damageDealerId].playerInfo.playerStats.damageMissed += damageData.damage;
+                        }
+                            break;
+
+                        case 51: //case damage healed
+                        {
+                            Players[damageData.damageTakerId].playerInfo.playerStats.damageHealed += damageData.damage;
+                            Players[damageData.damageTakerId].playerInfo.gameInfo.damage -= damageData.damage;
+                        }
+                            break;
+
+                        default:
+                        {
+                            Players[damageData.damageDealerId].playerInfo.playerStats.damageDone += damageData.damage;
+                            Players[damageData.damageTakerId].playerInfo.playerStats.damageTaken += damageData.damage;
+                            Players[damageData.damageTakerId].playerInfo.gameInfo.damage += damageData.damage;
+                        }
+                            break;
+                    }
+
+                    writer.Put((ushort) 152);
+                    writer.Put(damageData.damageTakerId);
+                    writer.PutBytesWithLength(Players[damageData.damageTakerId].playerInfo.gameInfo.ToByteArray());
+
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
+                    break;
+
                 case 201:
                 {
                     byte[] data = new byte[dataReader.UserDataSize];
@@ -284,16 +338,21 @@ namespace FL_Game_Server
 
                 case 300:
                 {
-
                     inGame = GameState.InPostGame;
 
                     //to post game
                     writer.Put((ushort) 300);
+                    writer.Put(Players.Count);
+                    foreach (var player in Players)
+                    {
+                        writer.PutBytesWithLength(player.Value.playerInfo.ToByteArray());
+                    }
 
-                    server.SendToAll(writer,DeliveryMethod.ReliableOrdered);
+
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
-                
+
                 case 301:
                 {
                     var levelId = dataReader.GetInt();
@@ -308,8 +367,8 @@ namespace FL_Game_Server
 
                     writer.Put((ushort) 301);
                     writer.Put(levelId);
-                    
-                    
+
+
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
 
                     NetworkObjects.Clear();
@@ -335,7 +394,7 @@ namespace FL_Game_Server
             foreach (NetPeer netPeer in server.ConnectedPeerList)
             {
                 if (peer == netPeer) continue;
-                
+
                 netPeer.Send(data, deliveryMethod);
             }
         }

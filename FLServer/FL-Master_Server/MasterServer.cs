@@ -196,7 +196,7 @@ namespace FL_Master_Server
                                 break; //user not found somehow not connected
 
                             writer.Put((ushort)2004);
-                            writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(id));
+                            writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(u));
                             fromPeer.Send(writer, DeliveryMethod.ReliableOrdered); 
                         }
                     }
@@ -319,6 +319,14 @@ namespace FL_Master_Server
                     }
                 }
                 break;
+                case 888: //Receive message from client
+                    {
+                        SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
+                        
+                        //See if user is online
+                        util.GetNetworkUserFromUsername(sendMessage.ReceivingUser);
+                    }
+                    break;
 
                 case 3010: //set character owned state of user frompeer after validation
                     {
