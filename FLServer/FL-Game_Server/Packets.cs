@@ -62,8 +62,9 @@ namespace FL_Game_Server.Packets
         public float damageBlocked;
         public float highestDamageSurvived;
         public float damageHealed;
+        public float damageMissed;
 
-        public PlayerStats(int kills, int deaths, int ultsUsed, float damageDone, float damageTaken, float damageBlocked, float highestDamageSurvived, float damageHealed)
+        public PlayerStats(int kills, int deaths, int ultsUsed, float damageDone, float damageTaken, float damageBlocked, float highestDamageSurvived, float damageHealed, float damageMissed)
         {
             this.kills = kills;
             this.deaths = deaths;
@@ -73,6 +74,7 @@ namespace FL_Game_Server.Packets
             this.damageBlocked = damageBlocked;
             this.highestDamageSurvived = highestDamageSurvived;
             this.damageHealed = damageHealed;
+            this.damageMissed = damageMissed;
         }
     }
 
@@ -155,6 +157,29 @@ namespace FL_Game_Server.Packets
             this.r = r;
             this.g = g;
             this.b = b;
+        }
+    }
+    
+    [Serializable]
+    public struct Damage
+    {
+        public int damageDealerId;
+        public int damageTakerId;
+        public float damage;
+        public float directionX;
+        public float directionY;
+        public byte damageType;
+        public long timeStamp;
+
+        public Damage(int damageDealerId, int damageTakerId, float damage, float directionX, float directionY, byte damageType)
+        {
+            this.damageDealerId = damageDealerId;
+            this.damageTakerId = damageTakerId;
+            this.damage = damage;
+            this.directionX = directionX;
+            this.directionY = directionY;
+            this.damageType = damageType;
+            timeStamp = DateTime.UtcNow.ToBinary();
         }
     }
 }
