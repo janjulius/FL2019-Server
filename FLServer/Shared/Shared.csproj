@@ -323,6 +323,10 @@
     <Compile Include="Migrations\20190604220119_201964_6.designer.cs">
       <DependentUpon>20190604220119_201964_6.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190605112107_201956_1.cs" />
+    <Compile Include="Migrations\20190605112107_201956_1.designer.cs">
+      <DependentUpon>20190605112107_201956_1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />
@@ -351,6 +355,7 @@
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
     <Compile Include="Packets\UserState\CharacterOwned.cs" />
+    <Compile Include="Packets\UserState\NotificationPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ranked\RankedFormulas.cs" />
     <Compile Include="Security\Security.cs" />

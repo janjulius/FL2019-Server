@@ -1,6 +1,7 @@
 ﻿using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Shared.Packets;
+using Shared.Packets.UserState;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +87,8 @@ namespace Shared.Users
                 {
                     From = u.UserId,
                     To = target.UserId,
-                    RequestDate = DateTime.Now
+                    RequestDate = DateTime.Now,
+                    RequestType = 0
                 };
                 ctx.FriendRequest.Add(rq);
                 ctx.SaveChanges();
@@ -147,29 +149,53 @@ namespace Shared.Users
             }
         }
 
-        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(string name)
-        {
-            using (FLDBContext ctx = new FLDBContext())
-            {
-                User u = GetUserByUsername(name);
-                FriendSlotPacket[] friends = GetFriendsAsPacket(name);
-                ProfilePartInfo result = new ProfilePartInfo(u.Username, u.Balance, u.PremiumBalance
-                    , u.Avatar, u.Level, u.Exp, friends.Length, friends, u.OwnedCharacters.ToArray());
-
-                return result;
-            }
-        }
-
         public static ProfilePartInfo GetUserAsProfilePartInfoPacket(User user)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
                 FriendSlotPacket[] friends = GetFriendsAsPacket(user.Username);
+                NotificationPacket[] notifs = GetNotificationAsPackets(user);
                 ProfilePartInfo result = new ProfilePartInfo(user.Username, user.Balance, user.PremiumBalance
-                    , user.Avatar, user.Level, user.Exp, friends.Length, friends, user.OwnedCharacters.ToArray());
+                    , user.Avatar, user.Level, user.Exp, friends.Length, friends, user.OwnedCharacters.ToArray(), notifs.Length, notifs);
 
                 return result;
             }
+        }
+
+        public static NotificationPacket[] GetNotificationAsPackets(User user)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                IEnumerable<FriendRequest> res = ctx.FriendRequest.Where(u => u.To == user.UserId).AsEnumerable();
+                NotificationPacket[] arr = new NotificationPacket[res.Count()];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = new NotificationPacket(ctx.User.Where(usr => usr.UserId == res.ElementAt(i).From).FirstOrDefault().Username,
+                        res.ElementAt(i).RequestType);
+                }
+                return arr;
+            }
+        }
+
+        public static bool CreateRequest(User source, User target, int type)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                if (ctx.FriendRequest.Where(a =>
+                 a.From == source.UserId && a.To == target.UserId).Any()) //request exists already
+                    return false;
+
+                ctx.FriendRequest.Add(
+                    new FriendRequest()
+                    {
+                        From = source.UserId,
+                        To = target.UserId,
+                        RequestDate = DateTime.Now,
+                        RequestType = type
+                    });
+                ctx.SaveChanges();
+            }
+            return true;
         }
 
         /// <summary>
@@ -208,7 +234,7 @@ namespace Shared.Users
                 char[] arr = new char[Constants.PacketConstants.CharacterCount];
                 for (int a = 0; a < arr.Length; a++)
                     arr[a] = '0';
-                user.OwnedCharactersString = arr.ToString();
+                user.OwnedCharactersString = new string(arr);
                 ctx.Entry(user).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
@@ -302,13 +328,17 @@ namespace Shared.Users
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                User u = GetUserByUsername(id);
+                User u = null;
+                u = GetUserByUsername(id);
+                if (u != null)
                     return new ProfileAccountInfo(u.Username,
                         u.Avatar,
                         u.Level,
                         u.Exp,
                         u.LastOnline.ToOADate(),
                         String.Empty);
+                else
+                    return new ProfileAccountInfo("", 1, 0, 0, DateTime.Now.ToOADate(), "Profile not found.");
             }
         }
 
