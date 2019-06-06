@@ -1,5 +1,6 @@
 ﻿using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Models;
 using Shared.Packets;
 using System;
 using System.Collections.Generic;
@@ -16,13 +17,13 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 IQueryable<User> usr = ctx.User.Where(user => user.Username == name);
-        
+
                 if (usr.Any())
                     return true;
             }
             return false;
         }
-        
+
         public static void UpdateLastLogin(string username)
         {
             using (FLDBContext ctx = new FLDBContext())
@@ -30,7 +31,7 @@ namespace Shared.Users
                 ctx.User.Where(u => u.Username == username).First().LastOnline = DateTime.UtcNow;
             }
         }
-        
+
         public static bool AddFriend(User source, User target)
         {
             using (FLDBContext ctx = new FLDBContext())
@@ -69,7 +70,7 @@ namespace Shared.Users
             }
             return true;
         }
-        
+
         public static FriendRequest[] GetIncomingFriendRequests(User u)
         {
             using (FLDBContext ctx = new FLDBContext())
@@ -111,7 +112,7 @@ namespace Shared.Users
                 return arr;
             }
         }
-        
+
         public static void AddPremiumBalance(User target, int v)
         {
             using (FLDBContext ctx = new FLDBContext())
@@ -186,9 +187,10 @@ namespace Shared.Users
                 {
                     u = ctx.User.Where(n => n.Username == username).First();
                 }
-                catch {
+                catch
+                {
                     return null;
-                        }
+                }
                 return u;
             }
         }
@@ -303,12 +305,12 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(id);
-                    return new ProfileAccountInfo(u.Username,
-                        u.Avatar,
-                        u.Level,
-                        u.Exp,
-                        u.LastOnline.ToOADate(),
-                        String.Empty);
+                return new ProfileAccountInfo(u.Username,
+                    u.Avatar,
+                    u.Level,
+                    u.Exp,
+                    u.LastOnline.ToOADate(),
+                    String.Empty);
             }
         }
 
@@ -364,5 +366,46 @@ namespace Shared.Users
                 ctx.SaveChanges();
             }
         }
+
+        public static void SaveMessageToDatabase(int senderId, int receiverId, string messageText, DateTime timeStamp)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                try
+                {
+                    ctx.Message.Add(new Message
+                    {
+                        SenderId = senderId,
+                        ReceiverId = receiverId,
+                        Sender = GetUserByUniqueIdentifier(Convert.ToString(senderId)),
+                        Receiver = GetUserByUniqueIdentifier(Convert.ToString(receiverId)),
+                        MessageText = messageText,
+                        TimeStamp = timeStamp
+                    });
+                    ctx.SaveChanges();
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+        }
+
+        public static List<Message> GetMessagesBetweenUsers(int firstUserId, int secondUserId)
+        {
+            List<Message> messages = new List<Message>();
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                foreach (Message m in ctx.Message.Where(n => (n.SenderId == firstUserId && n.ReceiverId == secondUserId) || (n.SenderId == secondUserId && n.ReceiverId == firstUserId)))
+                {
+                    if (m.TimeStamp > DateTime.Today.AddMonths(-1))
+                    {
+                        messages.Add(m);
+                    }
+                }
+            }
+            return messages;
+        }
+
     }
 }
