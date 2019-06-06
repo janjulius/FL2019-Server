@@ -322,9 +322,11 @@ namespace FL_Master_Server
                 case 888: //Receive message from client
                     {
                         SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
-                        
+                        User user = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
+                        User receivingUser = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
+                        UserMethods.SaveMessageToDatabase(user.UserId, receivingUser.UserId, sendMessage.MessageText, sendMessage.TimeStamp);
                         //See if user is online
-                        util.GetNetworkUserFromUsername(sendMessage.ReceivingUser);
+                        //util.GetNetworkUserFromUsername(sendMessage.ReceivingUser);
                     }
                     break;
 

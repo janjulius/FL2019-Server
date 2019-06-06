@@ -423,7 +423,7 @@ namespace Shared.Users
 
         public static List<Message> GetMessagesBetweenUsers(int firstUserId, int secondUserId)
         {
-            List<Message> messages = new List<Message>();
+            List<Models.Message> messages = new List<Models.Message>();
             using (FLDBContext ctx = new FLDBContext())
             {
                 foreach (Message m in ctx.Message.Where(n => (n.SenderId == firstUserId && n.ReceiverId == secondUserId) || (n.SenderId == secondUserId && n.ReceiverId == firstUserId)))

@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 
 namespace Shared.Packets
 {
-    public struct SendMessage
+    public struct ReceiveMessage
     {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
-        public string ReceivingUser;
         public string MessageText;
         public DateTime TimeStamp;
 
-        public SendMessage(string receivingUser, string messageText, DateTime timeStamp)
+        public ReceiveMessage(string messageText, DateTime timeStamp)
         {
-            ReceivingUser = receivingUser;  
             MessageText = messageText;
             TimeStamp = timeStamp;
         }
