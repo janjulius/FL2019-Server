@@ -196,7 +196,7 @@ namespace FL_Master_Server
                                 break; //user not found somehow not connected
 
                             writer.Put((ushort)2004);
-                            writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(id));
+                            writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(u));
                             fromPeer.Send(writer, DeliveryMethod.ReliableOrdered); 
                         }
                     }

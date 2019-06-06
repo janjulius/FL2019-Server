@@ -14,5 +14,6 @@ namespace FLServer.Models
         public int From { get; set; }
         public int To { get; set; }
         public DateTime RequestDate { get; set; }
+        public int RequestType { get; set; }
     }
 }
