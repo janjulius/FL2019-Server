@@ -22,11 +22,14 @@ namespace FL_Game_Server
         private byte roomType;
         private string serverName;
         private GameState inGame = GameState.InLobby;
+        private int playersLeftAlive = 0;
+
 
         private EventBasedNetListener listener;
         private NetManager server;
 
         public Dictionary<int, Player> Players = new Dictionary<int, Player>();
+        public Dictionary<int, DateTime> playersWaitingToRespawn = new Dictionary<int, DateTime>();
         public Dictionary<int, NetworkObject> NetworkObjects = new Dictionary<int, NetworkObject>();
 
         public List<Damage> damagePackets = new List<Damage>();
@@ -85,6 +88,31 @@ namespace FL_Game_Server
 
                 while (!stopServer)
                 {
+                    if (playersWaitingToRespawn.Count != 0)
+                    {
+                        List<int> playersToRemove = new List<int>();
+                        foreach (var player in playersWaitingToRespawn)
+                        {
+                            if ((DateTime.UtcNow - player.Value).TotalSeconds > 2d)
+                            {
+                                playersToRemove.Add(player.Key);
+                            }
+                        }
+
+                        foreach (var i in playersToRemove)
+                        {
+                            playersWaitingToRespawn.Remove(i);
+                            NetDataWriter writer = new NetDataWriter();
+                            writer.Put((ushort) 154);
+                            writer.Put(i);
+                            Players[i].peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                            writer.Reset();
+                        }
+
+                        playersToRemove.Clear();
+                    }
+
+
                     server.PollEvents();
                     Thread.Sleep(serverFreq);
                 }
@@ -279,7 +307,7 @@ namespace FL_Game_Server
                 {
                     var damageBytes = dataReader.GetBytesWithLength();
                     var damageData = damageBytes.ToStructure<Damage>();
-
+                    damagePackets.Add(damageData);
 
                     switch (damageData.damageType)
                     {
@@ -311,6 +339,82 @@ namespace FL_Game_Server
                     writer.PutBytesWithLength(Players[damageData.damageTakerId].playerInfo.gameInfo.ToByteArray());
 
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
+                    break;
+
+                case 153:
+                {
+                    int playerId = dataReader.GetInt();
+                    Players[playerId].playerInfo.gameInfo.lives--;
+                    Players[playerId].playerInfo.playerStats.deaths++;
+
+                    if (Players[playerId].playerInfo.playerStats.highestDamageSurvived < Players[playerId].playerInfo.gameInfo.damage)
+                        Players[playerId].playerInfo.playerStats.highestDamageSurvived = Players[playerId].playerInfo.gameInfo.damage;
+
+                    Players[playerId].playerInfo.gameInfo.damage = 0;
+
+                    var currentTime = DateTime.UtcNow;
+
+                    for (int i = damagePackets.Count - 1; i >= 0; i--)
+                    {
+                        if (damagePackets[i].damageTakerId == playerId)
+                        {
+                            Console.WriteLine((currentTime - DateTime.FromBinary(damagePackets[i].timeStamp)).TotalSeconds);
+                            if ((currentTime - DateTime.FromBinary(damagePackets[i].timeStamp)).TotalSeconds < 15d)
+                            {
+                                Players[damagePackets[i].damageDealerId].playerInfo.playerStats.kills++;
+                            }
+
+                            i = -1;
+                        }
+                    }
+
+                    bool endGame = false;
+
+                    if (Players[playerId].playerInfo.gameInfo.lives == 0)
+                    {
+                        Players[playerId].playerInfo.playerPlace = playersLeftAlive;
+                        playersLeftAlive--;
+
+                        if (playersLeftAlive <= 1)
+                        {
+                            foreach (var player in Players)
+                            {
+                                if (player.Value.playerInfo.gameInfo.lives > 0)
+                                {
+                                    player.Value.playerInfo.playerPlace = 1;
+                                }
+                            }
+
+                            endGame = true;
+                        }
+                    }
+                    else
+                    {
+                        playersWaitingToRespawn.Add(playerId, DateTime.UtcNow);
+                    }
+
+                    writer.Put((ushort) 152);
+                    writer.Put(playerId);
+                    writer.PutBytesWithLength(Players[playerId].playerInfo.gameInfo.ToByteArray());
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                    writer.Reset();
+
+                    if (endGame)
+                    {
+                        inGame = GameState.InPostGame;
+
+                        //to post game
+                        writer.Put((ushort) 300);
+                        writer.Put(Players.Count);
+                        foreach (var player in Players)
+                        {
+                            writer.PutBytesWithLength(player.Value.playerInfo.ToByteArray());
+                        }
+
+
+                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                    }
                 }
                     break;
 
@@ -362,8 +466,21 @@ namespace FL_Game_Server
                     else if (levelId == -3)
                         inGame = GameState.InPostGame;
                     else
+                    {
                         inGame = GameState.InGame;
+                        playersLeftAlive = Players.Count;
 
+
+                        foreach (var player in Players)
+                        {
+                            player.Value.playerInfo.gameInfo.lives = 3;
+                            writer.Put((ushort) 152);
+                            writer.Put(player.Key);
+                            writer.PutBytesWithLength(player.Value.playerInfo.gameInfo.ToByteArray());
+                            server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                            writer.Reset();
+                        }
+                    }
 
                     writer.Put((ushort) 301);
                     writer.Put(levelId);
