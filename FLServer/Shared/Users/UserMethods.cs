@@ -54,6 +54,11 @@ namespace Shared.Users
             return true;
         }
 
+        public static void RemoveRequest(User source, User target)
+        {
+            throw new NotImplementedException();
+        }
+
         public static bool RemoveFriend(User user, User target)
         {
             using (FLDBContext ctx = new FLDBContext())
