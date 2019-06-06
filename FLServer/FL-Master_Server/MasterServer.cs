@@ -265,7 +265,38 @@ namespace FL_Master_Server
                         }
                     }
                     break;
+                case 472: //adding user after accepting request
+                    {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        
+                        UserMethods.AddFriend(me.User, targetUser);
+                        UserMethods.AddFriend(targetUser, me.User);
+                        UserMethods.RemoveRequest(me.User, targetUser);
+                        UserMethods.RemoveRequest(targetUser, me.User);
+                        if(targetNetworkUser != null)
+                        {
+                            SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
+                        }
+                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                    }
+                    break;
+                case 473: //decling request / dismissing notification
+                    {
 
+                    }
+                    break;
+                case 474: //removing friend
+                    {
+
+                    }
+                    break;
+                case 475: //remove request
+                    {
+                    }
+                    break;
                 case 476:
                     {
                         string name = dataReader.GetString();
