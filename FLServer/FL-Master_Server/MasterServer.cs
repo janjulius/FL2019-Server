@@ -386,7 +386,7 @@ namespace FL_Master_Server
                 break;
                 case 888: //Receive message from client
                     {
-                        SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
+                        Message sendMessage = dataReader.GetPacketStruct<Message>();
                         User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
                         User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
                         UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, sendMessage.MessageText, sendMessage.TimeStamp);
@@ -399,10 +399,16 @@ namespace FL_Master_Server
                     break;
                 case 889: //get message history
                     {
-                        SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
+                        Message sendMessage = dataReader.GetPacketStruct<Message>();
                         User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
                         User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
-                        UserMethods.GetLatestMessages(me, target);
+                        NetDataWriter writer = new NetDataWriter();
+                        Messages msges = new Messages(UserMethods.GetLatestMessages(me, target));
+
+                        writer.Put((ushort)890);
+                        writer.PutPacketStruct(msges);
+
+                        fromPeer.Send(writer,DeliveryMethod.ReliableOrdered);
                     }
                     break;
                 case 3010: //set character owned state of user frompeer after validation

@@ -8,18 +8,30 @@ using System.Threading.Tasks;
 
 namespace Shared.Packets
 {
-    public struct SendMessage
+    public struct Message
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string ReceivingUser;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string MessageText;
-        public DateTime TimeStamp;
+        public double TimeStamp;
 
-        public SendMessage(string receivingUser, string messageText, DateTime timeStamp)
+        public Message(string receivingUser, string messageText, double timeStamp)
         {
             ReceivingUser = receivingUser;  
             MessageText = messageText;
             TimeStamp = timeStamp;
+        }
+    }
+
+    public struct Messages
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = PacketConstants.MaxMessages)]
+        public Message[] AllMessages;
+
+        public Messages(Message[] allMessages)
+        {
+            AllMessages = allMessages;
         }
     }
 }

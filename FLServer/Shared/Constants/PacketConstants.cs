@@ -13,5 +13,6 @@ namespace Shared.Constants
         internal const int CharacterCount = 6;
         internal const int BigStringSize = 2500;
         internal const int MaxIncomingNotifications = 25;
+        internal const int MaxMessages = 25;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FLServer.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Constants;
 using Shared.Models;
 using Shared.Packets;
 using Shared.Packets.UserState;
@@ -321,6 +322,14 @@ namespace Shared.Users
             }
         }
 
+        public static User GetUserById(int id)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return ctx.User.Where(u => u.UserId == id).FirstOrDefault();
+            }
+        }
+
         public static void ResetOwnedCharacters(User user)
         {
             using (FLDBContext ctx = new FLDBContext())
@@ -489,18 +498,18 @@ namespace Shared.Users
             }
         }
 
-        public static void SaveMessageToDatabase(int senderId, int receiverId, string messageText, DateTime timeStamp)
+        public static void SaveMessageToDatabase(int senderId, int receiverId, string messageText, double timeStamp)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
                 try
                 {
-                    ctx.Message.Add(new Message
+                    ctx.Message.Add(new Models.Message
                     {
                         SenderId = senderId,
                         ReceiverId = receiverId,
                         MessageText = messageText,
-                        TimeStamp = timeStamp
+                        TimeStamp = DateTime.FromOADate(timeStamp)
                     });
                     ctx.SaveChanges();
                 }
@@ -511,12 +520,12 @@ namespace Shared.Users
             }
         }
 
-        public static List<Message> GetMessagesBetweenUsers(int firstUserId, int secondUserId)
+        public static List<Models.Message> GetMessagesBetweenUsers(int firstUserId, int secondUserId)
         {
             List<Models.Message> messages = new List<Models.Message>();
             using (FLDBContext ctx = new FLDBContext())
             {
-                foreach (Message m in ctx.Message.Where(n => (n.SenderId == firstUserId && n.ReceiverId == secondUserId) || (n.SenderId == secondUserId && n.ReceiverId == firstUserId)))
+                foreach (Models.Message m in ctx.Message.Where(n => (n.SenderId == firstUserId && n.ReceiverId == secondUserId) || (n.SenderId == secondUserId && n.ReceiverId == firstUserId)))
                 {
                     if (m.TimeStamp > DateTime.Today.AddMonths(-1))
                     {
@@ -527,13 +536,18 @@ namespace Shared.Users
             return messages;
         }
 
-        public static Message[] GetLatestMessages(User user, User target)
+        public static Packets.Message[] GetLatestMessages(User user, User target)
         {
+            Packets.Message[] arr = new Packets.Message[PacketConstants.MaxMessages];
             using (FLDBContext ctx = new FLDBContext())
             {
-                IEnumerable<Message> collection = ctx.Message.Where(m => (m.SenderId == user.UserId && m.ReceiverId == target.UserId)
+                IEnumerable<Models.Message> collection = ctx.Message.Where(m => (m.SenderId == user.UserId && m.ReceiverId == target.UserId)
                     || (m.SenderId == target.UserId && m.ReceiverId== user.UserId)).AsEnumerable();
-                return collection.Reverse().Take(25).Reverse().ToArray();
+                var data = collection.Reverse().Take(25).Reverse().ToArray();
+                for (int i = 0; i < data.Count(); i++) {
+                    arr[i] = new Packets.Message(GetUserById(data[i].ReceiverId).Username, data[i].MessageText, data[i].TimeStamp.ToOADate());
+                }
+                return arr;
             }
         }
     }
