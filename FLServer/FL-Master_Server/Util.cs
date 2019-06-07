@@ -40,5 +40,15 @@ namespace FL_Master_Server
 
             return null;
         }
+
+        public bool IsOnline(User user)
+        {
+            NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User == user).FirstOrDefault();
+
+            if (result != null)
+                return true;
+
+            return false;
+        }
     }
 }

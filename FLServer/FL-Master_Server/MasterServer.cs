@@ -387,14 +387,24 @@ namespace FL_Master_Server
                 case 888: //Receive message from client
                     {
                         SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
-                        User user = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
-                        User receivingUser = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
-                        UserMethods.SaveMessageToDatabase(user.UserId, receivingUser.UserId, sendMessage.MessageText, sendMessage.TimeStamp);
+                        User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
+                        User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
+                        UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, sendMessage.MessageText, sendMessage.TimeStamp);
                         //See if user is online
-                        //util.GetNetworkUserFromUsername(sendMessage.ReceivingUser);
+                        if (util.IsOnline(target))
+                        {
+                            //refresh interface
+                        }
                     }
                     break;
-
+                case 889: //get message history
+                    {
+                        SendMessage sendMessage = dataReader.GetPacketStruct<SendMessage>();
+                        User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
+                        User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
+                        UserMethods.GetLatestMessages(me, target);
+                    }
+                    break;
                 case 3010: //set character owned state of user frompeer after validation
                     {
                         CharacterOwned packet = dataReader.GetPacketStruct<CharacterOwned>();

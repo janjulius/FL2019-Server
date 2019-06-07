@@ -499,8 +499,6 @@ namespace Shared.Users
                     {
                         SenderId = senderId,
                         ReceiverId = receiverId,
-                        Sender = GetUserByUniqueIdentifier(Convert.ToString(senderId)),
-                        Receiver = GetUserByUniqueIdentifier(Convert.ToString(receiverId)),
                         MessageText = messageText,
                         TimeStamp = timeStamp
                     });
@@ -529,5 +527,14 @@ namespace Shared.Users
             return messages;
         }
 
+        public static Message[] GetLatestMessages(User user, User target)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                IEnumerable<Message> collection = ctx.Message.Where(m => (m.SenderId == user.UserId && m.ReceiverId == target.UserId)
+                    || (m.SenderId == target.UserId && m.ReceiverId== user.UserId)).AsEnumerable();
+                return collection.Reverse().Take(25).Reverse().ToArray();
+            }
+        }
     }
 }
