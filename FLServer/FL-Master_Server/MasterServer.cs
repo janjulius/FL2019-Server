@@ -329,6 +329,18 @@ namespace FL_Master_Server
                             Commands.ProcessCommand(user.User, cmd);
                         }
                     } break;
+                case 477:
+                    {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        if (targetUser != null)
+                        {
+                            UserMethods.CreateFriendRequest(me.User, targetUser);
+                            SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetUser));
+                        }
+                    }
+                    break;
                 case 600:
                 {
                     string serverName = dataReader.GetString();
