@@ -341,6 +341,18 @@ namespace FL_Master_Server
                         }
                     }
                     break;
+                case 478:
+                    {
+                        string target = dataReader.GetString();
+                        User targetUser = UserMethods.GetUserByUsername(target);
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        NetDataWriter writer = new NetDataWriter();
+                        Messages msginfo = new Messages(UserMethods.GetLatestMessages(me.User, targetUser));
+                        writer.Put((ushort)890);
+                        writer.PutPacketStruct(msginfo);
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                    }
+                    break;
                 case 600:
                 {
                     string serverName = dataReader.GetString();
@@ -386,14 +398,21 @@ namespace FL_Master_Server
                 break;
                 case 888: //Receive message from client
                     {
-                        Message sendMessage = dataReader.GetPacketStruct<Message>();
+                        byte[] byteMessage = dataReader.GetBytesWithLength();
+                        Message message = byteMessage.ToStructure<Message>();
                         User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
-                        User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
-                        UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, sendMessage.MessageText, sendMessage.TimeStamp);
-                        //See if user is online
-                        if (util.IsOnline(target))
+                        User target = UserMethods.GetUserByUsername(message.ReceivingUser);
+                        NetDataWriter writer = new NetDataWriter();
+                        if (target != null)
                         {
-                            //refresh interface
+                            UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, message.MessageText, message.TimeStamp);
+                            if (util.IsOnline(target))
+                            {
+                                writer.Put((ushort)889);
+                                writer.PutPacketStruct(message);
+
+                                util.GetNetworkUserFromUser(target).Peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                            }
                         }
                     }
                     break;

@@ -43,7 +43,7 @@ namespace FL_Master_Server
 
         public bool IsOnline(User user)
         {
-            NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User == user).FirstOrDefault();
+            NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User.Username == user.Username).FirstOrDefault();
 
             if (result != null)
                 return true;

@@ -18,7 +18,7 @@ namespace Shared.Packets
 
         public Message(string receivingUser, string messageText, double timeStamp)
         {
-            ReceivingUser = receivingUser;  
+            ReceivingUser = receivingUser;
             MessageText = messageText;
             TimeStamp = timeStamp;
         }
