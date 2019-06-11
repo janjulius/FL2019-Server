@@ -543,10 +543,17 @@ namespace Shared.Users
             {
                 IEnumerable<Models.Message> collection = ctx.Message.Where(m => (m.SenderId == user.UserId && m.ReceiverId == target.UserId)
                     || (m.SenderId == target.UserId && m.ReceiverId== user.UserId)).AsEnumerable();
-                var data = collection.Reverse().Take(25).Reverse().ToArray();
-                for (int i = 0; i < data.Count(); i++) {
-                    arr[i] = new Packets.Message(GetUserById(data[i].ReceiverId).Username, data[i].MessageText, data[i].TimeStamp.ToOADate());
-                }
+
+                    if (collection.Any())
+                    {
+                        int maxMessages = collection.Count() <= PacketConstants.MaxMessages ? collection.Count() : PacketConstants.MaxMessages;
+                        var data = collection.Reverse().Take(maxMessages).Reverse().ToArray();
+                        for (int i = 0; i < data.Count(); i++)
+                        {
+                            arr[i] = new Packets.Message(GetUserById(data[i].ReceiverId).Username, data[i].MessageText, data[i].TimeStamp.ToOADate());
+                        }
+                    }
+                
                 return arr;
             }
         }
