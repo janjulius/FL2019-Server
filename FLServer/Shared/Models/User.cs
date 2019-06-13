@@ -21,6 +21,7 @@ namespace FLServer.Models
         public string UniqueIdentifier { get; set; }
         public int NormalElo { get; set; }
         public int RankedElo { get; set; }
+        public string Rank { get; set; }
         public int Exp { get; set; }
         public int Level { get; set; }
         public int Rights { get; set; } = 0;

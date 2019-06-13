@@ -4,6 +4,7 @@ using Shared.Constants;
 using Shared.Models;
 using Shared.Packets;
 using Shared.Packets.UserState;
+using Shared.Ranked;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -173,7 +174,7 @@ namespace Shared.Users
                 FriendSlotPacket[] friends = GetFriendsAsPacket(user.Username);
                 NotificationPacket[] notifs = GetNotificationAsPackets(user);
                 ProfilePartInfo result = new ProfilePartInfo(user.Username, user.Balance, user.PremiumBalance
-                    , user.Avatar, user.Level, user.Exp, friends.Length, friends, user.OwnedCharacters.ToArray(), notifs.Length, notifs);
+                    , user.Avatar, user.Level, user.Exp, user.RankedElo, user.Rank, friends.Length, friends, user.OwnedCharacters.ToArray(), notifs.Length, notifs);
 
                 return result;
             }
@@ -359,6 +360,7 @@ namespace Shared.Users
                         Level = 0,
                         NormalElo = 1250,
                         RankedElo = 1250,
+                        Rank = "IV",
                         Verified = true,
                         Rights = 0,
                         OwnedCharacters = new bool[Constants.PacketConstants.CharacterCount].ToList()
@@ -438,10 +440,12 @@ namespace Shared.Users
                         u.Avatar,
                         u.Level,
                         u.Exp,
+                        u.RankedElo,
+                        u.Rank,
                         u.LastOnline.ToOADate(),
                         String.Empty);
                 else
-                    return new ProfileAccountInfo("", 1, 0, 0, DateTime.Now.ToOADate(), "Profile not found.");
+                    return new ProfileAccountInfo("", 1, 0, 0, 0, "", DateTime.Now.ToOADate(), "Profile not found.");
             }
         }
 
@@ -520,22 +524,6 @@ namespace Shared.Users
             }
         }
 
-        public static List<Models.Message> GetMessagesBetweenUsers(int firstUserId, int secondUserId)
-        {
-            List<Models.Message> messages = new List<Models.Message>();
-            using (FLDBContext ctx = new FLDBContext())
-            {
-                foreach (Models.Message m in ctx.Message.Where(n => (n.SenderId == firstUserId && n.ReceiverId == secondUserId) || (n.SenderId == secondUserId && n.ReceiverId == firstUserId)))
-                {
-                    if (m.TimeStamp > DateTime.Today.AddMonths(-1))
-                    {
-                        messages.Add(m);
-                    }
-                }
-            }
-            return messages;
-        }
-
         public static Packets.Message[] GetLatestMessages(User user, User target)
         {
             Packets.Message[] arr = new Packets.Message[PacketConstants.MaxMessages];
@@ -557,5 +545,35 @@ namespace Shared.Users
                 return arr;
             }
         }
+
+        public static int GetRankEloOfUser(string username)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return GetUserByUsername(username).RankedElo;
+            }
+        }
+
+        public static string GetRankOfUser(string username)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                return GetUserByUsername(username).Rank;
+            }
+        }
+
+        public static void SetRankEloAndRankOfUserAfterMatch(string username, double currentELO, double opponentELO, bool win)
+        {
+            RankCalculator rc = new RankCalculator();
+            using (FLDBContext ctx = new FLDBContext())
+            {
+               User u = GetUserByUsername(username);
+               u.RankedElo = Convert.ToInt32(rc.GetNewELO(currentELO, opponentELO, win));
+               u.Rank = rc.GetCurrentAbsoluteRank(rc.newElo);
+               ctx.Entry(u).State = EntityState.Modified;
+               ctx.SaveChanges();
+            }
+        }
+     
     }
 }

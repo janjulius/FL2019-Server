@@ -15,6 +15,8 @@ namespace Shared.Packets
         public int Avatar;
         public int Level;
         public int Exp;
+        public int RankedElo;
+        public string Rank;
         public int AmountOfFriends;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PacketConstants.maxFriends)]
         public FriendSlotPacket[] Friends;
@@ -25,7 +27,7 @@ namespace Shared.Packets
         public NotificationPacket[] Notifications;
 
         public ProfilePartInfo(string userName, int currency, int premiumCurrency, int avatar,
-            int level, int exp, int amountoffriends, FriendSlotPacket[] friends, bool[] ownedCharacters, int amountOfNotifications,
+            int level, int exp, int rankedelo, string rank, int amountoffriends, FriendSlotPacket[] friends, bool[] ownedCharacters, int amountOfNotifications,
             NotificationPacket[] notifications) : this()
         {
             UserName = userName;
@@ -34,6 +36,8 @@ namespace Shared.Packets
             Avatar = avatar;
             Level = level;
             Exp = exp;
+            RankedElo = rankedelo;
+            Rank = rank;
             AmountOfFriends = amountoffriends;
             Friends = new FriendSlotPacket[PacketConstants.maxFriends];
             for (int i = 0; i < friends.Length; i++) { Friends[i] = friends[i]; }

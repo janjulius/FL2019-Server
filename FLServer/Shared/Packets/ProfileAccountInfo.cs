@@ -15,16 +15,20 @@ namespace Shared.Packets
         public int Avatar;
         public int Level;
         public int Exp;
+        public int RankedElo;
+        public string Rank;
         public double LastOnline;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string ErrorMessage;
 
-        public ProfileAccountInfo(string username, int avatar, int level, int exp, double lastOnline, string errorMessage)
+        public ProfileAccountInfo(string username, int avatar, int level, int exp, int rankedelo, string rank, double lastOnline, string errorMessage)
         {
             Username = username;
             Avatar = avatar;
             Level = level;
             Exp = exp;
+            RankedElo = rankedelo;
+            Rank = rank;
             LastOnline = lastOnline;
             ErrorMessage = errorMessage;
         }
