@@ -42,12 +42,14 @@ namespace FL_Game_Server.Packets
         public float damage;
         public float health;
         public byte lives;
+        public byte spawnPlace;
 
-        public PlayerGameInfo(float damage, float health, byte lives)
+        public PlayerGameInfo(float damage, float health, byte lives, byte spawnPlace)
         {
             this.damage = damage;
             this.health = health;
             this.lives = lives;
+            this.spawnPlace = spawnPlace;
         }
     }
     

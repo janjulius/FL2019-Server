@@ -23,6 +23,7 @@ namespace FL_Game_Server
         private string serverName;
         private GameState inGame = GameState.InLobby;
         private int playersLeftAlive = 0;
+        private int playersLoadedLevel = 0;
 
 
         private EventBasedNetListener listener;
@@ -470,10 +471,9 @@ namespace FL_Game_Server
                         inGame = GameState.InGame;
                         playersLeftAlive = Players.Count;
 
-                        
+
                         foreach (var player in Players)
                         {
-                            
                             player.Value.playerInfo.playerStats = new PlayerStats();
                             player.Value.playerInfo.gameInfo.lives = 3;
                             writer.Put((ushort) 152);
@@ -491,6 +491,33 @@ namespace FL_Game_Server
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
 
                     NetworkObjects.Clear();
+                }
+                    break;
+
+                case 302:
+                {
+                    playersLoadedLevel++;
+
+                    byte i = 0;
+                    foreach (var player in Players)
+                    {
+                        player.Value.playerInfo.gameInfo.spawnPlace = i;
+                        i++;
+                        
+                        writer.Put((ushort) 152);
+                        writer.Put(player.Key);
+                        writer.PutBytesWithLength(player.Value.playerInfo.gameInfo.ToByteArray());
+                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                        writer.Reset();
+                    }
+                    
+
+                    if (playersLoadedLevel == Players.Count)
+                    {
+                        writer.Put((ushort) 302);
+                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                        playersLoadedLevel = 0;
+                    }
                 }
                     break;
             }
