@@ -366,7 +366,6 @@
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
-    <Compile Include="Packets\ReceiveMessage.cs" />
     <Compile Include="Packets\Message.cs" />
     <Compile Include="Packets\UserState\CharacterOwned.cs" />
     <Compile Include="Packets\UserState\NotificationPacket.cs" />

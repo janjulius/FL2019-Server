@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FL_Patch_Server", "FL-Patch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{4D1BB2C6-97B2-4C22-AB4B-2A5A36528A14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaApplication2", "AvaloniaApplication2\AvaloniaApplication2.csproj", "{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		All servers|Any CPU = All servers|Any CPU
@@ -52,12 +50,6 @@ Global
 		{4D1BB2C6-97B2-4C22-AB4B-2A5A36528A14}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D1BB2C6-97B2-4C22-AB4B-2A5A36528A14}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D1BB2C6-97B2-4C22-AB4B-2A5A36528A14}.Release|Any CPU.Build.0 = Release|Any CPU
-		{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}.All servers|Any CPU.ActiveCfg = Debug|Any CPU
-		{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}.All servers|Any CPU.Build.0 = Debug|Any CPU
-		{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{353CCBBF-A230-41F7-92C5-F94BC16E5CA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
