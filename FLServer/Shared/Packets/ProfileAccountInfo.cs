@@ -11,6 +11,7 @@ namespace Shared.Packets
         public int Level;
         public int Exp;
         public int RankedElo;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string Rank;
         public double LastOnline;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]

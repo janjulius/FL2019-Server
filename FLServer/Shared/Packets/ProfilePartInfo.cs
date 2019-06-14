@@ -16,6 +16,7 @@ namespace Shared.Packets
         public int Level;
         public int Exp;
         public int RankedElo;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PacketConstants.DefaultStringSize)]
         public string Rank;
         public int AmountOfFriends;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = PacketConstants.maxFriends)]
