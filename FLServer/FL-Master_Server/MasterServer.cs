@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using FLServer.Models;
 using FL_Master_Server.Player.Content;
@@ -25,7 +26,10 @@ namespace FL_Master_Server
     {
         //singleton
         private static MasterServer instance = null;
-        private MasterServer() { }
+
+        private MasterServer()
+        {
+        }
 
         public static MasterServer Instance
         {
@@ -35,6 +39,7 @@ namespace FL_Master_Server
                 {
                     instance = new MasterServer();
                 }
+
                 return instance;
             }
         }
@@ -53,6 +58,8 @@ namespace FL_Master_Server
         Dictionary<int, List<NetPeer>> playersWaiting = new Dictionary<int, List<NetPeer>>();
 
         Random random = new Random();
+
+        private string MasterServerIP = "localhost";
         
         public void Run()
         {
@@ -96,7 +103,7 @@ namespace FL_Master_Server
             listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
 
             Console.WriteLine($"Server started succesfully \n{server.IsRunning}:{Constants.Port}");
-            
+
             while (running)
             {
                 server.PollEvents();
@@ -168,38 +175,38 @@ namespace FL_Master_Server
             switch (msgid)
             {
                 case 423:
+                {
+                    string id = dataReader.GetString();
+                    string pwd = Security.GetHashString(dataReader.GetString());
+                    Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})peer:{fromPeer}");
+                    var friends = UserMethods.GetFriendsAsPacket(id);
+                    if (!UserAuth.VerifyPassword(id, pwd))
                     {
-                        string id = dataReader.GetString();
-                        string pwd = Security.GetHashString(dataReader.GetString());
-                        Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})peer:{fromPeer}");
-                        var friends = UserMethods.GetFriendsAsPacket(id);
-                        if (!UserAuth.VerifyPassword(id, pwd))
+                        Console.WriteLine("Authetication failed disconnectin the user");
+                        fromPeer.Disconnect();
+                    }
+                    else
+                    {
+                        NetDataWriter writer = new NetDataWriter();
+                        FLServer.Models.User u = UserMethods.GetUserByUsername(id);
+
+                        if (u.Rights < 0)
                         {
-                            Console.WriteLine("Authetication failed disconnectin the user");
+                            Console.WriteLine($"Disconnected banned user {u.Username}");
                             fromPeer.Disconnect();
                         }
+
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        if (me != null)
+                            me.User = u;
                         else
-                        {
-                            NetDataWriter writer = new NetDataWriter();
-                            FLServer.Models.User u = UserMethods.GetUserByUsername(id);
-                            
-                            if(u.Rights < 0)
-                            {
-                                Console.WriteLine($"Disconnected banned user {u.Username}");
-                                fromPeer.Disconnect();
-                            }
+                            break; //user not found somehow not connected
 
-                            NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
-                            if (me != null)
-                                me.User = u;
-                            else
-                                break; //user not found somehow not connected
-
-                            writer.Put((ushort)2004);
-                            writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(u));
-                            fromPeer.Send(writer, DeliveryMethod.ReliableOrdered); 
-                        }
+                        writer.Put((ushort) 2004);
+                        writer.PutPacketStruct(UserMethods.GetUserAsProfilePartInfoPacket(u));
+                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
+                }
                     break;
                 case 424:
                 {
@@ -207,9 +214,9 @@ namespace FL_Master_Server
                     NetDataWriter writer = new NetDataWriter();
                     ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id);
 
-                    if(string.IsNullOrEmpty(pai.ErrorMessage))
+                    if (string.IsNullOrEmpty(pai.ErrorMessage))
                     {
-                        writer.Put((ushort)2005);
+                        writer.Put((ushort) 2005);
                         writer.PutPacketStruct(pai);
                         fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                     }
@@ -221,25 +228,27 @@ namespace FL_Master_Server
                     }
                 }
                     break;
-                case 425://Send character
-                    {
-                        string name = dataReader.GetString();
-                        NetDataWriter writer = new NetDataWriter();
-                        CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
-                        writer.Put((ushort)2016);
-                        writer.PutPacketStruct(charinfo);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                        break;
-                    }
-                case 426:  // send all chars
-                    {
-                        NetDataWriter writer = new NetDataWriter();
-                        CharacterInformationArray charinfo = CharacterMethods.GetAllCharactersAsCharacterInfoPackets();
-                        writer.Put((ushort)2017);
-                        writer.PutPacketStruct(charinfo);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                        break;
-                    }
+                case 425: //Send character
+                {
+                    string name = dataReader.GetString();
+                    NetDataWriter writer = new NetDataWriter();
+                    CharacterInformation charinfo = CharacterMethods.GetCharacterAsCharacterInfoPacket(name);
+                    writer.Put((ushort) 2016);
+                    writer.PutPacketStruct(charinfo);
+                    fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                    break;
+                }
+
+                case 426: // send all chars
+                {
+                    NetDataWriter writer = new NetDataWriter();
+                    CharacterInformationArray charinfo = CharacterMethods.GetAllCharactersAsCharacterInfoPackets();
+                    writer.Put((ushort) 2017);
+                    writer.PutPacketStruct(charinfo);
+                    fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                    break;
+                }
+
                 case 88:
                 {
                 }
@@ -253,105 +262,108 @@ namespace FL_Master_Server
                         UserMethods.SetAvatar(name, id);
                     }
                 }
-                break;
+                    break;
 
-                case 471://setting status text
+                case 471: //setting status text
+                {
+                    string name = dataReader.GetString();
+                    string id = dataReader.GetString();
+                    if (util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
                     {
-                        string name = dataReader.GetString();
-                        string id = dataReader.GetString();
-                        if (util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
-                        {
-                            UserMethods.SetStatusText(name, id);
-                        }
+                        UserMethods.SetStatusText(name, id);
                     }
+                }
                     break;
                 case 472: //adding user after accepting request
+                {
+                    string target = dataReader.GetString();
+                    User targetUser = UserMethods.GetUserByUsername(target);
+                    NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
+                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+
+                    UserMethods.AddFriend(me.User, targetUser);
+                    UserMethods.AddFriend(targetUser, me.User);
+                    UserMethods.RemoveRequest(me.User, targetUser, 0);
+                    UserMethods.RemoveRequest(targetUser, me.User, 0);
+                    if (targetNetworkUser != null)
                     {
-                        string target = dataReader.GetString();
-                        User targetUser = UserMethods.GetUserByUsername(target);
-                        NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
-                        
-                        UserMethods.AddFriend(me.User, targetUser);
-                        UserMethods.AddFriend(targetUser, me.User);
-                        UserMethods.RemoveRequest(me.User, targetUser, 0);
-                        UserMethods.RemoveRequest(targetUser, me.User, 0);
-                        if(targetNetworkUser != null)
-                        {
-                            SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
-                        }
-                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                        SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
                     }
+
+                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                }
                     break;
                 case 473: //decling request / dismissing notification
-                    {
-                        string target = dataReader.GetString();
-                        User targetUser = UserMethods.GetUserByUsername(target);
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                {
+                    string target = dataReader.GetString();
+                    User targetUser = UserMethods.GetUserByUsername(target);
+                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
 
-                        UserMethods.RemoveRequest(targetUser, me.User, 0);
-                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
-                    }
+                    UserMethods.RemoveRequest(targetUser, me.User, 0);
+                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                }
                     break;
                 case 474: //removing friend
-                    {
-                        string target = dataReader.GetString();
-                        User targetUser = UserMethods.GetUserByUsername(target);
-                        NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                {
+                    string target = dataReader.GetString();
+                    User targetUser = UserMethods.GetUserByUsername(target);
+                    NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
+                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
 
-                        UserMethods.RemoveFriend(me.User, targetUser);
-                        UserMethods.RemoveFriend(targetUser, me.User);
-                        if(targetNetworkUser != null)
-                        {
-                            SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
-                        }
+                    UserMethods.RemoveFriend(me.User, targetUser);
+                    UserMethods.RemoveFriend(targetUser, me.User);
+                    if (targetNetworkUser != null)
+                    {
                         SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                     }
+
+                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                }
                     break;
                 case 475: //remove request
-                    {
-                        string target = dataReader.GetString();
-                        User targetUser = UserMethods.GetUserByUsername(target);
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                {
+                    string target = dataReader.GetString();
+                    User targetUser = UserMethods.GetUserByUsername(target);
+                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
 
-                        UserMethods.RemoveRequest(targetUser, me.User, 1);
-                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
-                    }
+                    UserMethods.RemoveRequest(targetUser, me.User, 1);
+                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                }
                     break;
                 case 476:
+                {
+                    string name = dataReader.GetString();
+                    string cmd = dataReader.GetString();
+                    NetworkUser user = util.GetNetworkUserFromPeer(fromPeer);
+                    if (validation.ValidateNetworkUser(fromPeer, user))
                     {
-                        string name = dataReader.GetString();
-                        string cmd = dataReader.GetString();
-                        NetworkUser user = util.GetNetworkUserFromPeer(fromPeer);
-                        if (validation.ValidateNetworkUser(fromPeer, user))
-                        {
-                            Commands.ProcessCommand(user.User, cmd);
-                        }
-                    } break;
-                case 477:
-                    {
-                        string target = dataReader.GetString();
-                        User targetUser = UserMethods.GetUserByUsername(target);
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
-                        if (targetUser != null)
-                        {
-                            UserMethods.CreateFriendRequest(me.User, targetUser);
-                            SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetUser));
-                        }
+                        Commands.ProcessCommand(user.User, cmd);
                     }
+                }
+                    break;
+                case 477:
+                {
+                    string target = dataReader.GetString();
+                    User targetUser = UserMethods.GetUserByUsername(target);
+                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    if (targetUser != null)
+                    {
+                        UserMethods.CreateFriendRequest(me.User, targetUser);
+                        SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetUser));
+                    }
+                }
                     break;
                 case 478:
-                    {
-                        string target = dataReader.GetString();
-                        User targetUser = UserMethods.GetUserByUsername(target);
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
-                        NetDataWriter writer = new NetDataWriter();
-                        Messages msginfo = new Messages(UserMethods.GetLatestMessages(me.User, targetUser));
-                        writer.Put((ushort)890);
-                        writer.PutPacketStruct(msginfo);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                    }
+                {
+                    string target = dataReader.GetString();
+                    User targetUser = UserMethods.GetUserByUsername(target);
+                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetDataWriter writer = new NetDataWriter();
+                    Messages msginfo = new Messages(UserMethods.GetLatestMessages(me.User, targetUser));
+                    writer.Put((ushort) 890);
+                    writer.PutPacketStruct(msginfo);
+                    fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                }
                     break;
                 case 600:
                 {
@@ -386,7 +398,7 @@ namespace FL_Master_Server
                             writer.Put(gameServer.Value.serverName);
                             writer.Put(gameServer.Value.totalPlayers);
                             writer.Put(gameServer.Value.maxPlayers);
-                            writer.Put("localhost");
+                            writer.Put(MasterServerIP);
                             writer.Put(gameServer.Value.masterKey);
                             writer.Put(gameServer.Value.port);
 
@@ -395,86 +407,87 @@ namespace FL_Master_Server
                         }
                     }
                 }
-                break;
+                    break;
                 case 888: //Receive message from client
+                {
+                    byte[] byteMessage = dataReader.GetBytesWithLength();
+                    Message message = byteMessage.ToStructure<Message>();
+                    User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
+                    User target = UserMethods.GetUserByUsername(message.ReceivingUser);
+                    NetDataWriter writer = new NetDataWriter();
+                    if (target != null)
                     {
-                        byte[] byteMessage = dataReader.GetBytesWithLength();
-                        Message message = byteMessage.ToStructure<Message>();
-                        User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
-                        User target = UserMethods.GetUserByUsername(message.ReceivingUser);
-                        NetDataWriter writer = new NetDataWriter();
-                        if (target != null)
+                        UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, message.MessageText, message.TimeStamp);
+                        if (util.IsOnline(target))
                         {
-                            UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, message.MessageText, message.TimeStamp);
-                            if (util.IsOnline(target))
-                            {
-                                writer.Put((ushort)889);
-                                writer.PutPacketStruct(message);
+                            writer.Put((ushort) 889);
+                            writer.PutPacketStruct(message);
 
-                                util.GetNetworkUserFromUser(target).Peer.Send(writer, DeliveryMethod.ReliableOrdered);
-                            }
+                            util.GetNetworkUserFromUser(target).Peer.Send(writer, DeliveryMethod.ReliableOrdered);
                         }
                     }
+                }
                     break;
                 case 889: //get message history
-                    {
-                        Message sendMessage = dataReader.GetPacketStruct<Message>();
-                        User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
-                        User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
-                        NetDataWriter writer = new NetDataWriter();
-                        Messages msges = new Messages(UserMethods.GetLatestMessages(me, target));
+                {
+                    Message sendMessage = dataReader.GetPacketStruct<Message>();
+                    User me = NetworkUsers.Where(usr => usr.Peer == fromPeer).FirstOrDefault().User;
+                    User target = UserMethods.GetUserByUsername(sendMessage.ReceivingUser);
+                    NetDataWriter writer = new NetDataWriter();
+                    Messages msges = new Messages(UserMethods.GetLatestMessages(me, target));
 
-                        writer.Put((ushort)890);
-                        writer.PutPacketStruct(msges);
+                    writer.Put((ushort) 890);
+                    writer.PutPacketStruct(msges);
 
-                        fromPeer.Send(writer,DeliveryMethod.ReliableOrdered);
-                    }
+                    fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                }
                     break;
                 case 3010: //set character owned state of user frompeer after validation
+                {
+                    CharacterOwned packet = dataReader.GetPacketStruct<CharacterOwned>();
+                    bool success = false;
+
+                    if (validation.ValidateSender(fromPeer, packet.OwnerUsername))
                     {
-                        CharacterOwned packet = dataReader.GetPacketStruct<CharacterOwned>();
-                        bool success = false;
-                        
-                        if(validation.ValidateSender(fromPeer, packet.OwnerUsername))
+                        User user = NetworkUsers.Where(p => p.Peer == fromPeer).FirstOrDefault().User;
+                        Character character = CharacterMethods.GetCharacterByReferenceId(packet.Id);
+                        if (packet.State) //purchase
                         {
-                            User user = NetworkUsers.Where(p => p.Peer == fromPeer).FirstOrDefault().User;
-                            Character character = CharacterMethods.GetCharacterByReferenceId(packet.Id);
-                            if (packet.State) //purchase
+                            if (packet.PremiumPayment)
                             {
-                                if (packet.PremiumPayment)
+                                if (character.PremiumPrice <= user.PremiumBalance)
                                 {
-                                    if (character.PremiumPrice <= user.PremiumBalance)
-                                    {
-                                        UserMethods.AddPremiumBalance(user, -character.Price);
-                                        success = true;
-                                    }
-                                }
-                                if (!packet.PremiumPayment)
-                                {
-                                    if (character.Price <= user.Balance)
-                                    {
-                                        UserMethods.AddBalance(user, -character.Price);
-                                        success = true;
-                                    }
-                                }
-                                if (success)
-                                {
-                                    UserMethods.SetCharacterOwnedState(user, character.ReferenceId, true);
-                                    SendNetworkEvent(user, DeliveryMethod.ReliableOrdered, 3007, UserMethods.GetUserAsProfilePartInfoPacket(user));
+                                    UserMethods.AddPremiumBalance(user, -character.Price);
+                                    success = true;
                                 }
                             }
-                            else //refund check history 
-                            {
 
+                            if (!packet.PremiumPayment)
+                            {
+                                if (character.Price <= user.Balance)
+                                {
+                                    UserMethods.AddBalance(user, -character.Price);
+                                    success = true;
+                                }
+                            }
+
+                            if (success)
+                            {
+                                UserMethods.SetCharacterOwnedState(user, character.ReferenceId, true);
+                                SendNetworkEvent(user, DeliveryMethod.ReliableOrdered, 3007, UserMethods.GetUserAsProfilePartInfoPacket(user));
                             }
                         }
+                        else //refund check history 
+                        {
+                        }
                     }
+                }
                     break;
             }
 
             dataReader.Recycle();
         }
-        
+
         public void SendConsoleMessage(User target, string message)
         {
             SendNetworkEvent(util.GetNetworkUserFromUser(target), 20000, DeliveryMethod.ReliableOrdered, message);
@@ -490,27 +503,61 @@ namespace FL_Master_Server
 
         private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
+            bool isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                                 "\\GameServer\\FL_Game_Server.dll";
-            Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
-            try
+            if (!isLinux)
             {
-                var process = new Process()
+                Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
+
+                try
                 {
-                    StartInfo = new ProcessStartInfo
+                    var process = new Process()
                     {
-                        FileName = "dotnet",
-                        Arguments = $"\"{pathToFile}\" {port} {masterKey} {roomType} {serverName} {maxPlayers}",
-                        UseShellExecute = false,
-                        CreateNoWindow = false,
-                    }
-                }; Console.WriteLine(process.Start());
-                //process.Start();
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "dotnet",
+                            Arguments = $"\"{pathToFile}\" {port} {masterKey} {roomType} {serverName} {maxPlayers}",
+                            UseShellExecute = false,
+                            CreateNoWindow = true,
+                        }
+                    };
+                    Console.WriteLine(process.Start());
+                    //process.Start();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Could not start program " + ex);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine("Could not start program " + ex);
+                pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
+                             "/GameServer/FL_Game_Server.dll";
+                Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
+
+                try
+                {
+                    var process = new Process()
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "/bin/bash",
+                            Arguments = $"-c \"dotnet {pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}\"",
+                            UseShellExecute = false,
+                            CreateNoWindow = true,
+                        }
+                    };
+                    Console.WriteLine(process.StartInfo.Arguments);
+                    Console.WriteLine(process.Start());
+                    //process.Start();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Could not start program " + ex);
+                }
             }
         }
 
