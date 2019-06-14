@@ -490,7 +490,7 @@ namespace FL_Master_Server
 
         public void SendConsoleMessage(User target, string message)
         {
-            SendNetworkEvent(util.GetNetworkUserFromUser(target), 20000, DeliveryMethod.Unreliable, message);
+            SendNetworkEvent(util.GetNetworkUserFromUser(target), 20000, DeliveryMethod.ReliableOrdered, message);
         }
 
         private void SendNetworkEvent(NetworkUser target, ushort msgid, DeliveryMethod dm, string msg)
