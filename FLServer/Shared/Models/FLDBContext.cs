@@ -30,7 +30,7 @@ namespace FLServer.Models
         public virtual DbSet<Passive> Passive { get; set; }
         public virtual DbSet<Player> Player { get; set; }
         public virtual DbSet<Team> Team { get; set; }
-        public virtual DbSet<ServerVersion> ServerVersion {get; set;}
+        public virtual DbSet<ServerVersion> ServerVersion { get; set; }
         public virtual DbSet<Stats> Stats { get; set; }
         public virtual DbSet<Message> Message { get; set; }
         public virtual DbSet<FriendRequest> FriendRequest { get; set; }
@@ -40,16 +40,13 @@ namespace FLServer.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("Server=85.214.197.63;Database=FLDB;User=autisten;Password=autisten;SslMode=Preferred;Connection Timeout=30;");
+                optionsBuilder.UseMySql("Server=127.0.0.1;Database=FLDB;User=autisten;Password=autisten;SslMode=Preferred;Connection Timeout=30;");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Purchase>(entity =>
-            {
-
-            });
+            modelBuilder.Entity<Purchase>(entity => { });
 
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
@@ -70,7 +67,7 @@ namespace FLServer.Models
 
             modelBuilder.Entity<Player>().Property(p => p.PlayerId).UseMySqlIdentityColumn();
 
-            
+
             //modelBuilder.Entity<Player>().HasIndex(c => c.PlayerId).IsUnique();
 
             //modelBuilder.Entity<Player>().HasOne(p => p.User).WithOne().HasForeignKey<User>(u => u.UserId);

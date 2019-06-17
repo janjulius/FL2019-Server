@@ -59,7 +59,7 @@ namespace FL_Master_Server
 
         Random random = new Random();
 
-        private string MasterServerIP = "localhost";
+        private string MasterServerIP = "85.214.197.63";
         
         public void Run()
         {
