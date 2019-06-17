@@ -243,10 +243,6 @@
     <Compile Include="Migrations\20190528154716_2019528_10.designer.cs">
       <DependentUpon>20190528154716_2019528_10.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20190528163845_2019528_11.cs" />
-    <Compile Include="Migrations\20190528163845_2019528_11.designer.cs">
-      <DependentUpon>20190528163845_2019528_11.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\20190528171438_2019528_12.cs" />
     <Compile Include="Migrations\20190528171438_2019528_12.designer.cs">
       <DependentUpon>20190528171438_2019528_12.cs</DependentUpon>
