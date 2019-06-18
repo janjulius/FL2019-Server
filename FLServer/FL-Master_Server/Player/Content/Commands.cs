@@ -207,12 +207,15 @@ namespace FL_Master_Server.Player.Content
                     for (int i = 1; i < cmd.Length; i++)
                         name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                     target = UserMethods.GetUserByUsername(name);
-                    if (string.Equals(target.Username, "jan julius", StringComparison.OrdinalIgnoreCase))
+                    if (target != null)
                     {
-                        MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} is immume to bans.");
-                        return true;
+                        if (string.Equals(target.Username, "jan julius", StringComparison.OrdinalIgnoreCase))
+                        {
+                            MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} is immume to bans.");
+                            return true;
+                        }
+                        UserMethods.SetRights(target, -1);
                     }
-                    UserMethods.SetRights(target, -1);
                     return true;
                 case "unban":
                     for (int i = 1; i < cmd.Length; i++)
