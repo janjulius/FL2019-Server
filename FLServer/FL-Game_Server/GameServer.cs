@@ -9,6 +9,8 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using Shared.Extensions;
 using FL_Game_Server.Packets;
+using Shared.Packets;
+using Shared.Users;
 
 namespace FL_Game_Server
 {
@@ -519,6 +521,37 @@ namespace FL_Game_Server
                         playersLoadedLevel = 0;
                     }
                 }
+                    break;
+
+                case 304: //receive message from lobby
+                    {
+                        byte[] byteMessage = dataReader.GetBytesWithLength();
+                        Message message = byteMessage.ToStructure<Message>();
+                        int index = message.MessageText.IndexOf(':');
+                        User me = UserMethods.GetUserByUsername(message.MessageText.Substring(0, index));
+                        NetDataWriter ndWriter = new NetDataWriter();
+
+                        UserMethods.SaveMessageToDatabase(me.UserId, -1, message.MessageText, message.TimeStamp);
+                        ndWriter.Put((ushort)307);
+                        ndWriter.PutPacketStruct(message);
+
+                        server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
+                    }
+                    break;
+
+                case 305: //get message history
+                    {
+                        Message sendMessage = dataReader.GetPacketStruct<Message>();
+                        int index = sendMessage.MessageText.IndexOf(':');
+                        User me = UserMethods.GetUserByUsername(sendMessage.MessageText.Substring(0, index));
+                        NetDataWriter ndWriter = new NetDataWriter();
+                        Messages msges = new Messages(UserMethods.GetLatestMessages(me, UserMethods.GetUserById(-1)));
+
+                        ndWriter.Put((ushort)303);
+                        ndWriter.PutPacketStruct(msges);
+
+                        server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
+                    }
                     break;
             }
 
