@@ -478,6 +478,8 @@ namespace FL_Game_Server
                         {
                             player.Value.playerInfo.playerStats = new PlayerStats();
                             player.Value.playerInfo.gameInfo.lives = 3;
+                            player.Value.playerInfo.gameInfo.health = 0;
+                            player.Value.playerInfo.gameInfo.damage = 0;
                             writer.Put((ushort) 152);
                             writer.Put(player.Key);
                             writer.PutBytesWithLength(player.Value.playerInfo.gameInfo.ToByteArray());

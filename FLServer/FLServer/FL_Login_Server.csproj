@@ -6,6 +6,10 @@
     <Configurations>Debug;Release;All servers</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="LiteNetLib" Version="0.8.3.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
