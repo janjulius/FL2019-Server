@@ -295,6 +295,14 @@ namespace FL_Game_Server
                 }
                     break;
 
+                case 104:
+                {
+                    writer.Put((ushort) 104);
+                    writer.Put(dataReader.GetRemainingBytes());
+                    SendOthers(peer, writer, DeliveryMethod.ReliableUnordered);
+                }
+                    break;
+
                 case 151:
                 {
                     var damageBytes = dataReader.GetBytesWithLength();
@@ -507,14 +515,14 @@ namespace FL_Game_Server
                     {
                         player.Value.playerInfo.gameInfo.spawnPlace = i;
                         i++;
-                        
+
                         writer.Put((ushort) 152);
                         writer.Put(player.Key);
                         writer.PutBytesWithLength(player.Value.playerInfo.gameInfo.ToByteArray());
                         server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                         writer.Reset();
                     }
-                    
+
 
                     if (playersLoadedLevel == Players.Count)
                     {
@@ -525,35 +533,35 @@ namespace FL_Game_Server
                 }
                     break;
 
-                case 304: //receive message from lobby
-                    {
-                        byte[] byteMessage = dataReader.GetBytesWithLength();
-                        Message message = byteMessage.ToStructure<Message>();
-                        int index = message.MessageText.IndexOf(':');
-                        User me = UserMethods.GetUserByUsername(message.MessageText.Substring(0, index));
-                        NetDataWriter ndWriter = new NetDataWriter();
+                case 504: //receive message from lobby
+                {
+                    byte[] byteMessage = dataReader.GetBytesWithLength();
+                    Message message = byteMessage.ToStructure<Message>();
+                    int index = message.MessageText.IndexOf(':');
+                    User me = UserMethods.GetUserByUsername(message.MessageText.Substring(0, index));
+                    NetDataWriter ndWriter = new NetDataWriter();
 
-                        UserMethods.SaveMessageToDatabase(me.UserId, -1, message.MessageText, message.TimeStamp);
-                        ndWriter.Put((ushort)307);
-                        ndWriter.PutPacketStruct(message);
+                    UserMethods.SaveMessageToDatabase(me.UserId, -1, message.MessageText, message.TimeStamp);
+                    ndWriter.Put((ushort) 307);
+                    ndWriter.PutPacketStruct(message);
 
-                        server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
-                    }
+                    server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
+                }
                     break;
 
-                case 305: //get message history
-                    {
-                        Message sendMessage = dataReader.GetPacketStruct<Message>();
-                        int index = sendMessage.MessageText.IndexOf(':');
-                        User me = UserMethods.GetUserByUsername(sendMessage.MessageText.Substring(0, index));
-                        NetDataWriter ndWriter = new NetDataWriter();
-                        Messages msges = new Messages(UserMethods.GetLatestMessages(me, UserMethods.GetUserById(-1)));
+                case 505: //get message history
+                {
+                    Message sendMessage = dataReader.GetPacketStruct<Message>();
+                    int index = sendMessage.MessageText.IndexOf(':');
+                    User me = UserMethods.GetUserByUsername(sendMessage.MessageText.Substring(0, index));
+                    NetDataWriter ndWriter = new NetDataWriter();
+                    Messages msges = new Messages(UserMethods.GetLatestMessages(me, UserMethods.GetUserById(-1)));
 
-                        ndWriter.Put((ushort)303);
-                        ndWriter.PutPacketStruct(msges);
+                    ndWriter.Put((ushort) 303);
+                    ndWriter.PutPacketStruct(msges);
 
-                        server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
-                    }
+                    server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
+                }
                     break;
             }
 
