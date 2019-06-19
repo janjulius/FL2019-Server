@@ -504,7 +504,8 @@ namespace FL_Master_Server
         private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
             bool isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
+            
+            
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                                 "\\GameServer\\FL_Game_Server.dll";
@@ -519,7 +520,7 @@ namespace FL_Master_Server
                         StartInfo = new ProcessStartInfo
                         {
                             FileName = "dotnet",
-                            Arguments = $"\"{pathToFile}\" {port} {masterKey} {roomType} {serverName} {maxPlayers}",
+                            Arguments = $"\"{pathToFile}\" {port} {masterKey} {roomType} \"{serverName}\" {maxPlayers}",
                             UseShellExecute = false,
                             CreateNoWindow = true,
                         }
@@ -536,7 +537,7 @@ namespace FL_Master_Server
             {
                 pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                              "/GameServer/FL_Game_Server.dll";
-                Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} {serverName} {maxPlayers}");
+                Console.WriteLine($"Starting game server from: {pathToFile} with args:\n{pathToFile} {port} {masterKey} {roomType} \"{serverName}\" {maxPlayers}");
 
                 try
                 {

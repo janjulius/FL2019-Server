@@ -43,13 +43,15 @@ namespace FL_Game_Server.Packets
         public float health;
         public byte lives;
         public byte spawnPlace;
+        public short ultCharge;
 
-        public PlayerGameInfo(float damage, float health, byte lives, byte spawnPlace)
+        public PlayerGameInfo(float damage, float health, byte lives, byte spawnPlace,short ultCharge)
         {
             this.damage = damage;
             this.health = health;
             this.lives = lives;
             this.spawnPlace = spawnPlace;
+            this.ultCharge = ultCharge;
         }
     }
     

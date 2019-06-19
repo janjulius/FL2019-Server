@@ -131,7 +131,7 @@ namespace FL_Game_Server
 
         private void GetConnectionRequest(ConnectionRequest request)
         {
-            if (server.PeersCount < maxConnections && inGame == GameState.InLobby)
+            if (server.PeersCount < maxConnections && inGame != GameState.InGame)
                 request.AcceptIfKey(masterKey);
             else
                 request.Reject();
@@ -326,6 +326,7 @@ namespace FL_Game_Server
                         {
                             Players[damageData.damageTakerId].playerInfo.playerStats.damageBlocked += damageData.damage;
                             Players[damageData.damageDealerId].playerInfo.playerStats.damageMissed += damageData.damage;
+                            Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 5;
                         }
                             break;
 
@@ -341,14 +342,24 @@ namespace FL_Game_Server
                             Players[damageData.damageDealerId].playerInfo.playerStats.damageDone += damageData.damage;
                             Players[damageData.damageTakerId].playerInfo.playerStats.damageTaken += damageData.damage;
                             Players[damageData.damageTakerId].playerInfo.gameInfo.damage += damageData.damage;
+                            Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 10;
                         }
                             break;
                     }
 
+                    if (Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge >= 100)
+                        Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge = 100;
+
                     writer.Put((ushort) 152);
                     writer.Put(damageData.damageTakerId);
                     writer.PutBytesWithLength(Players[damageData.damageTakerId].playerInfo.gameInfo.ToByteArray());
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
 
+                    writer.Reset();
+
+                    writer.Put((ushort) 152);
+                    writer.Put(damageData.damageDealerId);
+                    writer.PutBytesWithLength(Players[damageData.damageDealerId].playerInfo.gameInfo.ToByteArray());
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
@@ -358,6 +369,7 @@ namespace FL_Game_Server
                     int playerId = dataReader.GetInt();
                     Players[playerId].playerInfo.gameInfo.lives--;
                     Players[playerId].playerInfo.playerStats.deaths++;
+                    Players[playerId].playerInfo.gameInfo.ultCharge =(short) (Players[playerId].playerInfo.gameInfo.ultCharge / 2);
 
                     if (Players[playerId].playerInfo.playerStats.highestDamageSurvived < Players[playerId].playerInfo.gameInfo.damage)
                         Players[playerId].playerInfo.playerStats.highestDamageSurvived = Players[playerId].playerInfo.gameInfo.damage;
