@@ -131,7 +131,7 @@ namespace FL_Game_Server
 
         private void GetConnectionRequest(ConnectionRequest request)
         {
-            if (server.PeersCount < maxConnections && inGame == GameState.InLobby)
+            if (server.PeersCount < maxConnections && inGame != GameState.InGame)
                 request.AcceptIfKey(masterKey);
             else
                 request.Reject();
