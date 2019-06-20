@@ -304,14 +304,14 @@ namespace FL_Game_Server
                     break;
 
                 case 150:
-                    {
-                        var cooldownBytes = dataReader.GetBytesWithLength();
-                        var cooldownData = cooldownBytes.ToStructure<Cooldown>();
-                        
-                        writer.Put((ushort)150);
-                        writer.PutBytesWithLength(cooldownBytes);
-                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-                    }
+                {
+                    var cooldownBytes = dataReader.GetBytesWithLength();
+                    var cooldownData = cooldownBytes.ToStructure<Cooldown>();
+
+                    writer.Put((ushort) 150);
+                    writer.PutBytesWithLength(cooldownBytes);
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
                     break;
 
                 case 151:
@@ -379,7 +379,7 @@ namespace FL_Game_Server
                     int playerId = dataReader.GetInt();
                     Players[playerId].playerInfo.gameInfo.lives--;
                     Players[playerId].playerInfo.playerStats.deaths++;
-                    Players[playerId].playerInfo.gameInfo.ultCharge =(short) (Players[playerId].playerInfo.gameInfo.ultCharge / 2);
+                    Players[playerId].playerInfo.gameInfo.ultCharge = (short) (Players[playerId].playerInfo.gameInfo.ultCharge / 2);
 
                     if (Players[playerId].playerInfo.playerStats.highestDamageSurvived < Players[playerId].playerInfo.gameInfo.damage)
                         Players[playerId].playerInfo.playerStats.highestDamageSurvived = Players[playerId].playerInfo.gameInfo.damage;
@@ -471,18 +471,19 @@ namespace FL_Game_Server
                     var target = dataReader.GetByte();
                     var rpcName = dataReader.GetString();
                     var rpcObjectId = dataReader.GetInt();
-                    switch (target)
-                    {
-                        case 0:
-                            NetworkObjects[rpcObjectId].peer.Send(data, DeliveryMethod.ReliableUnordered);
-                            break;
-                        case 1:
-                            SendOthers(NetworkObjects[rpcObjectId].peer, data, DeliveryMethod.ReliableUnordered);
-                            break;
-                        case 2:
-                            server.SendToAll(data, DeliveryMethod.ReliableUnordered);
-                            break;
-                    }
+                    if (NetworkObjects.ContainsKey(rpcObjectId))
+                        switch (target)
+                        {
+                            case 0:
+                                NetworkObjects[rpcObjectId].peer.Send(data, DeliveryMethod.ReliableUnordered);
+                                break;
+                            case 1:
+                                SendOthers(NetworkObjects[rpcObjectId].peer, data, DeliveryMethod.ReliableUnordered);
+                                break;
+                            case 2:
+                                server.SendToAll(data, DeliveryMethod.ReliableUnordered);
+                                break;
+                        }
                 }
                     break;
 
