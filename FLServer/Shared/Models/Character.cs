@@ -25,6 +25,8 @@ namespace FLServer.Models
         public DateTime ReleaseDate { get; set; }
         public int Price { get; set; }
         public int PremiumPrice { get; set; }
+        public float HeavyCoolDown { get; set; }
+        public float AbilityCoolDown { get; set; }
         public Ability[] Abilities { get; set; }
         public Passive Passive { get; set; }
     }

@@ -44,17 +44,21 @@ namespace FL_Game_Server.Packets
         public byte lives;
         public byte spawnPlace;
         public short ultCharge;
+        public bool heavyCooldown;
+        public bool abilityCooldown;
 
-        public PlayerGameInfo(float damage, float health, byte lives, byte spawnPlace,short ultCharge)
+        public PlayerGameInfo(float damage, float health, byte lives, byte spawnPlace, short ultCharge, bool heavyCooldown, bool abilityCooldown)
         {
             this.damage = damage;
             this.health = health;
             this.lives = lives;
             this.spawnPlace = spawnPlace;
             this.ultCharge = ultCharge;
+            this.heavyCooldown = heavyCooldown;
+            this.abilityCooldown = abilityCooldown;
         }
     }
-    
+
     [Serializable]
     public struct PlayerStats
     {
@@ -184,6 +188,19 @@ namespace FL_Game_Server.Packets
             this.directionY = directionY;
             this.damageType = damageType;
             timeStamp = DateTime.UtcNow.ToBinary();
+        }
+    }
+
+    [Serializable]
+    public struct Cooldown
+    {
+        public int senderId;
+        public bool heavy;
+
+        public Cooldown(int senderId, bool heavy)
+        {
+            this.senderId = senderId;
+            this.heavy = heavy;
         }
     }
 }

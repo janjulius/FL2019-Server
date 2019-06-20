@@ -23,7 +23,9 @@ namespace Shared.Characters
          int def,
          DateTime releasedate,
          int price,
-         int premiumprice)
+         int premiumprice,
+         float heavyCooldown,
+         float abilityCooldown)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
@@ -42,7 +44,9 @@ namespace Shared.Characters
                     ReleaseDate = releasedate,
                     Price = price,
                     PremiumPrice = premiumprice,
-                    ReferenceId = ctx.Character.Count() == 0 ? 0 : ctx.Character.Last().ReferenceId + 1
+                    ReferenceId = ctx.Character.Count() == 0 ? 0 : ctx.Character.Last().ReferenceId + 1,
+                    HeavyCoolDown = heavyCooldown,
+                    AbilityCoolDown = abilityCooldown
                 };
                 ctx.Character.Add(newChar);
                 ctx.SaveChanges();
