@@ -342,7 +342,7 @@ namespace FL_Game_Server
                             Players[damageData.damageDealerId].playerInfo.playerStats.damageDone += damageData.damage;
                             Players[damageData.damageTakerId].playerInfo.playerStats.damageTaken += damageData.damage;
                             Players[damageData.damageTakerId].playerInfo.gameInfo.damage += damageData.damage;
-                            Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 10;
+                            Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 15;
                         }
                             break;
                     }
