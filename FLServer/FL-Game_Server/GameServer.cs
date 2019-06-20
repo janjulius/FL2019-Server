@@ -441,6 +441,19 @@ namespace FL_Game_Server
                 }
                     break;
 
+                case 154:
+                {
+                    int playerId = dataReader.GetInt();
+                    short ultcharge = dataReader.GetShort();
+                    Players[playerId].playerInfo.gameInfo.ultCharge = ultcharge;
+                    Players[playerId].playerInfo.playerStats.ultsUsed++;
+                    writer.Put((ushort) 152);
+                    writer.Put(playerId);
+                    writer.PutBytesWithLength(Players[playerId].playerInfo.gameInfo.ToByteArray());
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
+                    break;
+
                 case 201:
                 {
                     byte[] data = new byte[dataReader.UserDataSize];
