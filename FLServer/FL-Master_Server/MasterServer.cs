@@ -521,8 +521,8 @@ namespace FL_Master_Server
                         {
                             FileName = "dotnet",
                             Arguments = $"\"{pathToFile}\" {port} {masterKey} {roomType} \"{serverName}\" {maxPlayers}",
-                            UseShellExecute = false,
-                            CreateNoWindow = true,
+                            UseShellExecute = true,
+                            CreateNoWindow = false,
                         }
                     };
                     Console.WriteLine(process.Start());
