@@ -335,6 +335,10 @@
     <Compile Include="Migrations\20190613091030_2019613_0.designer.cs">
       <DependentUpon>20190613091030_2019613_0.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\20190620094226_2019620_0.cs" />
+    <Compile Include="Migrations\20190620094226_2019620_0.designer.cs">
+      <DependentUpon>20190620094226_2019620_0.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />

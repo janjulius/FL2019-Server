@@ -25,9 +25,12 @@ namespace Shared.Packets
 
         public int ReferenceId;
 
+        public float HeavyCoolDown;
+        public float AbilityCoolDown;
+
         public CharacterInformation(string name, string description, string underTitle, int damage,
             int movementspeed, int weight, int attackspeed, int range, int size, int defense, int premiumprice, int regularprice,
-            int referenceId)
+            int referenceId, float heavyCoolDown, float abilityCoolDown)
         {
             Name = name;
             Description = description;
@@ -42,6 +45,8 @@ namespace Shared.Packets
             PremiumPrice = premiumprice;
             RegularPrice = regularprice;
             ReferenceId = referenceId;
+            HeavyCoolDown = heavyCoolDown;
+            AbilityCoolDown = abilityCoolDown;
         }
     }
 }

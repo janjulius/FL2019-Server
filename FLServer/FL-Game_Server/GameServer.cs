@@ -303,6 +303,17 @@ namespace FL_Game_Server
                 }
                     break;
 
+                case 150:
+                    {
+                        var cooldownBytes = dataReader.GetBytesWithLength();
+                        var cooldownData = cooldownBytes.ToStructure<Cooldown>();
+                        
+                        writer.Put((ushort)150);
+                        writer.PutBytesWithLength(cooldownBytes);
+                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                    }
+                    break;
+
                 case 151:
                 {
                     var damageBytes = dataReader.GetBytesWithLength();
@@ -329,7 +340,6 @@ namespace FL_Game_Server
                             Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 5;
                         }
                             break;
-
                         case 51: //case damage healed
                         {
                             Players[damageData.damageTakerId].playerInfo.playerStats.damageHealed += damageData.damage;
