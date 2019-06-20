@@ -352,7 +352,7 @@ namespace FL_Game_Server
                             Players[damageData.damageDealerId].playerInfo.playerStats.damageDone += damageData.damage;
                             Players[damageData.damageTakerId].playerInfo.playerStats.damageTaken += damageData.damage;
                             Players[damageData.damageTakerId].playerInfo.gameInfo.damage += damageData.damage;
-                            Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 10;
+                            Players[damageData.damageDealerId].playerInfo.gameInfo.ultCharge += 15;
                         }
                             break;
                     }
@@ -448,6 +448,19 @@ namespace FL_Game_Server
 
                         server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                     }
+                }
+                    break;
+
+                case 154:
+                {
+                    int playerId = dataReader.GetInt();
+                    short ultcharge = dataReader.GetShort();
+                    Players[playerId].playerInfo.gameInfo.ultCharge = ultcharge;
+                    Players[playerId].playerInfo.playerStats.ultsUsed++;
+                    writer.Put((ushort) 152);
+                    writer.Put(playerId);
+                    writer.PutBytesWithLength(Players[playerId].playerInfo.gameInfo.ToByteArray());
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
 
