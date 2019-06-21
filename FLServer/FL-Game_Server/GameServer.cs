@@ -394,10 +394,10 @@ namespace FL_Game_Server
                     {
                         if (damagePackets[i].damageTakerId == playerId)
                         {
-                            Console.WriteLine((currentTime - DateTime.FromBinary(damagePackets[i].timeStamp)).TotalSeconds);
                             if ((currentTime - DateTime.FromBinary(damagePackets[i].timeStamp)).TotalSeconds < 15d)
                             {
                                 Players[damagePackets[i].damageDealerId].playerInfo.playerStats.kills++;
+                                Console.WriteLine($"player {Players[damagePackets[i].damageDealerId].playerInfo.playerName} killed player {Players[playerId].playerInfo.playerName}");
                             }
 
                             i = -1;
