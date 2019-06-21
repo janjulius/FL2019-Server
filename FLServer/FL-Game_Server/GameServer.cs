@@ -255,6 +255,7 @@ namespace FL_Game_Server
                 case 101: //create networkObject
                 {
                     int objectId;
+                    int lobjectId = dataReader.GetUShort();
                     ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<ObjectData>();
 
                     do
@@ -268,6 +269,7 @@ namespace FL_Game_Server
                     NetworkObjects.Add(objectId, netObj);
 
                     netObj.SendObjectData(writer);
+                    writer.Put(lobjectId);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
