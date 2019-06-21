@@ -255,6 +255,7 @@ namespace FL_Game_Server
                 case 101: //create networkObject
                 {
                     int objectId;
+                    int lobjectId = dataReader.GetUShort();
                     ObjectData objectData = dataReader.GetBytesWithLength().ToStructure<ObjectData>();
 
                     do
@@ -268,6 +269,7 @@ namespace FL_Game_Server
                     NetworkObjects.Add(objectId, netObj);
 
                     netObj.SendObjectData(writer);
+                    writer.Put(lobjectId);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
@@ -392,10 +394,10 @@ namespace FL_Game_Server
                     {
                         if (damagePackets[i].damageTakerId == playerId)
                         {
-                            Console.WriteLine((currentTime - DateTime.FromBinary(damagePackets[i].timeStamp)).TotalSeconds);
                             if ((currentTime - DateTime.FromBinary(damagePackets[i].timeStamp)).TotalSeconds < 15d)
                             {
                                 Players[damagePackets[i].damageDealerId].playerInfo.playerStats.kills++;
+                                Console.WriteLine($"player {Players[damagePackets[i].damageDealerId].playerInfo.playerName} killed player {Players[playerId].playerInfo.playerName}");
                             }
 
                             i = -1;
