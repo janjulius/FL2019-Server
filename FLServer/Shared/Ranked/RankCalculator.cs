@@ -8,83 +8,58 @@ namespace Shared.Ranked
 {
     public class RankCalculator
     {
-        public double newElo;
-        private double eloBorder = 49; //50 in practice
-        private const int amountOfRanks = 6;
-        private double baseELO = 1000;
-        private double baseChange = 10;
-        private bool promoted, demoted, aboveCurrentRank, belowCurrentRank = false;
-        private string[] rankStrings = new string[amountOfRanks] { "I", "II", "III", "IV", "V", "VI" };
-        private int[] rankInts = new int[amountOfRanks] { 2500, 2250, 2000, 1500, 1000, 0 };
-        private double OpponentratingMultiplier = 0.01;
-        
-        public RankCalculator()
-        {
-            newElo = 0;
-        }
-        public double GetBaseELO()
+        internal const double eloBorder = 49; //50 in practice
+        internal const double I = 2500;
+        internal const double II = 2250;
+        internal const double III = 2000;
+        internal const double IV = 1500;
+        internal const double V = 1000;
+        internal const double VI = 0;
+        internal const double baseELO = 1000;
+        internal const double baseChange = 10;
+
+
+        internal const double OpponentratingMultiplier = 0.01;
+
+        public static double GetBaseELO()
         {
             return baseELO;
         }
 
-        public string GetCurrentRank(double CurrentELO)
+        public static string GetNewRank(int CurrentELO, string PreviousRank)
         {
-            for(int i = 0; i < rankInts.Length; i++)
+            string[] rankStrings = new string[6] { "I", "II", "III", "IV", "V", "VI" };
+            int[] rankInts = new int[6] { 2500, 2250, 2000, 1500, 1000, 0 };
+
+            for (int i = 0; i < 6; i++)
             {
-                if(CurrentELO > rankInts[i])
+                if (CurrentELO > (rankInts[i] + eloBorder))
                 {
                     return rankStrings[i];
                 }
+                else if (CurrentELO < (rankInts[i] - eloBorder)) { }
+                else
+                {
+                    return PreviousRank;
+                }
             }
-
-            return "";
+            return "Something went wrong while calculating rank";
         }
 
-        public string GetCurrentAbsoluteRank(double CurrentELO)
+        public static double GetNewELO(double CurrentELO, double OpponentELO, bool win)
         {
-            if(aboveCurrentRank)
+            double newELO = 0;
+
+            if (win == true)
             {
-                return GetCurrentRank(CurrentELO - 50);
+                newELO = (CurrentELO + (baseChange + (OpponentELO * OpponentratingMultiplier) * (OpponentELO / CurrentELO)));
             }
-            else if(belowCurrentRank)
+            else if (win == false)
             {
-                return GetCurrentRank(CurrentELO + 50);
+                newELO = (CurrentELO - (baseChange + (OpponentELO * OpponentratingMultiplier)) * (CurrentELO / OpponentELO));
             }
-            else
-            {
-                return GetCurrentRank(CurrentELO);
-            }
+
+            return newELO;
         }
-
-        public double GetNewELO(double CurrentELO, double OpponentELO, bool win)
-        {
-            if (win)
-            {
-                newElo = CurrentELO + (baseChange + (OpponentELO * OpponentratingMultiplier) * (OpponentELO / CurrentELO));
-                if (GetCurrentRank(newElo + eloBorder) != GetCurrentRank(CurrentELO))
-                {
-                    promoted = true;
-                }
-                else if(GetCurrentRank(newElo) != GetCurrentRank(CurrentELO))
-                {
-                    aboveCurrentRank = true;
-                }
-            }
-            else
-            {
-                newElo = CurrentELO - (baseChange + (OpponentELO * OpponentratingMultiplier)) * (CurrentELO / OpponentELO);
-                if(GetCurrentRank(newElo - eloBorder) != GetCurrentRank(CurrentELO))
-                {
-                    demoted = true;
-                }
-                else if(GetCurrentRank(newElo) != GetCurrentRank(CurrentELO))
-                {
-                    belowCurrentRank = true;
-                }
-            }
-
-            return newElo;
-        }
-
     }
 }

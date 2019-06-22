@@ -562,18 +562,18 @@ namespace Shared.Users
             }
         }
 
-        public static void SetRankEloAndRankOfUserAfterMatch(string username, double currentELO, double opponentELO, bool win)
-        {
-            RankCalculator rc = new RankCalculator();
-            using (FLDBContext ctx = new FLDBContext())
-            {
-               User u = GetUserByUsername(username);
-               u.RankedElo = Convert.ToInt32(rc.GetNewELO(currentELO, opponentELO, win));
-               u.Rank = rc.GetCurrentAbsoluteRank(rc.newElo);
-               ctx.Entry(u).State = EntityState.Modified;
-               ctx.SaveChanges();
-            }
-        }
+        //public static void SetRankEloAndRankOfUserAfterMatch(string username, double currentELO, double opponentELO, bool win)
+        //{
+        //    RankCalculator rc = new RankCalculator();
+        //    using (FLDBContext ctx = new FLDBContext())
+        //    {
+        //       User u = GetUserByUsername(username);
+        //       u.RankedElo = Convert.ToInt32(rc.GetNewELO(currentELO, opponentELO, win));
+        //       u.Rank = rc.GetCurrentAbsoluteRank(rc.newElo);
+        //       ctx.Entry(u).State = EntityState.Modified;
+        //       ctx.SaveChanges();
+        //    }
+        //}
      
     }
 }
