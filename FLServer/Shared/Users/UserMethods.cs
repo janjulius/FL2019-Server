@@ -167,10 +167,11 @@ namespace Shared.Users
             }
         }
 
-        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(User user)
+        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(User u)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
+                User user = GetUserByUsername(u.Username);
                 FriendSlotPacket[] friends = GetFriendsAsPacket(user.Username);
                 NotificationPacket[] notifs = GetNotificationAsPackets(user);
                 ProfilePartInfo result = new ProfilePartInfo(user.Username, user.Balance, user.PremiumBalance
@@ -440,7 +441,7 @@ namespace Shared.Users
             }
         }
 
-        public static ProfileAccountInfo GetProfileAccountInfoPacket(string id)
+        public static ProfileAccountInfo GetProfileAccountInfoPacket(string id, User sender)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
@@ -456,7 +457,10 @@ namespace Shared.Users
                         u.LastOnline.ToOADate(),
                         String.Empty);
                 else
-                    return new ProfileAccountInfo("", 1, 0, 0, 0, "", DateTime.Now.ToOADate(), "Profile not found.");
+                {
+                    u = GetUserByUsername(sender.Username);
+                    return new ProfileAccountInfo(u.Username, u.Avatar, u.Level, u.Exp, u.RankedElo, u.Rank, u.LastOnline.ToOADate(), string.Empty);
+                }
             }
         }
 

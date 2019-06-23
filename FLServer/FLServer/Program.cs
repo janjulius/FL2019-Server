@@ -9,6 +9,7 @@ namespace FLServer
     {
         static void Main(string[] args)
         {
+            //Shared.General.General.ResetAllVariables();
             //Shared.General.Gamemode.Add("Normal", "Normal gamemode");
             //Shared.General.Map.Add("Tundra", "Ice cold", 0);
             //Shared.Characters.Characters.Truncate();

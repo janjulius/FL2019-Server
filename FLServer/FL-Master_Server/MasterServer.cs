@@ -264,20 +264,11 @@ namespace FL_Master_Server
                 {
                     string id = dataReader.GetString();
                     NetDataWriter writer = new NetDataWriter();
-                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id);
+                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id, util.GetNetworkUserFromPeer(fromPeer).User);
 
-                    if (string.IsNullOrEmpty(pai.ErrorMessage))
-                    {
-                        writer.Put((ushort) 2005);
-                        writer.PutPacketStruct(pai);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                    }
-                    else
-                    {
-                        writer.Put((ushort) 2006);
-                        writer.PutPacketStruct(pai);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                    }
+                    writer.Put((ushort) 2005);
+                    writer.PutPacketStruct(pai);
+                    fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
                 case 425: //Send character
@@ -405,7 +396,7 @@ namespace FL_Master_Server
                     }
                 }
                     break;
-                case 478:
+                case 478: //chat
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
@@ -416,6 +407,22 @@ namespace FL_Master_Server
                     writer.PutPacketStruct(msginfo);
                     fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                 }
+                    break;
+                case 479: //refreshing client packet
+                    {
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        //ProfilePartInfo packet = UserMethods.GetUserAsProfilePartInfoPacket(me.User);
+                        //NetDataWriter writer = new NetDataWriter();
+                        //writer.Put((ushort)479);
+                        //writer.PutBytesWithLength(packet.ToByteArray());
+                        //Console.WriteLine(writer.Data.Length);
+                        //fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                        ProfilePartInfo packet = UserMethods.GetUserAsProfilePartInfoPacket(me.User);
+                        //Console.WriteLine(packet.Exp);
+                        SendNetworkEvent(fromPeer, DeliveryMethod.ReliableOrdered, 3006, packet);
+
+
+                    }
                     break;
                 case 600:
                 {
