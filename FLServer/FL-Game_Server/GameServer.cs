@@ -629,7 +629,6 @@ namespace FL_Game_Server
                     Message message = byteMessage.ToStructure<Message>();
                     for (int i = 0; i < msgs.AllMessages.Length; i++)
                      {
-                            Console.Write(msgs.AllMessages[i].MessageText);
                             if (msgs.AllMessages[i].MessageText != "")
                             {
                                 msgs.AllMessages[i] = message;
@@ -639,7 +638,6 @@ namespace FL_Game_Server
 
                     writer.Put((ushort) 307);
                     writer.PutPacketStruct(message);
-
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
