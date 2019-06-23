@@ -26,7 +26,6 @@ namespace FL_Game_Server
         private GameState inGame = GameState.InLobby;
         private int playersLeftAlive = 0;
         private int playersLoadedLevel = 0;
-        private Messages msgs = new Messages(new Message[25]);
 
 
         private EventBasedNetListener listener;
@@ -634,25 +633,9 @@ namespace FL_Game_Server
                 {
                     byte[] byteMessage = dataReader.GetBytesWithLength();
                     Message message = byteMessage.ToStructure<Message>();
-                    for (int i = 0; i < msgs.AllMessages.Length; i++)
-                    {
-                        if (msgs.AllMessages[i].MessageText != "")
-                        {
-                            msgs.AllMessages[i] = message;
-                            break;
-                        }
-                    }
 
                     writer.Put((ushort) 307);
                     writer.PutPacketStruct(message);
-                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-                }
-                    break;
-
-                case 602: //get message history
-                {
-                    writer.Put((ushort) 303);
-                    writer.PutPacketStruct(msgs);
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
