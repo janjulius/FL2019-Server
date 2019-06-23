@@ -12,7 +12,9 @@ namespace FL_Game_Server.Packets
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
         public string playerName;
-
+        public int playerLevel;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 100)]
+        public string playerRank;
         public int characterId;
         public int playerPlace;
 
@@ -33,6 +35,8 @@ namespace FL_Game_Server.Packets
             this.playerColor = playerColor;
             this.gameInfo = gameInfo;
             this.playerStats = playerStats;
+            playerLevel = 0;
+            playerRank = "";
         }
     }
 

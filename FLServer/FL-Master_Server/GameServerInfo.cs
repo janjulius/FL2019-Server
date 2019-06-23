@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace FL_Master_Server
 {
     public class GameServerInfo
@@ -9,6 +11,7 @@ namespace FL_Master_Server
         public byte totalPlayers = 0;
         public byte maxPlayers;
         public bool open = true;
+        public List<string> players = new List<string>();
 
         public GameServerInfo(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
