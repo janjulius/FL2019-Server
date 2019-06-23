@@ -149,7 +149,6 @@ namespace FL_Game_Server
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
-
             }
         }
 
@@ -222,7 +221,7 @@ namespace FL_Game_Server
                     UWriter.Put(serverPort);
                     UWriter.Put(player.Value.playerInfo.playerName);
                     SendMaster(UWriter);
-                    
+
                     if (roomType == 0)
                     {
                         if (player.Value.playerInfo.isHost)
@@ -487,8 +486,8 @@ namespace FL_Game_Server
 
 
                         server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-                        
-                        
+
+
                         NetDataWriter UWriter = new NetDataWriter();
                         UWriter.Put((ushort) 7);
                         UWriter.Put(serverPort);
@@ -498,6 +497,7 @@ namespace FL_Game_Server
                             UWriter.Put(player.Value.playerInfo.playerPlace);
                             UWriter.Put(player.Value.playerInfo.playerName);
                         }
+
                         SendMaster(UWriter);
                     }
                 }
@@ -523,19 +523,26 @@ namespace FL_Game_Server
                     var target = dataReader.GetByte();
                     var rpcName = dataReader.GetString();
                     var rpcObjectId = dataReader.GetInt();
-                    if (NetworkObjects.ContainsKey(rpcObjectId))
-                        switch (target)
-                        {
-                            case 0:
-                                NetworkObjects[rpcObjectId].peer.Send(data, DeliveryMethod.ReliableUnordered);
-                                break;
-                            case 1:
-                                SendOthers(NetworkObjects[rpcObjectId].peer, data, DeliveryMethod.ReliableUnordered);
-                                break;
-                            case 2:
-                                server.SendToAll(data, DeliveryMethod.ReliableUnordered);
-                                break;
-                        }
+                    if (rpcObjectId != 0)
+                    {
+                        if (NetworkObjects.ContainsKey(rpcObjectId))
+                            switch (target)
+                            {
+                                case 0:
+                                    NetworkObjects[rpcObjectId].peer.Send(data, DeliveryMethod.ReliableUnordered);
+                                    break;
+                                case 1:
+                                    SendOthers(NetworkObjects[rpcObjectId].peer, data, DeliveryMethod.ReliableUnordered);
+                                    break;
+                                case 2:
+                                    server.SendToAll(data, DeliveryMethod.ReliableUnordered);
+                                    break;
+                            }
+                    }
+                    else
+                    {
+                        SendOthers(peer, data, DeliveryMethod.ReliableUnordered);
+                    }
                 }
                     break;
 
