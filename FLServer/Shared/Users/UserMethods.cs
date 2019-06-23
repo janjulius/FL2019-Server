@@ -167,10 +167,11 @@ namespace Shared.Users
             }
         }
 
-        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(User user)
+        public static ProfilePartInfo GetUserAsProfilePartInfoPacket(User u)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
+                User user = GetUserByUsername(u.Username);
                 FriendSlotPacket[] friends = GetFriendsAsPacket(user.Username);
                 NotificationPacket[] notifs = GetNotificationAsPackets(user);
                 ProfilePartInfo result = new ProfilePartInfo(user.Username, user.Balance, user.PremiumBalance
@@ -293,6 +294,17 @@ namespace Shared.Users
             return true;
         }
 
+        public static void SetElo(User user, int v)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                user.RankedElo = v;
+                user.Rank = Ranked.RankCalculator.GetNewRank(user.RankedElo, user.Rank);
+                ctx.Entry(user).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
         /// <summary>
         /// gets the user by name
         /// </summary>
@@ -392,10 +404,10 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(username);
-                ctx.Entry(u).State = EntityState.Modified;
                 Levels.ProgressCalculator calc = new Levels.ProgressCalculator();
                 u.Exp = exp;
                 u.Level = calc.GetLevelByExperience(u.Exp);
+                ctx.Entry(u).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
         }
@@ -429,7 +441,7 @@ namespace Shared.Users
             }
         }
 
-        public static ProfileAccountInfo GetProfileAccountInfoPacket(string id)
+        public static ProfileAccountInfo GetProfileAccountInfoPacket(string id, User sender)
         {
             using (FLDBContext ctx = new FLDBContext())
             {
@@ -445,7 +457,10 @@ namespace Shared.Users
                         u.LastOnline.ToOADate(),
                         String.Empty);
                 else
-                    return new ProfileAccountInfo("", 1, 0, 0, 0, "", DateTime.Now.ToOADate(), "Profile not found.");
+                {
+                    u = GetUserByUsername(sender.Username);
+                    return new ProfileAccountInfo(u.Username, u.Avatar, u.Level, u.Exp, u.RankedElo, u.Rank, u.LastOnline.ToOADate(), string.Empty);
+                }
             }
         }
 
@@ -562,18 +577,18 @@ namespace Shared.Users
             }
         }
 
-        public static void SetRankEloAndRankOfUserAfterMatch(string username, double currentELO, double opponentELO, bool win)
-        {
-            RankCalculator rc = new RankCalculator();
-            using (FLDBContext ctx = new FLDBContext())
-            {
-               User u = GetUserByUsername(username);
-               u.RankedElo = Convert.ToInt32(rc.GetNewELO(currentELO, opponentELO, win));
-               u.Rank = rc.GetCurrentAbsoluteRank(rc.newElo);
-               ctx.Entry(u).State = EntityState.Modified;
-               ctx.SaveChanges();
-            }
-        }
+        //public static void SetRankEloAndRankOfUserAfterMatch(string username, double currentELO, double opponentELO, bool win)
+        //{
+        //    RankCalculator rc = new RankCalculator();
+        //    using (FLDBContext ctx = new FLDBContext())
+        //    {
+        //       User u = GetUserByUsername(username);
+        //       u.RankedElo = Convert.ToInt32(rc.GetNewELO(currentELO, opponentELO, win));
+        //       u.Rank = rc.GetCurrentAbsoluteRank(rc.newElo);
+        //       ctx.Entry(u).State = EntityState.Modified;
+        //       ctx.SaveChanges();
+        //    }
+        //}
      
     }
 }

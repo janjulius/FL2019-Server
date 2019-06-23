@@ -1,4 +1,5 @@
 ﻿using FLServer.Models;
+using Shared.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,6 +56,23 @@ namespace Shared.General
                     ctx.Add(s);
                 }
                 ctx.SaveChanges();
+            }
+        }
+
+        public static void ResetAllVariables()
+        {
+            using (var ctx = new FLDBContext())
+            {
+                foreach (var player in ctx.User)
+                {
+                    UserMethods.SetExp(player.Username, 0);
+                    player.RankedElo = 1250;
+                    player.Rank = Ranked.RankCalculator.GetNewRank(1250, "");
+                    player.Balance = 0;
+                    player.PremiumBalance = 0;
+                    UserMethods.ResetOwnedCharacters(player);
+                    player.Avatar = 5;
+                }
             }
         }
     }

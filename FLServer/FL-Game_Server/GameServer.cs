@@ -26,6 +26,7 @@ namespace FL_Game_Server
         private GameState inGame = GameState.InLobby;
         private int playersLeftAlive = 0;
         private int playersLoadedLevel = 0;
+        private Messages msgs = new Messages(new Message[25]);
 
 
         private EventBasedNetListener listener;
@@ -60,6 +61,7 @@ namespace FL_Game_Server
                 listener = new EventBasedNetListener();
                 server = new NetManager(listener);
 
+                server.UnconnectedMessagesEnabled = true;
                 try
                 {
                     server.Start(serverPort);
@@ -75,6 +77,7 @@ namespace FL_Game_Server
                 listener.PeerDisconnectedEvent += PeerDisconnect;
                 listener.PeerConnectedEvent += PeerConnected;
                 listener.NetworkReceiveEvent += ReceivePackage;
+                listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage;
 
                 NetDataWriter UWriter = new NetDataWriter();
 
@@ -126,6 +129,28 @@ namespace FL_Game_Server
                 SendMaster(UWriter);
 
                 server.Stop();
+            }
+        }
+
+        private void ReceiveUnconnectedMessage(IPEndPoint remoteendpoint, NetPacketReader reader, UnconnectedMessageType messagetype)
+        {
+            ushort msgid = reader.GetUShort();
+
+            switch (msgid)
+            {
+                case 1:
+                {
+                    int playerId = reader.GetInt();
+                    int playerLevel = reader.GetInt();
+                    string playerRank = reader.GetString();
+                    Players[playerId].playerInfo.playerLevel = playerLevel;
+                    Players[playerId].playerInfo.playerRank = playerRank;
+                    NetDataWriter writer = new NetDataWriter();
+                    Players[playerId].SendNewPlayerUpdate(writer);
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
+                    break;
+
             }
         }
 
@@ -193,6 +218,12 @@ namespace FL_Game_Server
             {
                 if (player.Value.peer == peer)
                 {
+                    UWriter.Reset();
+                    UWriter.Put((ushort) 6);
+                    UWriter.Put(serverPort);
+                    UWriter.Put(player.Value.playerInfo.playerName);
+                    SendMaster(UWriter);
+                    
                     if (roomType == 0)
                     {
                         if (player.Value.playerInfo.isHost)
@@ -243,6 +274,14 @@ namespace FL_Game_Server
                     Players.Add(player.playerInfo.playerId, player);
                     player.SendNewPlayerData(writer);
                     SendOthers(peer, writer, DeliveryMethod.ReliableOrdered);
+
+
+                    NetDataWriter UWriter = new NetDataWriter();
+                    UWriter.Put((ushort) 5);
+                    UWriter.Put(serverPort);
+                    UWriter.Put(player.playerInfo.playerId);
+                    UWriter.Put(player.playerInfo.playerName);
+                    SendMaster(UWriter);
                 }
                     break;
                 case 4:
@@ -449,6 +488,18 @@ namespace FL_Game_Server
 
 
                         server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                        
+                        
+                        NetDataWriter UWriter = new NetDataWriter();
+                        UWriter.Put((ushort) 7);
+                        UWriter.Put(serverPort);
+                        UWriter.Put(Players.Count);
+                        foreach (var player in Players)
+                        {
+                            UWriter.Put(player.Value.playerInfo.playerPlace);
+                            UWriter.Put(player.Value.playerInfo.playerName);
+                        }
+                        SendMaster(UWriter);
                     }
                 }
                     break;
@@ -572,34 +623,30 @@ namespace FL_Game_Server
                 }
                     break;
 
-                case 504: //receive message from lobby
+                case 601: //receive message from lobby
                 {
                     byte[] byteMessage = dataReader.GetBytesWithLength();
                     Message message = byteMessage.ToStructure<Message>();
-                    int index = message.MessageText.IndexOf(':');
-                    User me = UserMethods.GetUserByUsername(message.MessageText.Substring(0, index));
-                    NetDataWriter ndWriter = new NetDataWriter();
+                    for (int i = 0; i < msgs.AllMessages.Length; i++)
+                     {
+                            if (msgs.AllMessages[i].MessageText != "")
+                            {
+                                msgs.AllMessages[i] = message;
+                                break;
+                            }
+                     }
 
-                    UserMethods.SaveMessageToDatabase(me.UserId, -1, message.MessageText, message.TimeStamp);
-                    ndWriter.Put((ushort) 307);
-                    ndWriter.PutPacketStruct(message);
-
-                    server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
+                    writer.Put((ushort) 307);
+                    writer.PutPacketStruct(message);
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
 
-                case 505: //get message history
+                case 602: //get message history
                 {
-                    Message sendMessage = dataReader.GetPacketStruct<Message>();
-                    int index = sendMessage.MessageText.IndexOf(':');
-                    User me = UserMethods.GetUserByUsername(sendMessage.MessageText.Substring(0, index));
-                    NetDataWriter ndWriter = new NetDataWriter();
-                    Messages msges = new Messages(UserMethods.GetLatestMessages(me, UserMethods.GetUserById(-1)));
-
-                    ndWriter.Put((ushort) 303);
-                    ndWriter.PutPacketStruct(msges);
-
-                    server.SendToAll(ndWriter, DeliveryMethod.ReliableOrdered);
+                    writer.Put((ushort) 303);
+                    writer.PutPacketStruct(msgs);
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
             }

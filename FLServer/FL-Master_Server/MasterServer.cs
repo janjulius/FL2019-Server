@@ -165,6 +165,59 @@ namespace FL_Master_Server
                     GameServers[serverPort].totalPlayers--;
                 }
                     break;
+                case 5:
+                {
+                    int serverPort = reader.GetInt();
+                    int playerId = reader.GetInt();
+                    string userName = reader.GetString();
+                    GameServers[serverPort].players.Add(userName);
+                    Console.WriteLine(userName + " player joined server " + serverPort);
+                    
+                    NetDataWriter UWriter = new NetDataWriter();
+                    UWriter.Put((ushort) 1);
+                    UWriter.Put(playerId);
+                    UWriter.Put(UserMethods.GetLevel(userName));
+                    UWriter.Put(UserMethods.GetRankOfUser(userName));
+                    SendGameServer(UWriter,serverPort);
+                }
+                    break;
+                case 6:
+                {
+                    int serverPort = reader.GetInt();
+                    string userName = reader.GetString();
+                    GameServers[serverPort].players.Remove(userName);
+                    Console.WriteLine(userName + " player left server " + serverPort);
+                }
+                    break;
+                case 7:
+                {
+                    int serverPort = reader.GetInt();
+                    int totalPlayers = reader.GetInt();
+                    for (int i = 0; i < totalPlayers; i++)
+                    {
+                        var place = reader.GetInt();
+                        var name = reader.GetString();
+                        Console.WriteLine("player " + name + " ended on " + place);
+                        UserMethods.AddExp(name,120/place);
+                        UserMethods.AddBalance(UserMethods.GetUserByUsername(name),200/place);
+                    }
+
+                    Console.WriteLine("a game has ended on " + serverPort);
+                    
+                }
+                    break;
+
+                case 500:
+                    {
+                        string username = reader.GetString();
+                        var retreivedUser = util.GetNetworkUserFromUsername(username);
+
+                        NetDataWriter writer = new NetDataWriter();
+                        writer.Put((ushort)1);
+                        writer.Put(retreivedUser == null ? false : true);
+                        SendLogin(writer);
+                    }
+                    break;
             }
         }
 
@@ -179,7 +232,6 @@ namespace FL_Master_Server
                     string id = dataReader.GetString();
                     string pwd = Security.GetHashString(dataReader.GetString());
                     Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})peer:{fromPeer}");
-                    var friends = UserMethods.GetFriendsAsPacket(id);
                     if (!UserAuth.VerifyPassword(id, pwd))
                     {
                         Console.WriteLine("Authetication failed disconnectin the user");
@@ -212,20 +264,11 @@ namespace FL_Master_Server
                 {
                     string id = dataReader.GetString();
                     NetDataWriter writer = new NetDataWriter();
-                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id);
+                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id, util.GetNetworkUserFromPeer(fromPeer).User);
 
-                    if (string.IsNullOrEmpty(pai.ErrorMessage))
-                    {
-                        writer.Put((ushort) 2005);
-                        writer.PutPacketStruct(pai);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                    }
-                    else
-                    {
-                        writer.Put((ushort) 2006);
-                        writer.PutPacketStruct(pai);
-                        fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
-                    }
+                    writer.Put((ushort) 2005);
+                    writer.PutPacketStruct(pai);
+                    fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                 }
                     break;
                 case 425: //Send character
@@ -353,7 +396,7 @@ namespace FL_Master_Server
                     }
                 }
                     break;
-                case 478:
+                case 478: //chat
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
@@ -364,6 +407,22 @@ namespace FL_Master_Server
                     writer.PutPacketStruct(msginfo);
                     fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                 }
+                    break;
+                case 479: //refreshing client packet
+                    {
+                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        //ProfilePartInfo packet = UserMethods.GetUserAsProfilePartInfoPacket(me.User);
+                        //NetDataWriter writer = new NetDataWriter();
+                        //writer.Put((ushort)479);
+                        //writer.PutBytesWithLength(packet.ToByteArray());
+                        //Console.WriteLine(writer.Data.Length);
+                        //fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
+                        ProfilePartInfo packet = UserMethods.GetUserAsProfilePartInfoPacket(me.User);
+                        //Console.WriteLine(packet.Exp);
+                        SendNetworkEvent(fromPeer, DeliveryMethod.ReliableOrdered, 3006, packet);
+
+
+                    }
                     break;
                 case 600:
                 {
@@ -504,8 +563,8 @@ namespace FL_Master_Server
         private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
             bool isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-            
-            
+
+
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                                 "\\GameServer\\FL_Game_Server.dll";
@@ -562,6 +621,14 @@ namespace FL_Master_Server
             }
         }
 
+        private void SendLogin(NetDataWriter writer)
+        {
+            IPAddress mServerAdress = IPAddress.Parse("127.0.0.1");
+            IPEndPoint mServer = new IPEndPoint(mServerAdress, 9050);
+            
+            server.SendUnconnectedMessage(writer, mServer);
+        }
+
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
             Console.WriteLine($"peer disconnected: {peer.EndPoint} user: {Instance.util.GetNetworkUserFromPeer(peer).User.Username}");
@@ -588,6 +655,15 @@ namespace FL_Master_Server
             NetworkUser user = util.GetNetworkUserFromPeer(target);
             if (user != null)
                 SendNetworkEvent(user, dm, msgid, packet);
+        }
+        
+        private void SendGameServer(NetDataWriter writer,int serverport)
+        {
+            IPAddress mServerAdress = IPAddress.Parse("127.0.0.1");
+            IPEndPoint mServer = new IPEndPoint(mServerAdress, serverport);
+
+
+            server.SendUnconnectedMessage(writer, mServer);
         }
     }
 }
