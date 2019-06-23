@@ -200,6 +200,7 @@ namespace FL_Master_Server
                         Console.WriteLine("player " + name + " ended on " + place);
                         UserMethods.AddExp(name,120/place);
                         UserMethods.AddBalance(UserMethods.GetUserByUsername(name),200/place);
+                        UserMethods.SetElo(UserMethods.GetUserByUsername(name), (int)Shared.Ranked.RankCalculator.GetNewELO(UserMethods.GetUserByUsername(name).RankedElo, 1250, place <= 2));
                     }
 
                     Console.WriteLine("a game has ended on " + serverPort);
