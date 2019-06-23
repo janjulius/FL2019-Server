@@ -206,6 +206,18 @@ namespace FL_Master_Server
                     
                 }
                     break;
+
+                case 500:
+                    {
+                        string username = reader.GetString();
+                        var retreivedUser = util.GetNetworkUserFromUsername(username);
+
+                        NetDataWriter writer = new NetDataWriter();
+                        writer.Put((ushort)1);
+                        writer.Put(retreivedUser == null ? false : true);
+                        SendLogin(writer);
+                    }
+                    break;
             }
         }
 
@@ -220,7 +232,6 @@ namespace FL_Master_Server
                     string id = dataReader.GetString();
                     string pwd = Security.GetHashString(dataReader.GetString());
                     Console.WriteLine($"Verifying user {id}({id.Length}):{pwd}({pwd.Length})peer:{fromPeer}");
-                    var friends = UserMethods.GetFriendsAsPacket(id);
                     if (!UserAuth.VerifyPassword(id, pwd))
                     {
                         Console.WriteLine("Authetication failed disconnectin the user");
@@ -601,6 +612,14 @@ namespace FL_Master_Server
                     Console.WriteLine("Could not start program " + ex);
                 }
             }
+        }
+
+        private void SendLogin(NetDataWriter writer)
+        {
+            IPAddress mServerAdress = IPAddress.Parse("127.0.0.1");
+            IPEndPoint mServer = new IPEndPoint(mServerAdress, 9050);
+            
+            server.SendUnconnectedMessage(writer, mServer);
         }
 
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)

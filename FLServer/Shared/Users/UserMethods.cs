@@ -293,6 +293,17 @@ namespace Shared.Users
             return true;
         }
 
+        public static void SetElo(User user, int v)
+        {
+            using (FLDBContext ctx = new FLDBContext())
+            {
+                user.RankedElo = v;
+                user.Rank = Ranked.RankCalculator.GetNewRank(user.RankedElo, user.Rank);
+                ctx.Entry(user).State = EntityState.Modified;
+                ctx.SaveChanges();
+            }
+        }
+
         /// <summary>
         /// gets the user by name
         /// </summary>
@@ -392,10 +403,10 @@ namespace Shared.Users
             using (FLDBContext ctx = new FLDBContext())
             {
                 User u = GetUserByUsername(username);
-                ctx.Entry(u).State = EntityState.Modified;
                 Levels.ProgressCalculator calc = new Levels.ProgressCalculator();
                 u.Exp = exp;
                 u.Level = calc.GetLevelByExperience(u.Exp);
+                ctx.Entry(u).State = EntityState.Modified;
                 ctx.SaveChanges();
             }
         }
