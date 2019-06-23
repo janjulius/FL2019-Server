@@ -27,8 +27,8 @@ namespace FLServer
             //    "The unpredictable faceless", 100, 100, 100, 100, 75, 100, 100, DateTime.Now, 9500, 1000, 2, 5);
             //Shared.Characters.Characters.CreateCharacter("Kaarl", "Lizarlops are a very rare species of immortal creatures that roam the steppes around the world. the lizarlops are cowardly creatures, they’d back off for anyone bigger than an insect. Luckily, they are also very fast, much like raptors they can reach a ridiculous speed in time of need and this comes in very handy every time they run away from yet another stranger. Kaarl is a lizarlops, a rather lonely one. One evening Kaarl was roaming the steppes and ran into a campfire with delicious spit - roasted chicken hanging above it.Kaarl was tempted by the delicious smell, as he hadn’t eaten anything other than a few worms for the past month.When he was about to push the chicken breast over and feast on it, he noticed a human sitting on a log close to the fire.Kaarl panicked, he shrieked out a loud “GREEFRGLARG”. But to Kaarl’s surprise, the human did nothing suspicious.He just sat there, making gestures trying to calm Kaarl down while letting out a comforting “Oooh, calm down boy”. Kaarl spent the rest of the night with this man and decided the man had no evil intentions. Years went by spent with this human fast, after so many years Kaarl finally felt safe, he finally wasn’t lonely anymore.Together they could defeat any foe, they could do anything as long as they were together as a team. Kaarl was betrayed.He was sold to Thwamp for a great sum of money, the human turned out to be a homeless man that was banned from the city for his many crimes.The years they spent together, the man was just trying to find a way back into the city so he could sell the creature and start a new life with the money he’d raise.",
             //    "The cowardly lizarlops", 80, 150, 75, 150, 50, 60, 120, DateTime.Now, 6500, 750,3 ,8);
-            
-            //Shared.Users.UserMethods.CreateNewUser("kiprok", "t");
+
+            //Shared.Users.UserMethods.CreateNewUser("bankerkoer", "kkr");
             //Shared.Users.UserMethods.CreateNewUser("jan julius", "t");
             //Shared.Users.UserMethods.CreateNewUser("wesket", "t");
             //Shared.Users.UserMethods.CreateNewUser("thomaz", "t");
@@ -67,6 +67,10 @@ namespace FLServer
             //Shared.Users.UserMethods.AddMatch(w, match);
             //
             //Shared.Users.UserMethods.GetMatches(j);
+            
+            //Console.WriteLine(Shared.Combat.Formulas.GetRegularDamage(100, 100, 0));
+
+            //Console.WriteLine(Shared.Combat.Formulas.CalculateKnockBackVelocity(100, 150, 11));
 
             LoginServer server = new LoginServer();
             server.Run();

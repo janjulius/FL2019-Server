@@ -21,6 +21,10 @@ namespace FLServer
         private EventBasedNetListener listener;
         private NetManager server;
 
+        string username;
+        string password;
+        NetPeer fromPeer;
+
         private bool running = true;
 
         public void Run()
@@ -39,6 +43,7 @@ namespace FLServer
 
             Console.WriteLine("Assigning NetManager with serverlistener");
             server = new NetManager(listener);
+            server.UnconnectedMessagesEnabled = true;
             Console.WriteLine("Attempting to run server");
             try { server.Start(Constants.Port); } catch (Exception e) { Console.WriteLine(e); }
             //if (!server.Start(Port))
@@ -62,6 +67,8 @@ namespace FLServer
                 writer.Put((ushort)2003);         //this means the server is online
                 peer.Send(writer, DeliveryMethod.ReliableOrdered);
             };
+
+            listener.NetworkReceiveUnconnectedEvent += ReceiveUnconnectedMessage; 
 
             listener.NetworkReceiveEvent += OnListenerOnNetworkReceiveEvent;
 
@@ -90,7 +97,46 @@ namespace FLServer
             }
         }
 
-        private void OnListenerOnNetworkReceiveEvent(NetPeer fromPeer, NetPacketReader dataReader,
+        private void ReceiveUnconnectedMessage(IPEndPoint remoteendpoint, NetPacketReader reader, UnconnectedMessageType messagetype)
+        {
+            ushort msgid = reader.GetUShort();
+
+            switch (msgid)
+            {
+                case 1:
+                    {
+                        bool alreadyLoggedIn = reader.GetBool();
+                        NetDataWriter response = new NetDataWriter();
+
+                        string a = Security.GetHashString(password);
+                        if (UserAuth.VerifyPassword(username, a))
+                        {
+                            if (UserMethods.GetUserByUsername(username).Rights < 0)
+                                response.Put((ushort)2007);
+                            else
+                            {
+                                if (!alreadyLoggedIn)
+                                {
+                                    response.Put((ushort)2002); //succesful login
+                                    User user = UserMethods.GetUserByUsername(username);
+                                    string t = user.UniqueIdentifier;
+                                    response.Put(t);
+                                    UserMethods.UpdateLastLogin(username);
+                                } else
+                                {
+                                    response.Put((ushort)2008);
+                                }
+                            }
+                            fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
+                            response.Reset();
+                        }
+                    }
+                    break;
+            }
+
+        }
+
+            private void OnListenerOnNetworkReceiveEvent(NetPeer fromPeer, NetPacketReader dataReader,
             DeliveryMethod deliveryMethod)
         {
             ushort msgid = dataReader.GetUShort();
@@ -100,37 +146,16 @@ namespace FLServer
             {
                 case 3:
                     {
-                        string u = dataReader.GetString();
-                        string p = dataReader.GetString();
-
-                        NetDataWriter response = new NetDataWriter();
-
-                        string a = Security.GetHashString(p);
-                        if (UserAuth.VerifyPassword(u, a))
-                        {
-                            if (UserMethods.GetUserByUsername(u).Rights < 0)
-                                response.Put((ushort)2007);
-                            else
-                            {
-                                response.Put((ushort)2002); //succesful login
-                                User user = UserMethods.GetUserByUsername(u);
-                                string t = user.UniqueIdentifier;
-                                response.Put(t);
-                                UserMethods.UpdateLastLogin(u);
-                            }
-                        }
-                        else
-                        {
-                            response.Put((ushort)2001); //bad credentials
-                        }
-
-
-                        fromPeer.Send(response, DeliveryMethod.ReliableOrdered);
-                        response.Reset();
+                        username = dataReader.GetString();
+                        password = dataReader.GetString();
+                        this.fromPeer = fromPeer;
+                        NetDataWriter writer = new NetDataWriter();
+                        writer.Put((ushort)500);
+                        writer.Put(username);
+                        SendMaster(writer);
                     }
                     break;
             }
-
             dataReader.Recycle();
         }
 
@@ -138,6 +163,15 @@ namespace FLServer
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
             Console.WriteLine($"peer disconnected: {peer.EndPoint}");
+        }
+
+        private void SendMaster(NetDataWriter writer)
+        {
+            IPAddress mServerAdress = IPAddress.Parse("127.0.0.1");
+            IPEndPoint mServer = new IPEndPoint(mServerAdress, 9052);
+
+
+            server.SendUnconnectedMessage(writer, mServer);
         }
     }
 }

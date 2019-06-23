@@ -18,7 +18,7 @@ namespace Shared.Combat
         internal const float VelocityMultiplier = 1;
         internal const float KnockBackPercentageDivider = 2.5f;
 
-        internal const float DamageMultiplier = 1;
+        internal const float DamageMultiplier = 1.5f;
 
         internal const int PercentageDecimals = 2;
 
@@ -50,7 +50,6 @@ namespace Shared.Combat
                 + VelocityMultiplier)
                 /
                 (dWeight / VelocityWeightDivider));
-
         }
 
         private static float regularDamageFormula(float aDmg, 
@@ -65,15 +64,11 @@ namespace Shared.Combat
         {
             return 
                 (float)Math.Round((flatDamage / 
-                ((percentage >= 26) ? 
-                percentage * (float)Math.Pow(BasePercentageMultiplier, percentage/ 100) : 
+                (//(percentage >= 26) ? 
+                //percentage * (float)Math.Pow(BasePercentageMultiplier, percentage/ 100) : 
                 22.5f) 
-                * 10), 
+                * 10) * DamageMultiplier, 
                 PercentageDecimals);
         }
-
-
-
-       
     }
 }

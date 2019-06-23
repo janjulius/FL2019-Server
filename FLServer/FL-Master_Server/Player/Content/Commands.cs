@@ -193,6 +193,13 @@ namespace FL_Master_Server.Player.Content
                 case "clearnotifs":
                     UserMethods.TruncateNotifications();
                     return true;
+                case "setexp":
+                    UserMethods.SetExp(user.Username, Convert.ToInt32(cmd[1]));
+                    return true;
+
+                case "setelo":
+                    UserMethods.SetElo(user, Convert.ToInt32(cmd[1]));
+                    return true;
             }
             return false;
         }
