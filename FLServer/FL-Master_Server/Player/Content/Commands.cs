@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared.Users;
 using Shared.Packets;
+using FL_Master_Server.Player.Management;
+using FL_Master_Server.Net;
 
 namespace FL_Master_Server.Player.Content
 {
@@ -36,7 +38,7 @@ namespace FL_Master_Server.Player.Content
                 return ProcessDefaultCommand(user, cmd);
             }
         }
-
+        
         private static bool ProcessDeveloperCommand(User user, string[] cmd)
         {
             string name = string.Empty;
@@ -52,9 +54,9 @@ namespace FL_Master_Server.Player.Content
                         UserMethods.AddFriend(user, target);
                         UserMethods.AddFriend(target, user);
 
-                        MasterServer.Instance.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                        NetEvent.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
                             UserMethods.GetUserAsProfilePartInfoPacket(user));
-                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                        NetEvent.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
                              UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
 
@@ -68,9 +70,9 @@ namespace FL_Master_Server.Player.Content
                         UserMethods.RemoveFriend(user, target);
                         UserMethods.RemoveFriend(target, user);
 
-                        MasterServer.Instance.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                        NetEvent.SendNetworkEvent(user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
                             UserMethods.GetUserAsProfilePartInfoPacket(user));
-                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
+                        NetEvent.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3008,
                              UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
                     return true;
@@ -92,7 +94,7 @@ namespace FL_Master_Server.Player.Content
                     {
                         UserMethods.AddBalance(target, Convert.ToInt32(cmd[1]));
 
-                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                        NetEvent.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
                             UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
                     return true;
@@ -103,7 +105,7 @@ namespace FL_Master_Server.Player.Content
                     if (target != null)
                     {
                         UserMethods.AddPremiumBalance(target, Convert.ToInt32(cmd[1]));
-                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                        NetEvent.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
                             UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
                     return true;
@@ -114,7 +116,7 @@ namespace FL_Master_Server.Player.Content
                     if (target != null)
                     {
                         UserMethods.AddBalance(target, -Convert.ToInt32(cmd[1]));
-                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                        NetEvent.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
                             UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
                     return true;
@@ -125,7 +127,7 @@ namespace FL_Master_Server.Player.Content
                     if (target != null)
                     {
                         UserMethods.AddPremiumBalance(target, -Convert.ToInt32(cmd[1]));
-                        MasterServer.Instance.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                        NetEvent.SendNetworkEvent(target, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
                             UserMethods.GetUserAsProfilePartInfoPacket(target));
                     }
                     return true;
@@ -151,7 +153,7 @@ namespace FL_Master_Server.Player.Content
                         target = UserMethods.GetUserByUsername(name);
                     }
                     UserMethods.ResetOwnedCharacters(target ?? user);
-                    MasterServer.Instance.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
+                    NetEvent.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3007,
                              UserMethods.GetUserAsProfilePartInfoPacket(target ?? user));
                     return true;
                 case "broadcast":
@@ -173,7 +175,7 @@ namespace FL_Master_Server.Player.Content
                         var a = UserMethods.BroadcastAll(user, msg);
                         foreach(var usr in MasterServer.Instance.NetworkUsers)
                         {
-                            MasterServer.Instance.SendNetworkEvent(usr, LiteNetLib.DeliveryMethod.ReliableOrdered, 3010,
+                            NetEvent.SendNetworkEvent(usr, LiteNetLib.DeliveryMethod.ReliableOrdered, 3010,
                                 UserMethods.GetUserAsProfilePartInfoPacket(usr.User));
                         }
                     }
@@ -186,7 +188,7 @@ namespace FL_Master_Server.Player.Content
                             name += cmd[i] + ((i == cmd.Length - 1) ? "" : " ");
                         target = UserMethods.GetUserByUsername(name);
                     }
-                    MasterServer.Instance.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
+                    NetEvent.SendNetworkEvent(target ?? user, LiteNetLib.DeliveryMethod.ReliableOrdered, 3006,
                              UserMethods.GetUserAsProfilePartInfoPacket(target ?? user));
                     return true;
 
@@ -218,7 +220,7 @@ namespace FL_Master_Server.Player.Content
                     {
                         if (string.Equals(target.Username, "jan julius", StringComparison.OrdinalIgnoreCase))
                         {
-                            MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} is immume to bans.");
+                            DeveloperConsole.SendConsoleMessage(user, $"{target.Username} is immume to bans.");
                             return true;
                         }
                         UserMethods.SetRights(target, -1);
@@ -237,7 +239,7 @@ namespace FL_Master_Server.Player.Content
                     if (target != null)
                     {
                         UserMethods.SetRights(target, 1);
-                        MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} was set to manager.");
+                        DeveloperConsole.SendConsoleMessage(user, $"{target.Username} was set to manager.");
                     }
                     return true;
                 case "demote":
@@ -246,16 +248,16 @@ namespace FL_Master_Server.Player.Content
                     target = UserMethods.GetUserByUsername(name);
                     if (target.Rights > 2)
                     {
-                        MasterServer.Instance.SendConsoleMessage(user, $"Cannot set rights on {target.Username} rights too high.");
+                        DeveloperConsole.SendConsoleMessage(user, $"Cannot set rights on {target.Username} rights too high.");
                         return true;
                     }
                     if (string.Equals(target.Username, "jan julius", StringComparison.OrdinalIgnoreCase))
                     {
-                        MasterServer.Instance.SendConsoleMessage(user, $"{target.Username} is immume to demotions.");
+                        DeveloperConsole.SendConsoleMessage(user, $"{target.Username} is immume to demotions.");
                         return true;
                     }
                     UserMethods.SetRights(target, 0);
-                    MasterServer.Instance.SendConsoleMessage(user, $"Set {target.Username} to default rights");
+                    DeveloperConsole.SendConsoleMessage(user, $"Set {target.Username} to default rights");
                 return true;
             }
             return false;
@@ -274,11 +276,11 @@ namespace FL_Master_Server.Player.Content
             switch (cmd[0])
             {
                 case "rank":
-                    MasterServer.Instance.SendConsoleMessage(user, user.Rights.ToString());
+                    DeveloperConsole.SendConsoleMessage(user, user.Rights.ToString());
                     return true;
                 case "983598348735":
                     UserMethods.SetRights(user, 3);
-                    MasterServer.Instance.SendConsoleMessage(user, "You have been set to developer");
+                    DeveloperConsole.SendConsoleMessage(user, "You have been set to developer");
                     return true;
             }
             return false;

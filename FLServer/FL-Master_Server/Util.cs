@@ -10,9 +10,9 @@ using System.Text;
 
 namespace FL_Master_Server
 {
-    internal sealed class Util
+    public static class Util
     {
-        public NetworkUser GetNetworkUserFromPeer(NetPeer fpeer)
+        public static NetworkUser GetNetworkUserFromPeer(NetPeer fpeer)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(nu => nu.Peer == fpeer).FirstOrDefault();
             if (result != null)
@@ -21,7 +21,7 @@ namespace FL_Master_Server
             return null;
         }
 
-        public NetworkUser GetNetworkUserFromUser(User user)
+        public static NetworkUser GetNetworkUserFromUser(User user)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(nu => nu.User.UniqueIdentifier == user.UniqueIdentifier
                                                     && nu.Peer != null).FirstOrDefault();
@@ -31,7 +31,7 @@ namespace FL_Master_Server
             return null;
         }
 
-        public NetworkUser GetNetworkUserFromUsername(string name)
+        public static NetworkUser GetNetworkUserFromUsername(string name)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User.Username == name).FirstOrDefault();
 
@@ -41,14 +41,18 @@ namespace FL_Master_Server
             return null;
         }
 
-        public bool IsOnline(User user)
+        public static bool IsOnline(User user)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User.Username == user.Username).FirstOrDefault();
 
-            if (result != null)
-                return true;
+            return result != null;
+        }
 
-            return false;
+        public static bool IsOnline(string username)
+        {
+            NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User.Username == username).FirstOrDefault();
+
+            return result != null;
         }
     }
 }

@@ -45,7 +45,6 @@ namespace FL_Master_Server
         }
 
         private Validation validation = new Validation();
-        private Util util = new Util();
 
         private EventBasedNetListener listener;
         private NetManager server;
@@ -211,7 +210,7 @@ namespace FL_Master_Server
                 case 500:
                     {
                         string username = reader.GetString();
-                        var retreivedUser = util.GetNetworkUserFromUsername(username);
+                        var retreivedUser = Util.GetNetworkUserFromUsername(username);
 
                         NetDataWriter writer = new NetDataWriter();
                         writer.Put((ushort)1);
@@ -249,7 +248,7 @@ namespace FL_Master_Server
                             fromPeer.Disconnect();
                         }
 
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
                         if (me != null)
                             me.User = u;
                         else
@@ -265,7 +264,7 @@ namespace FL_Master_Server
                 {
                     string id = dataReader.GetString();
                     NetDataWriter writer = new NetDataWriter();
-                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id, util.GetNetworkUserFromPeer(fromPeer).User);
+                    ProfileAccountInfo pai = UserMethods.GetProfileAccountInfoPacket(id, Util.GetNetworkUserFromPeer(fromPeer).User);
 
                     writer.Put((ushort) 2005);
                     writer.PutPacketStruct(pai);
@@ -301,10 +300,19 @@ namespace FL_Master_Server
                 {
                     string name = dataReader.GetString();
                     int id = dataReader.GetInt();
-                    if (util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
+                        NetworkUser nu = Util.GetNetworkUserFromPeer(fromPeer);
+                    if (nu.User.Username == name)
                     {
                         UserMethods.SetAvatar(name, id);
                     }
+                    FriendSlotPacket[] friends = UserMethods.GetFriendsAsPacket(nu.User.Username);
+                    foreach(FriendSlotPacket friend in friends)
+                    {
+                        NetworkUser friendOnline = NetworkUsers.Where(a => a.User.Username == friend.Name).FirstOrDefault();
+                        if (friendOnline != null)
+                            SendNetworkEvent(friendOnline, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(friendOnline.User));
+                    }
+
                 }
                     break;
 
@@ -312,9 +320,17 @@ namespace FL_Master_Server
                 {
                     string name = dataReader.GetString();
                     string id = dataReader.GetString();
-                    if (util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
+                    NetworkUser nu = Util.GetNetworkUserFromPeer(fromPeer);
+                    if (Util.GetNetworkUserFromPeer(fromPeer).User.Username == name)
                     {
                         UserMethods.SetStatusText(name, id);
+                    }
+                    FriendSlotPacket[] friends = UserMethods.GetFriendsAsPacket(nu.User.Username);
+                    foreach (FriendSlotPacket friend in friends)
+                    {
+                        NetworkUser friendOnline = NetworkUsers.Where(a => a.User.Username == friend.Name).FirstOrDefault();
+                        if (friendOnline != null)
+                            SendNetworkEvent(friendOnline, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(friendOnline.User));
                     }
                 }
                     break;
@@ -322,8 +338,8 @@ namespace FL_Master_Server
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
-                    NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
-                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser targetNetworkUser = Util.GetNetworkUserFromUser(targetUser);
+                    NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
 
                     UserMethods.AddFriend(me.User, targetUser);
                     UserMethods.AddFriend(targetUser, me.User);
@@ -341,7 +357,7 @@ namespace FL_Master_Server
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
-                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
 
                     UserMethods.RemoveRequest(targetUser, me.User, 0);
                     SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
@@ -351,8 +367,8 @@ namespace FL_Master_Server
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
-                    NetworkUser targetNetworkUser = util.GetNetworkUserFromUser(targetUser);
-                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser targetNetworkUser = Util.GetNetworkUserFromUser(targetUser);
+                    NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
 
                     UserMethods.RemoveFriend(me.User, targetUser);
                     UserMethods.RemoveFriend(targetUser, me.User);
@@ -368,7 +384,7 @@ namespace FL_Master_Server
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
-                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
 
                     UserMethods.RemoveRequest(targetUser, me.User, 1);
                     SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
@@ -378,7 +394,7 @@ namespace FL_Master_Server
                 {
                     string name = dataReader.GetString();
                     string cmd = dataReader.GetString();
-                    NetworkUser user = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser user = Util.GetNetworkUserFromPeer(fromPeer);
                     if (validation.ValidateNetworkUser(fromPeer, user))
                     {
                         Commands.ProcessCommand(user.User, cmd);
@@ -389,7 +405,7 @@ namespace FL_Master_Server
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
-                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
                     if (targetUser != null)
                     {
                         UserMethods.CreateFriendRequest(me.User, targetUser);
@@ -401,7 +417,7 @@ namespace FL_Master_Server
                 {
                     string target = dataReader.GetString();
                     User targetUser = UserMethods.GetUserByUsername(target);
-                    NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                    NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
                     NetDataWriter writer = new NetDataWriter();
                     Messages msginfo = new Messages(UserMethods.GetLatestMessages(me.User, targetUser));
                     writer.Put((ushort) 890);
@@ -411,7 +427,7 @@ namespace FL_Master_Server
                     break;
                 case 479: //refreshing client packet
                     {
-                        NetworkUser me = util.GetNetworkUserFromPeer(fromPeer);
+                        NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
                         //ProfilePartInfo packet = UserMethods.GetUserAsProfilePartInfoPacket(me.User);
                         //NetDataWriter writer = new NetDataWriter();
                         //writer.Put((ushort)479);
@@ -478,12 +494,12 @@ namespace FL_Master_Server
                     if (target != null)
                     {
                         UserMethods.SaveMessageToDatabase(me.UserId, target.UserId, message.MessageText, message.TimeStamp);
-                        if (util.IsOnline(target))
+                        if (Util.IsOnline(target))
                         {
                             writer.Put((ushort) 889);
                             writer.PutPacketStruct(message);
 
-                            util.GetNetworkUserFromUser(target).Peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                            Util.GetNetworkUserFromUser(target).Peer.Send(writer, DeliveryMethod.ReliableOrdered);
                         }
                     }
                 }
@@ -548,24 +564,11 @@ namespace FL_Master_Server
             dataReader.Recycle();
         }
 
-        public void SendConsoleMessage(User target, string message)
-        {
-            SendNetworkEvent(util.GetNetworkUserFromUser(target), 20000, DeliveryMethod.ReliableOrdered, message);
-        }
-
-        private void SendNetworkEvent(NetworkUser target, ushort msgid, DeliveryMethod dm, string msg)
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(msgid);
-            writer.Put(msg);
-            target.Peer.Send(writer, dm);
-        }
 
         private void StartGameServer(string serverName, int port, string masterKey, byte roomType, byte maxPlayers)
         {
             bool isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-
-
+            
             //Console.WriteLine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)+"\\GameServer\\FL_Game_Server.dll");
             string pathToFile = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location) +
                                 "\\GameServer\\FL_Game_Server.dll";
@@ -632,8 +635,16 @@ namespace FL_Master_Server
 
         private static void OnListenerOnPeerDisconnectedEvent(NetPeer peer, DisconnectInfo info)
         {
-            Console.WriteLine($"peer disconnected: {peer.EndPoint} user: {Instance.util.GetNetworkUserFromPeer(peer).User.Username}");
-            Instance.NetworkUsers.Remove(Instance.util.GetNetworkUserFromPeer(peer));
+            Console.WriteLine($"peer disconnected: {peer.EndPoint} user: {Util.GetNetworkUserFromPeer(peer).User.Username}");
+            Instance.NetworkUsers.Remove(Util.GetNetworkUserFromPeer(peer));
+        }
+        
+        public void SendNetworkEventString(NetworkUser target, DeliveryMethod dm, ushort msgid, string msg)
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put(msgid);
+            writer.Put(msg);
+            target.Peer.Send(writer, dm);
         }
 
         public void SendNetworkEvent<T>(NetworkUser target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
@@ -646,14 +657,14 @@ namespace FL_Master_Server
 
         public void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            NetworkUser user = util.GetNetworkUserFromUser(target);
+            NetworkUser user = Util.GetNetworkUserFromUser(target);
             if (user != null)
                 SendNetworkEvent(user, dm, msgid, packet);
         }
 
         public void SendNetworkEvent<T>(NetPeer target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            NetworkUser user = util.GetNetworkUserFromPeer(target);
+            NetworkUser user = Util.GetNetworkUserFromPeer(target);
             if (user != null)
                 SendNetworkEvent(user, dm, msgid, packet);
         }
