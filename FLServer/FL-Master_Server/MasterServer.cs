@@ -19,6 +19,7 @@ using System.Threading;
 using FLServer.Models;
 using FL_Master_Server.Player.Content;
 using Shared.Packets.UserState;
+using FL_Master_Server.Net;
 
 namespace FL_Master_Server
 {
@@ -310,7 +311,7 @@ namespace FL_Master_Server
                     {
                         NetworkUser friendOnline = NetworkUsers.Where(a => a.User.Username == friend.Name).FirstOrDefault();
                         if (friendOnline != null)
-                            SendNetworkEvent(friendOnline, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(friendOnline.User));
+                                NetEvent.SendNetworkEvent(friendOnline, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(friendOnline.User));
                     }
 
                 }
@@ -330,7 +331,7 @@ namespace FL_Master_Server
                     {
                         NetworkUser friendOnline = NetworkUsers.Where(a => a.User.Username == friend.Name).FirstOrDefault();
                         if (friendOnline != null)
-                            SendNetworkEvent(friendOnline, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(friendOnline.User));
+                                NetEvent.SendNetworkEvent(friendOnline, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(friendOnline.User));
                     }
                 }
                     break;
@@ -347,10 +348,10 @@ namespace FL_Master_Server
                     UserMethods.RemoveRequest(targetUser, me.User, 0);
                     if (targetNetworkUser != null)
                     {
-                        SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
+                        NetEvent.SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetNetworkUser.User));
                     }
 
-                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                        NetEvent.SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                 }
                     break;
                 case 473: //decling request / dismissing notification
@@ -360,7 +361,7 @@ namespace FL_Master_Server
                     NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
 
                     UserMethods.RemoveRequest(targetUser, me.User, 0);
-                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                        NetEvent.SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                 }
                     break;
                 case 474: //removing friend
@@ -374,10 +375,10 @@ namespace FL_Master_Server
                     UserMethods.RemoveFriend(targetUser, me.User);
                     if (targetNetworkUser != null)
                     {
-                        SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                            NetEvent.SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                     }
 
-                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                        NetEvent.SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3008, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                 }
                     break;
                 case 475: //remove request
@@ -387,7 +388,7 @@ namespace FL_Master_Server
                     NetworkUser me = Util.GetNetworkUserFromPeer(fromPeer);
 
                     UserMethods.RemoveRequest(targetUser, me.User, 1);
-                    SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
+                        NetEvent.SendNetworkEvent(me, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(me.User));
                 }
                     break;
                 case 476:
@@ -409,7 +410,7 @@ namespace FL_Master_Server
                     if (targetUser != null)
                     {
                         UserMethods.CreateFriendRequest(me.User, targetUser);
-                        SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetUser));
+                            NetEvent.SendNetworkEvent(targetUser, DeliveryMethod.ReliableOrdered, 3006, UserMethods.GetUserAsProfilePartInfoPacket(targetUser));
                     }
                 }
                     break;
@@ -436,7 +437,7 @@ namespace FL_Master_Server
                         //fromPeer.Send(writer, DeliveryMethod.ReliableOrdered);
                         ProfilePartInfo packet = UserMethods.GetUserAsProfilePartInfoPacket(me.User);
                         //Console.WriteLine(packet.Exp);
-                        SendNetworkEvent(fromPeer, DeliveryMethod.ReliableOrdered, 3006, packet);
+                        NetEvent.SendNetworkEvent(fromPeer, DeliveryMethod.ReliableOrdered, 3006, packet);
 
 
                     }
@@ -550,7 +551,7 @@ namespace FL_Master_Server
                             if (success)
                             {
                                 UserMethods.SetCharacterOwnedState(user, character.ReferenceId, true);
-                                SendNetworkEvent(user, DeliveryMethod.ReliableOrdered, 3007, UserMethods.GetUserAsProfilePartInfoPacket(user));
+                                    NetEvent.SendNetworkEvent(user, DeliveryMethod.ReliableOrdered, 3007, UserMethods.GetUserAsProfilePartInfoPacket(user));
                             }
                         }
                         else //refund check history 
@@ -639,35 +640,7 @@ namespace FL_Master_Server
             Instance.NetworkUsers.Remove(Util.GetNetworkUserFromPeer(peer));
         }
         
-        public void SendNetworkEventString(NetworkUser target, DeliveryMethod dm, ushort msgid, string msg)
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(msgid);
-            writer.Put(msg);
-            target.Peer.Send(writer, dm);
-        }
-
-        public void SendNetworkEvent<T>(NetworkUser target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
-        {
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put(msgid);
-            writer.PutPacketStruct(packet);
-            target.Peer.Send(writer, dm);
-        }
-
-        public void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
-        {
-            NetworkUser user = Util.GetNetworkUserFromUser(target);
-            if (user != null)
-                SendNetworkEvent(user, dm, msgid, packet);
-        }
-
-        public void SendNetworkEvent<T>(NetPeer target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
-        {
-            NetworkUser user = Util.GetNetworkUserFromPeer(target);
-            if (user != null)
-                SendNetworkEvent(user, dm, msgid, packet);
-        }
+        
         
         private void SendGameServer(NetDataWriter writer,int serverport)
         {
