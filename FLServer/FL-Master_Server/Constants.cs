@@ -15,7 +15,7 @@ namespace FL_Master_Server
         internal const string CantFindProfile = "User does not exist";
 
         internal const string ServerVersion = "0.2";
-        internal const bool InitializeDatabase = true;
+        internal const bool InitializeDatabase = false;
         internal const bool UpdateDatabase = false;
 
         internal const bool ValidateNetworkUsers = true;

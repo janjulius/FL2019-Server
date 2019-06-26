@@ -29,14 +29,14 @@ namespace FL_Master_Server.Net
 
         public static void SendNetworkEvent<T>(User target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            NetworkUser user = Util.GetNetworkUserFromUser(target);
+            NetworkUser user = Util.GetNetworkUser(target);
             if (user != null)
                 SendNetworkEvent(user, dm, msgid, packet);
         }
 
         public static void SendNetworkEvent<T>(NetPeer target, DeliveryMethod dm, ushort msgid, T packet) where T : struct
         {
-            NetworkUser user = Util.GetNetworkUserFromPeer(target);
+            NetworkUser user = Util.GetNetworkUser(target);
             if (user != null)
                 SendNetworkEvent(user, dm, msgid, packet);
         }

@@ -12,7 +12,7 @@ namespace FL_Master_Server
 {
     public static class Util
     {
-        public static NetworkUser GetNetworkUserFromPeer(NetPeer fpeer)
+        public static NetworkUser GetNetworkUser(NetPeer fpeer)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(nu => nu.Peer == fpeer).FirstOrDefault();
             if (result != null)
@@ -21,7 +21,7 @@ namespace FL_Master_Server
             return null;
         }
 
-        public static NetworkUser GetNetworkUserFromUser(User user)
+        public static NetworkUser GetNetworkUser(User user)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(nu => nu.User.UniqueIdentifier == user.UniqueIdentifier
                                                     && nu.Peer != null).FirstOrDefault();
@@ -31,7 +31,7 @@ namespace FL_Master_Server
             return null;
         }
 
-        public static NetworkUser GetNetworkUserFromUsername(string name)
+        public static NetworkUser GetNetworkUser(string name)
         {
             NetworkUser result = MasterServer.Instance.NetworkUsers.Where(usr => usr.User.Username == name).FirstOrDefault();
 

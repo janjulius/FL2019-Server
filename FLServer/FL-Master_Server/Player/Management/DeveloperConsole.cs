@@ -12,7 +12,7 @@ namespace FL_Master_Server.Player.Management
 
         public static void SendConsoleMessage(User target, string message)
         {
-            NetEvent.SendNetworkEventString(Util.GetNetworkUserFromUser(target), DeliveryMethod.ReliableOrdered, 20000, message);
+            NetEvent.SendNetworkEventString(Util.GetNetworkUser(target), DeliveryMethod.ReliableOrdered, 20000, message);
         }
     }
 }

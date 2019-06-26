@@ -339,10 +339,6 @@
     <Compile Include="Migrations\20190620094226_2019620_0.designer.cs">
       <DependentUpon>20190620094226_2019620_0.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20190624231408_methodtest.cs" />
-    <Compile Include="Migrations\20190624231408_methodtest.designer.cs">
-      <DependentUpon>20190624231408_methodtest.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\FLDBContextModelSnapshot.cs" />
     <Compile Include="Models\Ability.cs" />
     <Compile Include="Models\Character.cs" />
@@ -367,6 +363,8 @@
     <Compile Include="Models\UserMatch.cs" />
     <Compile Include="Packets\CharacterInformation.cs" />
     <Compile Include="Packets\CharacterInformationArray.cs" />
+    <Compile Include="Packets\Generics\ArrayMarshaler.cs" />
+    <Compile Include="Packets\Generics\ArrayPacket.cs" />
     <Compile Include="Packets\Packet.cs" />
     <Compile Include="Packets\ProfileAccountInfo.cs" />
     <Compile Include="Packets\ProfilePartInfo.cs" />
