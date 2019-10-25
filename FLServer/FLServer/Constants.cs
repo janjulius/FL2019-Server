@@ -10,7 +10,7 @@ namespace FLServer
         public const int MaxConnections = 1000;
         public const int Port = 9050;
 
-        public const bool UpdateVersion = true;
+        public const bool UpdateVersion = false;
         public const string ServerVersion = "0.2";
     }
 }

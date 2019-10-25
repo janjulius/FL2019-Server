@@ -58,7 +58,6 @@ namespace Shared.Characters
         {
             using (FLDBContext ctx = new FLDBContext())
             {
-                CharacterInformationArray cia = new CharacterInformationArray();
                 List<CharacterInformation> chars = new List<CharacterInformation>();
                 for(int i = 0; i < Constants.PacketConstants.CharacterCount; i++)
                 {
@@ -69,8 +68,7 @@ namespace Shared.Characters
                 {
                     chars[i] = CharacterToCharacterInformationPacket(realchars[i]);
                 }
-                cia.chars = chars.ToArray();
-                return cia;
+                return new CharacterInformationArray(chars.Count, chars.ToArray());
             }
         }
 
